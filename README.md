@@ -10,7 +10,7 @@ curl -fsSL https://bun.sh/install | bash
 ```
 Then, clone the repository and install the dependencies:
 ```bash
-git clone
+git clone git@github.com:brewcoua/e2e-agent.git
 cd e2e-agent
 bun install
 ```
