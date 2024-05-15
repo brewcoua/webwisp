@@ -1,27 +1,14 @@
-import { chromium, LaunchOptions } from 'playwright'
-
-const options = {
-    headless: false,
-    slowMo: 50,
-} satisfies LaunchOptions
+import { Agent } from './agent'
 
 async function init() {
-    const browser = await chromium.launch(options)
+    const agent = await Agent.getInstance();
 
-    const context = await browser.newContext()
-    const page = await context.newPage()
+    // Wait for terminal interaction before starting
+    console.log('Press any key to start');
+    process.stdin.setRawMode(true);
+    process.stdin.resume();
 
-    await page.goto('https://example.com')
-
-    await waitTill(5000)
-
-    await browser.close()
-}
-
-const waitTill = async (time: number) => {
-    return new Promise((resolve) => {
-        setTimeout(resolve, time)
-    })
+    await agent.run();
 }
 
 init()
