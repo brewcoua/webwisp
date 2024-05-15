@@ -22,7 +22,7 @@ export class BrowserHandler {
     }
 
     private static async _init(): Promise<[Browser, Page]> {
-        const config = await useConfig();
+        const config = useConfig();
 
         let browser;
         switch (config.browser.type) {

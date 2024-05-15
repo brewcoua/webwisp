@@ -1,7 +1,10 @@
 import { LaunchOptions } from 'playwright'
-import input from '@inquirer/input'
 
-const config: ConfigInput = {
+export function useConfig(): Readonly<Config> {
+    return Object.freeze(config);
+}
+
+const config: Config = {
     target: 'https://labri.brewen.dev',
     delay: 4000,
     models: {
@@ -63,10 +66,6 @@ type Config = {
     tasks?: Task[],
 }
 
-type ConfigInput = Omit<Config, 'target'> & {
-    target?: URL,
-}
-
 type Task = {
     objective: string,
     scenario: string[][],
@@ -77,27 +76,3 @@ type BrowserType = 'chromium' | 'firefox';
 
 type GPTModel = 'gpt-4o' | 'gpt-4-turbo' | 'gpt-4' | 'gpt-3.5-turbo';
 type GPTVisionModel = 'gpt-4o' | 'gpt-4-turbo';
-
-
-const prompts = {
-    target: {
-        message: 'Enter target URL',
-        validate: (input: string) => {
-            try {
-                new URL(input)
-                return true
-            } catch {
-                return 'Invalid URL'
-            }
-        },
-    },
-}
-
-export async function useConfig(): Promise<Config> {
-    if (!config.target) {
-        config.target = await input(prompts.target) as URL
-    }
-
-    return config as Config
-}
-

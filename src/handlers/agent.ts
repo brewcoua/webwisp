@@ -34,7 +34,7 @@ export class Agent {
     }
 
     async run() {
-        const config = await useConfig();
+        const config = useConfig();
 
         await this.browser.goto(config.target);
 

@@ -1,3 +1,5 @@
+import { AssistantCreateParams } from 'openai/resources/beta'
+
 export const PROMPTS = {
     scenarios2code: {
         system: "Say that you are a human browsing a website for a task, doing each action step by step." +
@@ -33,3 +35,95 @@ export const PROMPTS = {
         },
     }
 }
+
+export const ASSISTANT = {
+    model: "gpt-4o",
+    instructions: "You are a human browsing a website to perform a task, doing each action step by step." +
+        "At each step, you are given a screenshot of the website by the user, the full url, the previous actions, and the full list of steps, including the current one, marked by 2 pluses (++), before deciding the next action" +
+        "First of, you need to decide the next action to take relative to the current marked step and the actions you have done so far." +
+        "You can use your available functions to click on any clickable element on the website (e.g. buttons, links, input), based on the text of that element." +
+        "Unlike humans, you may directly type or select an option without focusing on the input field or dropdown." +
+        "Terminate the thread when you deem the task complete or that it may have any harmful effects.",
+    tools: [
+        {
+            type: "function",
+            function: {
+                name: "click",
+                description: "Click on an element on the website based on the text of that element.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        type: {
+                            type: "string",
+                            description: "The type of element to click on.",
+                            enum: ["button", "link", "input", "dropdown"]
+                        },
+                        element: {
+                            type: "string",
+                            description: "The name of the element to click on." +
+                                "This name must be unique relative to the type of element." +
+                                "If you aren't sure for a part of the name, you can indicate only a part of it as long as it is unique."
+                        }
+                    },
+                    required: ["type", "element"]
+                }
+            }
+        },
+        {
+            type: "function",
+            function: {
+                name: "type",
+                description: "Type text into an input field on the website.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        text: {
+                            type: "string",
+                            description: "The text to type into the input field."
+                        },
+                        element: {
+                            type: "string",
+                            description: "The name of the input field to type into."
+                        },
+                    },
+                    required: ["text", "element"]
+                }
+            }
+        },
+        {
+            type: "function",
+            function: {
+                name: "selectOption",
+                description: "Select an option from a dropdown on the website.",
+                parameters: {
+                    type: "object",
+                    properties: {
+                        option: {
+                            type: "string",
+                            description: "The option to select from the dropdown."
+                        },
+                        element: {
+                            type: "string",
+                            description: "The name of the dropdown to select from."
+                        }
+                    },
+                    required: ["option", "element"]
+                }
+            }
+        },
+        {
+            type: "function",
+            function: {
+                name: "press",
+                description: "Press the 'Enter' key on the website."
+            }
+        },
+        {
+            type: "function",
+            function: {
+                name: "terminate",
+                description: "Terminate the thread."
+            }
+        }
+    ]
+} satisfies AssistantCreateParams;

@@ -1,33 +1,31 @@
 import OpenAI from 'openai';
+import { Assistant, AssistantCreateParams } from 'openai/resources/beta'
 import * as env from 'env-var';
 
-const assistant = {
-    model: "gpt-4o",
-    instructions: "You are a human browsing a website to perform a task, doing each action step by step." +
-        "At each step, you are given a screenshot of the website by the user, the full url, the previous actions, and the full list of steps, including the current one, marked by 2 pluses (++), before deciding the next action" +
-        "First of, you need to decide the next action to take relative to the current marked step and the actions you have done so far." +
-        "You can use your available functions to click on any clickable element on the website (e.g. buttons, links, input), based on the text of that element." +
-        "Unlike humans, you may directly type or select an option without focusing on the input field or dropdown." +
-        "Terminate the thread when you deem the task complete or that it may have any harmful effects.",
-    tools: [
-        {
-            type: "function",
-            function: {
-                name: "click",
-                description: "Click on an element based on its text",
-
-            }
-        }
-    ]
-}
+import { ASSISTANT } from '../prompts'
 
 export class OpenAIHandler {
     private static instance: OpenAIHandler;
 
     private openai: OpenAI;
+    private assistant: any;
 
-    private constructor() {
-        this.openai = new OpenAI({
+    private constructor(openai: OpenAI, assistant: Assistant) {
+        this.openai = openai;
+        this.assistant = assistant;
+    }
+
+    public static async getInstance(): Promise<OpenAIHandler> {
+        if (!this.instance) {
+            const params = await this._init();
+            this.instance = new OpenAIHandler(...params);
+        }
+
+        return this.instance
+    }
+
+    private static async _init(): Promise<[OpenAI, Assistant]> {
+        const openai = new OpenAI({
             apiKey: env.get("OPENAI_API_KEY")
                 .required()
                 .asString(),
@@ -36,14 +34,11 @@ export class OpenAIHandler {
             project: env.get("OPENAI_PROJECT")
                 .asString(),
         });
-    }
 
-    public static getInstance(): OpenAIHandler {
-        if (!this.instance) {
-            this.instance = new OpenAIHandler();
-        }
 
-        return this.instance
+        const assistant = await openai.beta.assistants.create(ASSISTANT);
+
+        return [openai, assistant];
     }
 
     async test() {
