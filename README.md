@@ -1,5 +1,6 @@
 # `e2e-agent`
-This is a simple agent that can be used to generate end-to-end tests with playwright through the use of ChatGPT models such as `gpt-4o` or `gpt-3.5-turbo`.
+This is a simple agent, made during my internship at [LaBRI](https://www.labri.fr/), that can be used to generate
+end-to-end tests with playwright through the use of ChatGPT models such as `gpt-4o` or `gpt-3.5-turbo`.
 The resulting tests can easily be run with playwright to test the functionality of a website.
 
 ## Installation
