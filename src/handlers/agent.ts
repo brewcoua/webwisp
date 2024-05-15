@@ -1,5 +1,5 @@
 import { BrowserHandler } from './browser'
-import { useConfig } from './config'
+import { useConfig } from '../config'
 
 export class Agent {
     private static instance: Agent

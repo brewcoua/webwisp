@@ -1,5 +1,5 @@
 import { Page, Browser, chromium, firefox } from 'playwright'
-import { useConfig } from './config'
+import { useConfig } from '../config'
 
 export class BrowserHandler {
     private static instance: BrowserHandler;
