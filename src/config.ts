@@ -7,10 +7,6 @@ export function useConfig(): Readonly<Config> {
 const config: Config = {
     target: 'https://labri.brewen.dev',
     delay: 4000,
-    models: {
-        vision: 'gpt-4o',
-        text: 'gpt-3.5-turbo',
-    },
     browser: {
         type: 'chromium',
         options: {
@@ -18,8 +14,8 @@ const config: Config = {
             slowMo: 50,
         },
         viewport: {
-            width: 1920,
-            height: 1080,
+            width: 1280,
+            height: 720,
         },
     },
     tasks: [
@@ -45,12 +41,6 @@ type Config = {
     target: URL,
     // Delay in milliseconds between each action
     delay?: number,
-    models: {
-        // Model to use for image processing
-        vision: GPTVisionModel,
-        // Model to use for text processing and code generation
-        text: GPTModel,
-    },
     browser: {
         // Browser type to use (e.g. chromium, firefox)
         type: BrowserType,

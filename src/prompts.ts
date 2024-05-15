@@ -39,7 +39,7 @@ export const PROMPTS = {
 export const ASSISTANT = {
     model: "gpt-4o",
     instructions: "You are a human browsing a website to perform a task, doing each action step by step." +
-        "At each step, you are given a screenshot of the website by the user, the full url, the previous actions, and the full list of steps, including the current one, marked by 2 pluses (++), before deciding the next action" +
+        "At each step, you are given a screenshot of the website by the user, the full url, and the full list of steps, including the current one, marked by 2 pluses (++), before deciding the next action" +
         "First of, you need to decide the next action to take relative to the current marked step and the actions you have done so far." +
         "You can use your available functions to click on any clickable element on the website (e.g. buttons, links, input), based on the text of that element." +
         "Unlike humans, you may directly type or select an option without focusing on the input field or dropdown." +
@@ -127,3 +127,16 @@ export const ASSISTANT = {
         }
     ]
 } satisfies AssistantCreateParams;
+
+export const PROMPT = "The screenshot below displays the current state of the website. The full url is `%%URL%%`.\n" +
+    "The full list of steps is:\n" +
+    "```markdown\n" +
+    "%%STEPS%%\n" +
+    "```\n" +
+    "For your answer, you must do the following:\n" +
+    "1. Identify the current website state (e.g. what it is about, where you are, what you can do).\n" +
+    "2. Review what you did previously and the actions you have done so far, analyzing the current state of the website.\n" +
+    "3. Based on your analysis, decide the next action to take relative to the current marked step and the actions you have done so far.\n" +
+    "You must follow the rules below:\n" +
+    "- You should only issue a valid action based on the current state of the website.\n" +
+    "- You should only ever issue one action at a time, except for terminating the thread."
