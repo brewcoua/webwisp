@@ -1,0 +1,38 @@
+{
+  "name": "e2e-agent",
+  "version": "1.0.0",
+  "description": "Agent for generating end-to-end tests from a given URL",
+  "license": "(MIT OR Apache-2.0)",
+  "private": true,
+  "author": {
+    "name": "Brewen Couaran",
+    "email": "brewcoua@brewen.dev",
+    "url": "https://brewen.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:brewcoua/e2e-agent.git"
+  },
+  "homepage": "https://github.com/brewcoua/e2e-agent#readme",
+  "bugs": {
+    "url": "https://github.com/brewcoua/e2e-agent/issues",
+    "email": "contact@brewen.dev"
+  },
+  "engines": {
+    "node": ">=20.13.0",
+    "npm": ">=10.5.0"
+  },
+  "scripts": {
+    "start": "bun ./src/index.ts",
+    "build": "bun build ./src/index.ts --target=bun --outfile ./dist/e2e-agent.js --external=playwright --minify",
+    "format": "prettier --write ./src/**/*.ts"
+  },
+  "devDependencies": {
+    "prettier": "^3.2.5",
+    "typescript": "^5.4.5"
+  },
+  "dependencies": {
+    "openai": "^4.47.1",
+    "playwright": "^1.44.0"
+  }
+}
