@@ -1,12 +1,15 @@
 import { BrowserHandler } from './browser'
 import { useConfig } from '../config'
+import { OpenAIHandler } from './openai'
 
 export class Agent {
     private static instance: Agent
     private browser: BrowserHandler
+    private openai: OpenAIHandler
 
     private constructor(browser: BrowserHandler) {
         this.browser = browser
+        this.openai = OpenAIHandler.getInstance()
     }
 
     public static async getInstance(): Promise<Agent> {
