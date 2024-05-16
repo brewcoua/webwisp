@@ -60,9 +60,12 @@ export class PlaywrightService extends Service {
         await this.pages[pageIndex].goto(url);
     }
 
-    public async screenshot(pageIndex: number): Promise<string> {
-        const img = await this.pages[pageIndex].screenshot();
-        return `data:image/png;base64,${img.toString('base64')}`;
+    public async url(pageIndex: number): Promise<string> {
+        return this.pages[pageIndex].url();
+    }
+
+    public async screenshot(pageIndex: number, path: string): Promise<void> {
+        await this.pages[pageIndex].screenshot({ path });
     }
 
     public async resolve_element(pageIndex: number, role: ClickableElement, text: string): Promise<Option<Locator>> {

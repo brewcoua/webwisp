@@ -5,8 +5,8 @@ import { Logger } from 'pino'
 import * as env from 'env-var'
 
 import OpenAI from 'openai'
-import { Assistant, Thread } from 'openai/resources/beta'
-import { AssistantStream } from 'openai/lib/AssistantStream'
+import { Assistant, AssistantStream, Message, MessageCreateParams, MessagesPage, Thread } from '../domain/openai'
+import fs from 'node:fs'
 
 export type ToolOutput = {
     tool_call_id?: string
@@ -17,6 +17,7 @@ export class OpenAIService extends Service {
     private client!: OpenAI
     private assistant!: Assistant
     private threads: Thread[] = []
+    private files: string[] = []
 
     constructor(logger: Logger) {
         super(
@@ -44,8 +45,13 @@ export class OpenAIService extends Service {
         for (const thread of this.threads) {
             await this.client.beta.threads.del(thread.id)
         }
+        for (const file of this.files) {
+            await this.client.files.del(file)
+        }
         await this.client.beta.assistants.del(this.assistant.id)
     }
+
+    // Threads
 
     async make_thread(): Promise<Thread> {
         const thread = await this.client.beta.threads.create()
@@ -58,6 +64,33 @@ export class OpenAIService extends Service {
         await this.client.beta.threads.del(threadId)
         this.threads = this.threads.filter(thread => thread.id !== threadId)
     }
+
+    async add_message(threadId: string, message: MessageCreateParams): Promise<Message> {
+        return this.client.beta.threads.messages.create(threadId, message);
+    }
+
+    async list_messages(threadId: string): Promise<MessagesPage> {
+        return this.client.beta.threads.messages.list(threadId) as any;
+    }
+
+    // Files
+
+    async upload_file(threadId: string, path: string): Promise<string> {
+        const file = await this.client.files.create({
+            file: fs.createReadStream(path),
+            purpose: 'assistants',
+        });
+        this.files.push(file.id);
+
+        return file.id;
+    }
+
+    async delete_file(fileId: string): Promise<void> {
+        await this.client.files.del(fileId);
+        this.files = this.files.filter(file => file !== fileId);
+    }
+
+    // Runs
 
     async stream_run(threadId: string): Promise<AssistantStream> {
         return this.client.beta.threads.runs.stream(threadId, {

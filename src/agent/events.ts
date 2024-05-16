@@ -1,22 +1,33 @@
-import { OpenAIService, ToolOutput } from '../services/openai.service'
+import { OpenAIService } from '../services/openai.service'
 import { PlaywrightService } from '../services/playwright.service'
 
 import { EventEmitter } from 'node:events'
+import {
+    FunctionToolCallFunction,
+    RequiredActionFunctionToolCall,
+    Run,
+    RunStreamEvent,
+    ToolOutput,
+} from '../domain/openai'
 
-import { RunStreamEvent } from 'openai/resources/beta'
-import { Run, Runs } from 'openai/resources/beta/threads'
-import RequiredActionFunctionToolCall = Runs.RequiredActionFunctionToolCall
-
-export class EventHandler extends EventEmitter {
+export class RunStreamHandler extends EventEmitter {
     private readonly client: OpenAIService
     private readonly pw: PlaywrightService
     private readonly pageId: number
+
+    private _done = false
 
     constructor(client: OpenAIService, pw: PlaywrightService, pageId: number) {
         super()
         this.client = client
         this.pw = pw
         this.pageId = pageId
+
+        this.on('event', this.onEvent.bind(this))
+    }
+
+    public get done() {
+        return this._done
     }
 
     async onEvent(event: RunStreamEvent) {
@@ -24,6 +35,13 @@ export class EventHandler extends EventEmitter {
             switch (event.event) {
                 case 'thread.run.requires_action':
                     await this.handle_actions(event.data.thread_id, event.data.id, event.data)
+                    break
+                case 'thread.run.completed':
+                    this.client.debug({
+                        run: event.data,
+                    }, 'Run completed')
+                    this.emit('run.completed', event.data)
+                    this._done = true
                     break
             }
         } catch (error) {
@@ -46,7 +64,7 @@ export class EventHandler extends EventEmitter {
             const outputs: ToolOutput[] =
                 await Promise.all(
                     run.required_action.submit_tool_outputs.tool_calls
-                        .map((tool_call): Promise<ToolOutput> | ToolOutput => {
+                        .map((tool_call: RequiredActionFunctionToolCall): Promise<ToolOutput> | ToolOutput => {
                             switch (tool_call.function.name) {
                                 case 'click':
                                     return this.handle_click(tool_call.id, tool_call.function)
@@ -62,10 +80,10 @@ export class EventHandler extends EventEmitter {
                                         output: 'Unknown function called.',
                                     }
                             }
-                        })
+                        }),
                 )
 
-            await this.submit_outputs(threadId, runId, outputs);
+            await this.submit_outputs(threadId, runId, outputs)
         } catch (error) {
             this.client.error({
                 error: error,
@@ -76,7 +94,7 @@ export class EventHandler extends EventEmitter {
 
     async submit_outputs(threadId: string, runId: string, outputs: ToolOutput[]) {
         try {
-            const stream = await this.client.submit_tool_outputs(threadId, runId, outputs);
+            const stream = await this.client.submit_tool_outputs(threadId, runId, outputs)
 
             for await (const event of stream) {
                 this.emit('event', event)
@@ -87,21 +105,21 @@ export class EventHandler extends EventEmitter {
                 threadId: threadId,
                 runId: runId,
                 outputs: outputs,
-            }, 'Error submitting tool outputs');
+            }, 'Error submitting tool outputs')
         }
     }
 
-    async handle_click(id: string, func: RequiredActionFunctionToolCall.Function): Promise<ToolOutput> {
-        const args = JSON.parse(func.arguments);
+    async handle_click(id: string, func: FunctionToolCallFunction): Promise<ToolOutput> {
+        const args = JSON.parse(func.arguments)
 
         const element = await this.pw.resolve_element(
             this.pageId,
-            args.type,
+            args.role,
             args.element,
-        );
+        )
 
         if (element.isSome()) {
-            await element.unwrap().click();
+            await element.unwrap().click()
             this.client.debug({
                 tool_call_id: id,
                 arguments: args,
@@ -121,17 +139,17 @@ export class EventHandler extends EventEmitter {
         }
     }
 
-    async handle_input(id: string, func: RequiredActionFunctionToolCall.Function): Promise<ToolOutput> {
-        const args = JSON.parse(func.arguments);
+    async handle_input(id: string, func: FunctionToolCallFunction): Promise<ToolOutput> {
+        const args = JSON.parse(func.arguments)
 
         const element = await this.pw.resolve_element(
             this.pageId,
-            "input",
+            'input',
             args.element,
-        );
+        )
 
         if (element.isSome()) {
-            await element.unwrap().fill(args.text);
+            await element.unwrap().fill(args.text)
             this.client.debug({
                 tool_call_id: id,
                 arguments: args,

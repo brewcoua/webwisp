@@ -24,7 +24,7 @@
   },
   "scripts": {
     "start": "dotenvx run -- bun ./src/index.ts | pino-pretty",
-    "build": "bun build ./src/index.ts --target=bun --outfile ./dist/e2e-agent.js --external=playwright --minify",
+    "build": "bun build ./src/index.ts --target=bun --outfile ./dist/e2e-agent.js --external=playwright --external=openai --minify",
     "format": "prettier --write ./src/**/*.ts"
   },
   "devDependencies": {
@@ -34,7 +34,6 @@
   },
   "dependencies": {
     "@dotenvx/dotenvx": "^0.39.0",
-    "@inquirer/prompts": "^5.0.3",
     "env-var": "^7.4.2",
     "openai": "^4.47.1",
     "oxide.ts": "^1.1.0",

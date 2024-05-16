@@ -4,7 +4,7 @@ import { Service } from '../domain/service'
 
 import pino, { Logger } from 'pino'
 import { useConfig, usePrompts } from '../hooks'
-import { EventHandler } from './events'
+import { RunStreamHandler } from './events'
 
 export class Agent extends Service {
     private openai!: OpenAIService;
@@ -44,6 +44,10 @@ export class Agent extends Service {
         this.debug('Agent destroyed');
     }
 
+    async sleep(ms: number) {
+        return new Promise(resolve => setTimeout(resolve, ms));
+    }
+
     async run() {
         this.debug('Running agent');
 
@@ -51,6 +55,10 @@ export class Agent extends Service {
 
         const pageId = await this.pw.make_page(config.target);
         const thread = await this.openai.make_thread();
+
+        const seenMessages = new Set<string>();
+
+        const url = await this.pw.url(pageId);
 
         const steps = config.tasks?.at(0)?.scenario[0] as string[];
         let currentStep = 0;
@@ -68,13 +76,66 @@ export class Agent extends Service {
                         return `${i+1}. ${s}`;
                     }).join('\n')
                 )
+                .replace("%%URL%%", url);
 
-            const screenshot = await this.pw.screenshot(pageId);
+            const screenshotPath = `dist/run/${currentStep}.png`;
+            await this.pw.screenshot(pageId, screenshotPath);
 
-            const handler = new EventHandler(this.openai, this.pw, pageId);
+            const fileId = await this.openai.upload_file(thread.id, screenshotPath);
 
+            // Add message to thread
+            const message = await this.openai.add_message(thread.id, {
+                role: 'user',
+                content: [
+                    {
+                        type: 'text',
+                        text: prompt,
+                    },
+                    {
+                        type: 'image_file',
+                        image_file: {
+                            file_id: fileId,
+                            detail: 'low'
+                        }
+                    }
+                ]
+            })
+
+            this.debug(`Added message ${message.id}`);
+
+            // Launch run on thread
+            const handler = new RunStreamHandler(this.openai, this.pw, pageId);
+            const stream = await this.openai.stream_run(thread.id);
+            for await (const event of stream) {
+                handler.emit('event', event);
+            }
+
+            // Wait till run is done
+            await new Promise<void>((resolve) => {
+                const interval = setInterval(() => {
+                    if (handler.done) {
+                        clearInterval(interval);
+                        resolve();
+                    }
+                }, 1000);
+            });
+
+            this.info('Continuing to next step');
 
             currentStep++;
+
+            // Output messages in console
+            const messages = await this.openai.list_messages(thread.id);
+            for (const message of messages.data) {
+                if (!seenMessages.has(message.id)) {
+                    seenMessages.add(message.id);
+                    this.info(null, `[${message.role}] ${message.content.map((content) =>
+                        content.type === 'text' ? content.text.value : `[${content.type}]`
+                    ).join('\n')}`);
+                }
+            }
+
+            await this.sleep(5000);
         }
 
         await new Promise((resolve) => {

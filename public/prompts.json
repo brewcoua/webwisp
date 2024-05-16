@@ -2,7 +2,7 @@
   "assistant": {
     "model": "gpt-4o",
     "name": "e2e-agent",
-    "instructions": "You are a human browsing a website to perform a task, doing each action step by step.\nAt each step, you are given a screenshot of the website by the user, the full url, and the full list of steps, including the current one, marked by 2 pluses (++), before deciding the next action.\nFirst of, you need to decide the next action to take relative to the current marked step and the actions you have done so far.\nYou can use your available functions to click on any clickable element on the website (e.g. buttons, links, input), based on the text of that element.\nUnlike humans, you may directly type or select an option without focusing on the input field or dropdown.\nTerminate the thread when you deem the task complete or that it may have any harmful effects.",
+    "instructions": "You are a human browsing a website to perform a task, doing each action step by step.\nAt each step, you are given a screenshot of the website by the user, the full url, and the full list of steps, including the current one, marked by 2 pluses (++), before deciding the next action.\nFirst of, you need to decide the next action to take relative to the current marked step and the actions you have done so far.\nYou can use your available functions to click on any clickable element on the website (e.g. buttons, links, input), based on the text of that element.\nUnlike humans, you may directly type without focusing on the input field. However, you must first click on a dropdown before selecting an option.\nTerminate the thread when you deem the task complete or that it may have any harmful effects.",
     "tools": [
       {
         "type": "function",
@@ -12,14 +12,14 @@
           "parameters": {
             "type": "object",
             "properties": {
-              "type": {
+              "role": {
                 "type": "string",
-                "description": "The type of element to click on.",
+                "description": "The role of the element to click on. (as in playwright roles)",
                 "enum": [
                   "button",
                   "link",
                   "input",
-                  "dropdown"
+                  "select"
                 ]
               },
               "element": {
@@ -28,7 +28,7 @@
               }
             },
             "required": [
-              "type",
+              "role",
               "element"
             ]
           }
@@ -62,13 +62,13 @@
         "type": "function",
         "function": {
           "name": "selectOption",
-          "description": "Select an option from a dropdown on the website.",
+          "description": "Select an option from an opened dropdown on the website.",
           "parameters": {
             "type": "object",
             "properties": {
               "option": {
                 "type": "string",
-                "description": "The option to select from the dropdown."
+                "description": "The option to select from the dropdown. If you aren't sure for a part of the option, you can indicate only a part of it as long as it is unique."
               },
               "element": {
                 "type": "string",
