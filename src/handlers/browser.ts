@@ -1,5 +1,6 @@
 import { Page, Browser, chromium, firefox } from 'playwright'
 import { useConfig } from '../config'
+import * as fs from 'node:fs'
 
 export class BrowserHandler {
     private static instance: BrowserHandler;
@@ -46,8 +47,12 @@ export class BrowserHandler {
         await this.page.goto(url)
     }
 
-    async screenshot(): Promise<Buffer> {
-        return await this.page.screenshot()
+    async screenshot(): Promise<string> {
+        await this.page.screenshot({ path: 'dist/tmp/screenshot.png' })
+        const img = fs.readFileSync('dist/tmp/screenshot.png');
+        const base64 = Buffer.from(img).toString('base64');
+        fs.unlinkSync('dist/tmp/screenshot.png');
+        return `data:image/png;base64,${base64}`;
     }
 
     async close() {

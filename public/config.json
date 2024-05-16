@@ -1,0 +1,31 @@
+{
+  "target": "https://labri.brewen.dev",
+  "ratelimit": 1,
+  "browser": {
+    "type": "chromium",
+    "options": {
+      "headless": false,
+      "slowMo": 50
+    },
+    "viewport": {
+      "width": 1280,
+      "height": 720
+    }
+  },
+  "tasks": [
+    {
+      "objective": "Log in to the website with username \"robot\" and password \"12345678\"",
+      "scenario": [
+        [
+          "Click on the 'login' link",
+          "Focus on the 'username' input field",
+          "Type 'robot'",
+          "Focus on the 'password' input field",
+          "Type '12345678'",
+          "Click on the 'submit' button",
+          "Verify that the user is logged in"
+        ]
+      ]
+    }
+  ]
+}

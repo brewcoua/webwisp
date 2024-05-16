@@ -1,0 +1,116 @@
+{
+  "assistant": {
+    "model": "gpt-4o",
+    "name": "e2e-agent",
+    "instructions": "You are a human browsing a website to perform a task, doing each action step by step.\nAt each step, you are given a screenshot of the website by the user, the full url, and the full list of steps, including the current one, marked by 2 pluses (++), before deciding the next action.\nFirst of, you need to decide the next action to take relative to the current marked step and the actions you have done so far.\nYou can use your available functions to click on any clickable element on the website (e.g. buttons, links, input), based on the text of that element.\nUnlike humans, you may directly type or select an option without focusing on the input field or dropdown.\nTerminate the thread when you deem the task complete or that it may have any harmful effects.",
+    "tools": [
+      {
+        "type": "function",
+        "function": {
+          "name": "click",
+          "description": "Click on an element on the website based on the text of that element.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "description": "The type of element to click on.",
+                "enum": [
+                  "button",
+                  "link",
+                  "input",
+                  "dropdown"
+                ]
+              },
+              "element": {
+                "type": "string",
+                "description": "The name of the element to click on.\nThis name must be unique relative to the type of element.\nIf you aren't sure for a part of the name, you can indicate only a part of it as long as it is unique."
+              }
+            },
+            "required": [
+              "type",
+              "element"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "type",
+          "description": "Type text into an input field on the website.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "text": {
+                "type": "string",
+                "description": "The text to type into the input field."
+              },
+              "element": {
+                "type": "string",
+                "description": "The name of the input field to type into."
+              }
+            },
+            "required": [
+              "text",
+              "element"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "selectOption",
+          "description": "Select an option from a dropdown on the website.",
+          "parameters": {
+            "type": "object",
+            "properties": {
+              "option": {
+                "type": "string",
+                "description": "The option to select from the dropdown."
+              },
+              "element": {
+                "type": "string",
+                "description": "The name of the dropdown to select from."
+              }
+            },
+            "required": [
+              "option",
+              "element"
+            ]
+          }
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "press",
+          "description": "Press the 'Enter' key on the website."
+        }
+      },
+      {
+        "type": "function",
+        "function": {
+          "name": "terminate",
+          "description": "Terminate the thread."
+        }
+      }
+    ]
+  },
+  "user": [
+    "The screenshot below displays the current state of the website. The full url is `%%URL%%`.",
+    "The full list of steps is:",
+    "```markdown",
+    "%%STEPS%%",
+    "```",
+    "For your answer, you must do the following:",
+    "1. Identify the current website state (e.g. what it is about, where you are, what you can do).",
+    "2. Review what you did previously and the actions you have done so far, analyzing the current state of the website.",
+    "3. Based on your analysis, decide the next action to take relative to the current marked step and the actions you have done so far.",
+    "You must follow the rules below:",
+    "- You should only issue a valid action based on the current state of the website.",
+    "- You should only ever issue one action at a time, except for terminating the thread.",
+    "- Once you have completed the step, you can end the run."
+  ]
+}

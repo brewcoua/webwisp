@@ -53,7 +53,7 @@ export class OpenAIHandler {
         return this.client.beta.threads.del(threadId)
     }
 
-    async makeMessage(threadId: string, content: string, screenshot: Buffer | null = null) {
+    async makeMessage(threadId: string, content: string, screenshot: string | null = null) {
         const contents = [
             {
                 type: 'text',
@@ -66,7 +66,7 @@ export class OpenAIHandler {
                 type: 'image_url',
                 image_url: {
                     detail: 'low',
-                    url: `data:image/png;base64,${screenshot.toString('base64')}==`,
+                    url: 'https://i.ibb.co/Wk52ghd/Screenshot-2024-05-16-at-09-43-45-Hacker-News-Clone.png',
                 }
             })
         }

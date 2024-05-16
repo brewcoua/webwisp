@@ -1,8 +1,12 @@
-import { Agent } from './handlers/agent'
+import { Agent } from './agent'
 
 async function init() {
-    const agent = await Agent.getInstance();
+    const agent = new Agent();
+    await agent.initialize();
+
     await agent.run();
+
+    await agent.destroy();
 }
 
 init()

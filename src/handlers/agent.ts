@@ -2,6 +2,7 @@ import { BrowserHandler } from './browser'
 import { useConfig } from '../config'
 import { OpenAIHandler } from './openai'
 import { PROMPT, PROMPTS } from '../prompts'
+import * as util from 'node:util'
 
 export class Agent {
     private static instance: Agent
@@ -33,6 +34,12 @@ export class Agent {
         return new Promise((resolve) => {
             setTimeout(resolve, time)
         })
+    }
+
+    private async handleActions(threadId: string, )
+
+    private async turn(threadId: string, steps: string[], current: number) {
+
     }
 
     async run() {
@@ -68,12 +75,14 @@ export class Agent {
 
         const messages = await this.openai.getMessages(thread.id);
         messages.data.reverse().forEach((message) => {
-            const content = message.content.filter((content) => content.type === 'text')
-                .map((content) => (content as any).text).join("\n");
-            console.log(`[${message.created_at}| ${message.role}] ${content}`);
+            const contents = message.content.filter(
+                (content) => content.type === 'text'
+            );
+            console.log(`[${message.created_at} | ${message.role}] ${util.inspect(contents, false, null, true)}`);
         });
 
         if (run.status !== 'completed') {
+            console.log('Cancelling run...', run.id, run.status);
             await this.openai.cancelRun(thread.id, run.id);
         }
         await this.openai.deleteThread(thread.id);
