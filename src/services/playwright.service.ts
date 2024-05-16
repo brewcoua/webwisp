@@ -2,7 +2,7 @@ import { Service } from '../domain/service'
 import { useConfig } from '../hooks'
 
 import { Logger } from 'pino'
-import { Browser, chromium, firefox, Locator, Page } from 'playwright'
+import { Browser, chromium, ElementHandle, firefox, Locator, Page } from 'playwright'
 import { None, Option, Some } from 'oxide.ts'
 
 export type ClickableElement = 'button' | 'link' | 'input' | 'dropdown';
@@ -68,25 +68,53 @@ export class PlaywrightService extends Service {
         await this.pages[pageIndex].screenshot({ path });
     }
 
-    public async resolve_element(pageIndex: number, role: ClickableElement, text: string): Promise<Option<Locator>> {
+    public async resolve_element(pageIndex: number, role: ClickableElement, text: string): Promise<Option<ElementHandle>> {
         const page = this.pages[pageIndex];
         let element = null;
 
         switch (role) {
             case 'button':
-                element = page.getByRole('button', { name: text });
+                element = await page.getByRole('button', { name: text }).elementHandle();
                 break;
             case 'link':
-                element = page.getByRole('link', { name: text });
+                element = await page.getByRole('link', { name: text }).elementHandle();
                 break;
             case 'input':
-                element = page.getByRole('textbox', { name: text });
+                const ways = [
+                    () => page.getByPlaceholder(text).elementHandle(),
+                    () => page.getByLabel(text).elementHandle(),
+                    () => page.getByRole('textbox', { name: text }).elementHandle(),
+                    // Last attempt, try to find an element with the text and find the nearest text input by at most going to the parent and search for children
+                    async () => {
+                        const label = page.getByText(text)
+                        const handle = await label.elementHandle()
+                        if(!handle) return null
+
+                        const result = await handle.evaluateHandle((node) => {
+                            let input1 = node.querySelector('input')
+                            if(input1) return input1
+
+                            let parent = node.parentElement
+                            let input2 = parent?.querySelector('input')
+                            if(input2) return input2
+
+                            return null
+                        })
+
+                        return result.asElement()
+                    }
+                ]
+
+                for (const way of ways) {
+                    element = await way()
+                    if (element) break
+                }
                 break;
             case 'dropdown':
-                element = page.getByRole('combobox', { name: text });
+                element = await page.getByRole('combobox', { name: text }).elementHandle()
                 break;
         }
 
-        return element && (await element.count()) > 0 ? Some(element) : None;
+        return element ? Some(element) : None;
     }
 }
