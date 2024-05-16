@@ -1,6 +1,11 @@
 {
   "target": "https://labri.brewen.dev",
-  "ratelimit": 1,
+  "api": {
+    "ratelimit": 0.5,
+    "delay": 5000,
+    "max_prompt_tokens": 3000,
+    "max_completion_tokens": 1000
+  },
   "browser": {
     "type": "chromium",
     "options": {

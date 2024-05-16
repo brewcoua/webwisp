@@ -1,11 +1,11 @@
 import { Service } from '../domain/service'
-import { usePrompts } from '../hooks'
+import { useConfig, usePrompts } from '../hooks'
 
 import { Logger } from 'pino'
 import * as env from 'env-var'
 
 import OpenAI from 'openai'
-import { Assistant, AssistantStream, Message, MessageCreateParams, MessagesPage, Thread } from '../domain/openai'
+import { Assistant, AssistantStream, Message, MessageCreateParams, MessagesPage, Run, Thread } from '../domain/openai'
 import fs from 'node:fs'
 
 export type ToolOutput = {
@@ -97,8 +97,11 @@ export class OpenAIService extends Service {
     // Runs
 
     async stream_run(threadId: string): Promise<AssistantStream> {
+        const config = useConfig();
         return this.client.beta.threads.runs.stream(threadId, {
             assistant_id: this.assistant.id,
+            max_prompt_tokens: config.api.max_prompt_tokens,
+            max_completion_tokens: config.api.max_completion_tokens,
         })
     }
 
@@ -108,5 +111,9 @@ export class OpenAIService extends Service {
             runId,
             { tool_outputs: outputs },
         )
+    }
+
+    async retrieve_run(threadId: string, runId: string): Promise<Run> {
+        return this.client.beta.threads.runs.retrieve(threadId, runId)
     }
 }

@@ -15,7 +15,10 @@ export class RunStreamHandler extends EventEmitter {
     private readonly pw: PlaywrightService
     private readonly pageId: number
 
+    public runId!: string
+
     private _done = false
+    private _failed = false
 
     constructor(client: OpenAIService, pw: PlaywrightService, pageId: number) {
         super()
@@ -29,12 +32,27 @@ export class RunStreamHandler extends EventEmitter {
     public get done() {
         return this._done
     }
+    public get failed() {
+        return this._failed
+    }
 
     async onEvent(event: RunStreamEvent) {
         try {
+            this.runId = event.data.id
             switch (event.event) {
                 case 'thread.run.requires_action':
                     await this.handle_actions(event.data.thread_id, event.data.id, event.data)
+                    break
+                case 'thread.run.failed':
+                case 'thread.run.cancelled':
+                    this.client.error({
+                        run_id: event.data.id,
+                        error: event.data.last_error,
+                        incomplete_details: event.data.incomplete_details,
+                    }, 'Run failed')
+                    this.emit('failed', event.data)
+                    this._done = true
+                    this._failed = true
                     break
                 case 'thread.run.completed':
                     this.client.debug({

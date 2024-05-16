@@ -61,6 +61,12 @@ export class Agent extends Service {
 
         const url = await this.pw.url(pageId);
 
+        const globalUsage = {
+            prompt_tokens: 0,
+            completion_tokens: 0,
+            total_tokens: 0,
+        };
+
         const steps = config.tasks?.at(0)?.scenario[0] as string[];
         let currentStep = 0;
         while (currentStep < steps.length) {
@@ -120,6 +126,20 @@ export class Agent extends Service {
                 }, 1000);
             });
 
+            // Check run details
+            const run = await this.openai.retrieve_run(thread.id, handler.runId);
+            this.debug({
+                usage: run.usage,
+                status: run.status,
+            }, 'Run details');
+            globalUsage.prompt_tokens += run.usage?.prompt_tokens || 0;
+            globalUsage.completion_tokens += run.usage?.completion_tokens || 0;
+            globalUsage.total_tokens += run.usage?.total_tokens || 0;
+
+            if (handler.failed) {
+                break;
+            }
+
             currentStep++;
 
             // Output messages in console
@@ -136,13 +156,11 @@ export class Agent extends Service {
             // Delete user message (with image file) to avoid overwhelming context
             await this.openai.delete_message(thread.id, message.id);
 
-            await this.sleep(5000);
+            await this.sleep(config.api.delay);
         }
 
-        await new Promise((resolve) => {
-            setTimeout(resolve, 5000);
-        });
-
-        this.debug('Agent ran');
+        this.debug({
+            usage: globalUsage,
+        }, 'Global usage');
     }
 }

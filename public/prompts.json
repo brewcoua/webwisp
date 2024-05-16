@@ -108,9 +108,11 @@
     "1. Identify the current website state (e.g. what it is about, where you are, what you can do).",
     "2. Review what you did previously and the actions you have done so far, analyzing the current state of the website.",
     "3. Based on your analysis, decide the next action to take relative to the current marked step and the actions you have done so far.",
-    "You must follow the rules below:",
+    "You must absolutely follow the rules below:",
     "- You should only issue a valid action based on the current state of the website.",
-    "- You should only ever issue one action at a time, except for terminating the thread.",
-    "- Once you have completed the step, you can end the run."
+    "- You should only ever issue one action (or function) after my own message.",
+    "- You must always only ever generate one message after my own message, then complete the run if you are done issuing actions.",
+    "- Once you have completed the step, you can end the run.",
+    "- If after 3 repeated attempts, you are unable to issue a valid action, you may mark it as failed."
   ]
 }
