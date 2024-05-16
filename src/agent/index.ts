@@ -54,6 +54,7 @@ export class Agent extends Service {
         const config = useConfig();
 
         const pageId = await this.pw.make_page(config.target);
+
         const thread = await this.openai.make_thread();
 
         const seenMessages = new Set<string>();
@@ -64,7 +65,7 @@ export class Agent extends Service {
         let currentStep = 0;
         while (currentStep < steps.length) {
             const step = steps[currentStep];
-            this.debug(`Running step ${currentStep}: ${step}`);
+            this.info(`Step ${currentStep}: ${step}`);
 
             const prompt = usePrompts().user
                 .join('\n')
@@ -101,11 +102,10 @@ export class Agent extends Service {
                 ]
             })
 
-            this.debug(`Added message ${message.id}`);
-
             // Launch run on thread
             const handler = new RunStreamHandler(this.openai, this.pw, pageId);
             const stream = await this.openai.stream_run(thread.id);
+            this.debug('Stream run started');
             for await (const event of stream) {
                 handler.emit('event', event);
             }
@@ -120,13 +120,11 @@ export class Agent extends Service {
                 }, 1000);
             });
 
-            this.info('Continuing to next step');
-
             currentStep++;
 
             // Output messages in console
             const messages = await this.openai.list_messages(thread.id);
-            for (const message of messages.data) {
+            for (const message of messages.data.reverse()) {
                 if (!seenMessages.has(message.id)) {
                     seenMessages.add(message.id);
                     this.info(null, `[${message.role}] ${message.content.map((content) =>
@@ -134,6 +132,9 @@ export class Agent extends Service {
                     ).join('\n')}`);
                 }
             }
+
+            // Delete user message (with image file) to avoid overwhelming context
+            await this.openai.delete_message(thread.id, message.id);
 
             await this.sleep(5000);
         }

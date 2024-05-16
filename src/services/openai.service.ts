@@ -69,6 +69,10 @@ export class OpenAIService extends Service {
         return this.client.beta.threads.messages.create(threadId, message);
     }
 
+    async delete_message(threadId: string, messageId: string): Promise<void> {
+        await this.client.beta.threads.messages.del(threadId, messageId);
+    }
+
     async list_messages(threadId: string): Promise<MessagesPage> {
         return this.client.beta.threads.messages.list(threadId) as any;
     }
@@ -97,6 +101,7 @@ export class OpenAIService extends Service {
             assistant_id: this.assistant.id,
         })
     }
+
     async submit_tool_outputs(threadId: string, runId: string, outputs: ToolOutput[]): Promise<AssistantStream> {
         return this.client.beta.threads.runs.submitToolOutputsStream(
             threadId,

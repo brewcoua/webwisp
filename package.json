@@ -23,7 +23,7 @@
     "npm": ">=10.5.0"
   },
   "scripts": {
-    "start": "dotenvx run -- bun ./src/index.ts | pino-pretty",
+    "start": "dotenvx run -- bun ./src/index.ts | pino-pretty -i service",
     "build": "bun build ./src/index.ts --target=bun --outfile ./dist/e2e-agent.js --external=playwright --external=openai --minify",
     "format": "prettier --write ./src/**/*.ts"
   },

@@ -38,9 +38,9 @@ export class RunStreamHandler extends EventEmitter {
                     break
                 case 'thread.run.completed':
                     this.client.debug({
-                        run: event.data,
+                        run_id: event.data.id,
                     }, 'Run completed')
-                    this.emit('run.completed', event.data)
+                    this.emit('completed', event.data)
                     this._done = true
                     break
             }
