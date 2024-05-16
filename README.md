@@ -21,9 +21,11 @@ bun start
 ```
 
 ## Configuration
-The agent can be configured through environment variables and a configuration in `src/config.ts`.
+The agent can be configured through environment variables and a configuration in `public/config.json`.
 The following environment variables can be set:
-- `OPENAI_API_KEY`: The OpenAI API key to use for the agent. **Required**
+- `OPENAI_API_KEY`: The OpenAI API key to use for the agent. ***Required***
+- `OPENAI_ORG` : The OpenAI organization to use for the agent.
+- `OPENAI_PROJECT`: The OpenAI project to use for the agent.
 
 ## License
 This project is licensed under either of the following, at your option:
