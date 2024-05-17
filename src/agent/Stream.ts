@@ -1,7 +1,7 @@
 import { EventEmitter } from 'node:events'
 import OpenAI from 'openai'
 import { ClickableElement, PlaywrightService } from '../services/Playwright.service'
-import { match } from 'oxide.ts'
+import { match, None, Option, Some } from 'oxide.ts'
 
 export enum CompletionStreamEvent {
     Chunk = 'chunk',
@@ -20,13 +20,14 @@ export type CompletionStreamData = {
     reason: OpenAI.ChatCompletionChunk.Choice['finish_reason'],
     // The generated message
     message: string,
+    tool_calls: OpenAI.ChatCompletionChunk['tool_calls'],
     // The outputs of the tools called by the model
     tool_outputs: OpenAI.ChatCompletionMessageParam[],
     // The usage of the completion
     usage: OpenAI.CompletionUsage | null,
 }
 
-export class CompletionStreamHandler extends EventEmitter {
+export class CompletionStreamHandler {
     private message_buffer: string = ''
     private tool_call = {
         id: '',
@@ -35,11 +36,10 @@ export class CompletionStreamHandler extends EventEmitter {
     }
     private tool_outputs: OpenAI.ChatCompletionMessageParam[] = []
     private usage: OpenAI.CompletionUsage | null = null
-    private ongoing_events = 0
+
+    public result: CompletionStreamData | null = null
 
     constructor(private pw: PlaywrightService, private pageId: number) {
-        super()
-        this.on(CompletionStreamEvent.Chunk, this.onChunk)
     }
 
     /**
@@ -55,8 +55,6 @@ export class CompletionStreamHandler extends EventEmitter {
             this.pw.warn('No choices in completion chunk')
             return
         }
-
-        this.ongoing_events += 1
 
         const choice = chunk.choices[0]
         const delta = choice.delta
@@ -84,15 +82,16 @@ export class CompletionStreamHandler extends EventEmitter {
 
                     try {
                         const args = JSON.parse(this.tool_call.buffer)
+                        this.tool_call.buffer = ''
 
                         const tool = ToolMap[this.tool_call.name]
                         if (!tool) {
                             this.pw.error(`Tool '${this.tool_call.name}' not found`)
-                            return {
+                            return Some({
                                 tool_call_id: this.tool_call.id || '',
                                 role: 'tool',
                                 content: 'Tool not implemented, avoid calling it'
-                            }
+                            }) as Option<OpenAI.ChatCompletionMessageParam>
                         }
 
                         const result = await tool(args)
@@ -101,34 +100,37 @@ export class CompletionStreamHandler extends EventEmitter {
                             tool_call_id: this.tool_call.id,
                         }, `Called tool '${this.tool_call.name}' with result '${result}'`)
 
-                        return {
+                        return Some({
                             tool_call_id: this.tool_call.id || '',
                             role: 'tool',
                             content: result,
-                        }
-
+                        }) as Option<OpenAI.ChatCompletionMessageParam>
                     } catch (err) {
                         if (!(err instanceof SyntaxError)) {
                             this.pw.error(err, 'Error handling tool call');
                         }
                     }
-                })
-            )).filter(Boolean) as OpenAI.ChatCompletionMessageParam[]
 
-            this.tool_outputs.push(...outputs)
+                    return None as Option<OpenAI.ChatCompletionMessageParam>
+                })
+            ))
+                .filter((output: Option<OpenAI.ChatCompletionMessageParam>) => output.isSome())
+                .map((output: Option<OpenAI.ChatCompletionMessageParam>) => output.unwrap())
+
+            this.pw.debug(outputs, 'Tool outputs')
+
+            this.tool_outputs = this.tool_outputs.concat(outputs)
         }
 
         if (choice.finish_reason) {
-            this.pw.debug(`Completion stream finished with reason '${choice.finish_reason}'`)
-            this.emit(CompletionStreamEvent.Completed, {
+            this.result = {
                 reason: choice.finish_reason,
                 message: this.message_buffer,
                 tool_outputs: this.tool_outputs,
                 usage: this.usage,
-            } as CompletionStreamData)
+            };
+            this.pw.debug(this.result, `Completion stream finished with reason '${choice.finish_reason}'`)
         }
-
-        this.ongoing_events -= 1
     }
 
     // Functions for tool calls

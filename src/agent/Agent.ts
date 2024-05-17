@@ -118,19 +118,14 @@ export class Agent extends Service {
                 cycles++;
                 this.debug(`Stream completion started (${cycles}/${config.api.max_cycles})`)
 
-                const results: [CompletionStreamData, void] = await Promise.all([
-                    new Promise<CompletionStreamData>((resolve) => {
-                        handler.once(CompletionStreamEvent.Completed, resolve)
-                    }),
-                    new Promise<void>(async (resolve) => {
-                        for await (const chunk of stream) {
-                            handler.emit(CompletionStreamEvent.Chunk, chunk);
-                        }
-                        resolve();
-                    })
-                ])
+                for await (const chunk of stream) {
+                    await handler.onChunk(chunk);
+                }
 
-                const result = results[0]
+                const result = handler.result;
+                if (!result) {
+                    throw new Error('No result from stream');
+                }
                 this.debug({
                     result,
                 }, 'Result for stream')
