@@ -2,6 +2,13 @@ import OpenAI from 'openai'
 
 export type Beta = OpenAI.Beta
 
+// Completions
+export type ChatCompletionMessageParam = OpenAI.ChatCompletionMessageParam
+
+export type ChatCompletionTool = OpenAI.ChatCompletionTool
+
+export type ChatCompletionChunk = OpenAI.ChatCompletionChunk
+
 // Files
 export type FileObject = OpenAI.Files.FileObject
 

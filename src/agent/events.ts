@@ -1,5 +1,5 @@
-import { OpenAIService } from '../services/openai.service'
-import { PlaywrightService } from '../services/playwright.service'
+import { OpenAIService } from '../services/OpenAI.service'
+import { PlaywrightService } from '../services/Playwright.service'
 
 import { EventEmitter } from 'node:events'
 import {
@@ -8,7 +8,7 @@ import {
     Run,
     RunStreamEvent,
     ToolOutput,
-} from '../domain/openai'
+} from '../domain/OpenAI'
 
 export class RunStreamHandler extends EventEmitter {
     private readonly client: OpenAIService

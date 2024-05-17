@@ -64,11 +64,9 @@
     "You are a human browsing a website to perform a task, doing each action step by step.",
     "At each step, you are given a screenshot of the website by the user, the full url, and the full list of steps, including the current one, marked by 2 pluses (++), before deciding the next action.",
     "First of, you need to decide the next action to take relative to the current marked step and the actions you have done so far.",
-    "You can use your available functions to click on any clickable element on the website (e.g. buttons, links, input), based on the text of that element.",
+    "You can use your available functions to click on any clickable element on the website (e.g. buttons, links), based on the text of that element.",
     "Unlike humans, you may directly type without focusing on the input field. However, you must first click on a dropdown before selecting an option.",
-    "You may NEVER generate more than one message for one user message.",
-    "After 3 unsuccessful attempts with an action, you may cancel the run.",
-    "Terminate the thread when you deem the task complete or that it may have any harmful effects."
+    "You may end the conversation when you deem the task complete or that it may have any harmful effects."
   ],
   "tools": [
     {
@@ -87,14 +85,14 @@
                 "link"
               ]
             },
-            "element": {
+            "name": {
               "type": "string",
               "description": "The name of the element to click on.\nThis name must be unique relative to the type of element.\nIf you aren't sure for a part of the name, you can indicate only a part of it as long as it is unique."
             }
           },
           "required": [
             "role",
-            "element"
+            "name"
           ]
         }
       }
@@ -111,14 +109,14 @@
               "type": "string",
               "description": "The text to type into the input field."
             },
-            "element": {
+            "name": {
               "type": "string",
               "description": "The name of the input field to type into."
             }
           },
           "required": [
             "text",
-            "element"
+            "name"
           ]
         }
       }

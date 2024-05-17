@@ -1,10 +1,11 @@
 {
   "target": "https://labri.brewen.dev",
   "api": {
+    "model": "gpt-4o",
     "ratelimit": 0.5,
     "delay": 5000,
-    "max_prompt_tokens": 1500,
-    "max_completion_tokens": 300
+    "max_tokens": 2000,
+    "max_cycles": 5
   },
   "browser": {
     "type": "chromium",
