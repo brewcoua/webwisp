@@ -21,7 +21,7 @@ export function useConfig(): Readonly<Config> {
     return Object.freeze(CACHE.config.unwrap())
 }
 
-export function usePrompts(): Prompts {
+export function usePrompts(): Readonly<Prompts> {
     if (CACHE.prompts.isNone()) {
         const promptsStr = fs.readFileSync('public/prompts.json', 'utf-8')
         if (!promptsStr) {

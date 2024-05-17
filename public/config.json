@@ -3,8 +3,8 @@
   "api": {
     "ratelimit": 0.5,
     "delay": 5000,
-    "max_prompt_tokens": 3000,
-    "max_completion_tokens": 1000
+    "max_prompt_tokens": 1500,
+    "max_completion_tokens": 300
   },
   "browser": {
     "type": "chromium",
@@ -23,12 +23,9 @@
       "scenario": [
         [
           "Click on the 'login' link",
-          "Focus on the 'username' input field",
-          "Type 'robot'",
-          "Focus on the 'password' input field",
-          "Type '12345678'",
-          "Click on the 'submit' button",
-          "Verify that the user is logged in"
+          "Type 'robot' in the 'username' input field",
+          "Type '12345678' in the 'password' input field",
+          "Click on the 'submit' button"
         ]
       ]
     }

@@ -83,6 +83,9 @@ export class RunStreamHandler extends EventEmitter {
                 await Promise.all(
                     run.required_action.submit_tool_outputs.tool_calls
                         .map((tool_call: RequiredActionFunctionToolCall): Promise<ToolOutput> | ToolOutput => {
+                            this.client.debug({
+                                tool_call: tool_call,
+                            }, 'Handling tool call')
                             switch (tool_call.function.name) {
                                 case 'click':
                                     return this.handle_click(tool_call.id, tool_call.function)
