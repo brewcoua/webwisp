@@ -39,7 +39,8 @@
                   "enum": [
                     "button",
                     "link",
-                    "input"
+                    "textbox",
+                    "combobox"
                   ]
                 },
                 "name": {
@@ -65,7 +66,7 @@
                           "text",
                           "button",
                           "link",
-                          "input"
+                          "textbox"
                         ]
                       },
                       "name": {
