@@ -1,4 +1,3 @@
-import { EventEmitter } from 'node:events'
 import OpenAI from 'openai'
 import { ClickableElement, PlaywrightService } from '../services/Playwright.service'
 import { match, None, Option, Some } from 'oxide.ts'

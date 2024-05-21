@@ -9,7 +9,7 @@ export type ClickableElement = 'button' | 'link' | 'input' | 'dropdown';
 
 export class PlaywrightService extends Service {
     private browser!: Browser
-    private pages: Page[] = []
+    private pages: PageController[] = []
 
     constructor(logger: Logger) {
         super(
@@ -35,12 +35,12 @@ export class PlaywrightService extends Service {
 
     public async destroy(): Promise<void> {
         for (const page of this.pages) {
-            await page.close()
+            await page.destroy()
         }
         await this.browser.close()
     }
 
-    public async make_page(url?: string): Promise<number> {
+    public async make_page(url?: string): Promise<PageController> {
         const page = await this.browser.newPage()
         if (url) {
             await page.goto(url)
@@ -51,40 +51,37 @@ export class PlaywrightService extends Service {
             await page.setViewportSize(config.browser.viewport)
         }
 
-        this.pages.push(page)
+        const controller = new PageController(this, page)
+        this.pages.push(controller)
 
-        return this.pages.length - 1
+        return controller
+    }
+}
+
+export class PageController {
+    constructor(
+        private readonly pw: PlaywrightService,
+        private readonly page: Page,
+    ) { }
+
+    async destroy(): Promise<void> {
+        await this.page.close()
     }
 
-    public async goto(pageIndex: number, url: string) {
-        await this.pages[pageIndex].goto(url)
-    }
-
-    public async url(pageIndex: number): Promise<string> {
-        return this.pages[pageIndex].url()
-    }
-
-    public async screenshot(pageIndex: number): Promise<string> {
-        const buf = await this.pages[pageIndex].screenshot()
-        return `data:image/png;base64,${buf.toString('base64')}`
-    }
-
-    public async resolve_element(pageIndex: number, role: ClickableElement, text: string): Promise<Option<ElementHandle>> {
-        const page = this.pages[pageIndex]
+    private async resolve({ role, name }: { role: ClickableElement, name: string }): Promise<Option<ElementHandle>> {
         let element = null
 
         switch (role) {
             case 'button':
-                element = await page.getByRole('button', { name: text }).elementHandle()
+                element = await this.page.getByRole('button', { name }).elementHandle()
                 break
             case 'link':
-                element = await page.getByRole('link', { name: text }).elementHandle()
+                element = await this.page.getByRole('link', { name }).elementHandle()
                 break
             case 'input':
                 const ways = [
-                    () => page.getByPlaceholder(text).elementHandle(),
-                    () => page.getByLabel(text).elementHandle(),
-                    () => page.getByRole('textbox', { name: text }).elementHandle()
+                    () => this.page.getByLabel(name).elementHandle(),
+                    () => this.page.getByRole('textbox', { name }).elementHandle()
                 ]
 
                 for (const way of ways) {
@@ -93,10 +90,41 @@ export class PlaywrightService extends Service {
                 }
                 break
             case 'dropdown':
-                element = await page.getByRole('combobox', { name: text }).elementHandle()
+                element = await this.page.getByRole('combobox', { name }).elementHandle()
                 break
         }
 
         return element ? Some(element) : None
+    }
+
+    public async getUrl(): Promise<string> {
+        return this.page.url()
+    }
+    public async screenshot(): Promise<string> {
+        const buf = await this.page.screenshot()
+        return `data:image/png;base64,${buf.toString('base64')}`
+    }
+
+
+    public async click({ role, name }: { role: ClickableElement, name: string}): Promise<string> {
+        const element = await this.resolve({ role, name });
+
+        if (element.isNone()) {
+            return 'Could not find element'
+        } else {
+            await element.unwrap().click()
+            return 'Successfully clicked'
+        }
+    }
+
+    public async type({ text, name }: { text: string, name: string }): Promise<string> {
+        const element = await this.resolve({ role: 'input', name });
+
+        if (element.isNone()) {
+            return 'Could not find element'
+        } else {
+            await element.unwrap().fill(text)
+            return 'Successfully typed'
+        }
     }
 }

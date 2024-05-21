@@ -1,122 +1,62 @@
 {
-  "assistant": {
-    "model": "gpt-4o",
-    "name": "e2e-agent",
-    "instructions": "You are a human browsing a website to perform a task, doing each action step by step.\nAt each step, you are given a screenshot of the website by the user, the full url, and the full list of steps, including the current one, marked by 2 pluses (++), before deciding the next action.\nFirst of, you need to decide the next action to take relative to the current marked step and the actions you have done so far.\nYou can use your available functions to click on any clickable element on the website (e.g. buttons, links, input), based on the text of that element.\nUnlike humans, you may directly type without focusing on the input field. However, you must first click on a dropdown before selecting an option.\nYou may NEVER generate more than one message for one user message.\nAfter 3 unsuccessful attempts with an action, you may cancel the run.\nTerminate the thread when you deem the task complete or that it may have any harmful effects.",
-    "tools": [
-      {
-        "type": "function",
-        "function": {
-          "name": "click",
-          "description": "Click on an element on the website based on the text of that element.",
-          "parameters": {
-            "type": "object",
-            "properties": {
-              "role": {
-                "type": "string",
-                "description": "The role of the element to click on. (as in playwright roles)",
-                "enum": [
-                  "button",
-                  "link",
-                  "input",
-                  "select"
-                ]
-              },
-              "element": {
-                "type": "string",
-                "description": "The name of the element to click on.\nThis name must be unique relative to the type of element.\nIf you aren't sure for a part of the name, you can indicate only a part of it as long as it is unique."
-              }
-            },
-            "required": [
-              "role",
-              "element"
-            ]
-          }
-        }
-      },
-      {
-        "type": "function",
-        "function": {
-          "name": "type",
-          "description": "Type text into an input field on the website.",
-          "parameters": {
-            "type": "object",
-            "properties": {
-              "text": {
-                "type": "string",
-                "description": "The text to type into the input field."
-              },
-              "element": {
-                "type": "string",
-                "description": "The name of the input field to type into."
-              }
-            },
-            "required": [
-              "text",
-              "element"
-            ]
-          }
-        }
-      }
-    ]
-  },
   "system": [
     "You are a human browsing a website to perform a task, doing each action step by step.",
     "At each step, you are given a screenshot of the website by the user, the full url, and the full list of steps, including the current one, marked by 2 pluses (++), before deciding the next action.",
     "First of, you need to decide the next action to take relative to the current marked step and the actions you have done so far.",
     "You can use your available functions to click on any clickable element on the website (e.g. buttons, links), based on the text of that element.",
     "Unlike humans, you may directly type without focusing on the input field. However, you must first click on a dropdown before selecting an option.",
-    "You may end the conversation when you deem the task complete or that it may have any harmful effects."
+    "You can only try one action at a time, and you must wait for the user to respond before trying another action.",
+    "If the last message is the result of an action, you must wait for the user to respond before trying another action.",
+    "You can describe what you did after an action, in maximum 3 sentences, to help the user understand your reasoning."
   ],
   "tools": [
     {
       "type": "function",
       "function": {
-        "name": "click",
-        "description": "Click on an element on the website based on the text of that element.",
+        "name": "action",
+        "description": "Apply an action to the website. (Only one action per step / per user message)",
         "parameters": {
           "type": "object",
           "properties": {
-            "role": {
+            "type": {
               "type": "string",
-              "description": "The role of the element to click on. (as in playwright roles)",
+              "description": "The type of action to apply.",
               "enum": [
-                "button",
-                "link"
+                "click",
+                "type"
               ]
             },
-            "name": {
-              "type": "string",
-              "description": "The name of the element to click on.\nThis name must be unique relative to the type of element.\nIf you aren't sure for a part of the name, you can indicate only a part of it as long as it is unique."
-            }
-          },
-          "required": [
-            "role",
-            "name"
-          ]
-        }
-      }
-    },
-    {
-      "type": "function",
-      "function": {
-        "name": "type",
-        "description": "Type text into an input field on the website.",
-        "parameters": {
-          "type": "object",
-          "properties": {
-            "text": {
-              "type": "string",
-              "description": "The text to type into the input field."
+            "element": {
+              "type": "object",
+              "description": "The element to apply the action to, as detailed as possible.",
+              "properties": {
+                "role": {
+                  "type": "string",
+                  "description": "The role of the element to apply the action to. (as in playwright roles)",
+                  "enum": [
+                    "button",
+                    "link",
+                    "input"
+                  ]
+                },
+                "name": {
+                  "type": "string",
+                  "description": "The name of the element to apply the action to.\nThis name must be unique relative to the type of element.\nIf you aren't sure for a part of the name, you can indicate only a part of it as long as it is unique."
+                }
+              },
+              "required": [
+                "role",
+                "name"
+              ]
             },
-            "name": {
+            "value": {
               "type": "string",
-              "description": "The name of the input field to type into."
+              "description": "The value used in the action, if any. This is required for type actions."
             }
           },
           "required": [
-            "text",
-            "name"
+            "type",
+            "element"
           ]
         }
       }
@@ -135,8 +75,7 @@
     "You must absolutely follow the rules below:",
     "- You should only issue a valid action based on the current state of the website.",
     "- You should only ever issue one action (or function) after my own message.",
-    "- You must always only ever generate one message after my own message, then complete the run if you are done issuing actions.",
-    "- Once you have completed the step, you can end the run.",
-    "- If after 3 repeated attempts, you are unable to issue a valid action, you may mark it as failed."
+    "- You may only do one thing for each step.",
+    "- Never try to start another step in the same message as the previous one. You must wait for me to respond before starting a new step."
   ]
 }
