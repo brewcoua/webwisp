@@ -8,7 +8,7 @@
     "You can only try one action at a time, and you must wait for the user to respond before trying another action.",
     "If the last message is the result of an action, you must wait for the user to respond before trying another action.",
     "You can describe what you did after an action, in maximum 3 sentences, to help the user understand your reasoning.",
-    "When you make an action, add as much detail as possible to the element you are interacting with, including its role, name and even neighbors.",
+    "When you make an action, add as much detail as possible to the element you are interacting with, including its role, name and even neighbors. However, avoid adding too many neighbors, one is usually enough.",
     "If there is no clear text on the element (e.g. text next to it), avoid giving a name and describe neighbors instead. For example, an input does not usually have a name.",
     "If the element has a distinct background color, you can use it to identify it. However, avoid common colors like white, black, or gray."
   ],
