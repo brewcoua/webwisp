@@ -33,8 +33,10 @@
     "typescript": "^5.4.5"
   },
   "dependencies": {
+    "@andreekeberg/imagedata": "^1.0.2",
     "@dotenvx/dotenvx": "^0.39.0",
     "env-var": "^7.4.2",
+    "extract-colors": "^4.0.6",
     "openai": "^4.47.1",
     "oxide.ts": "^1.1.0",
     "pino": "^9.1.0",

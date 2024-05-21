@@ -1,11 +1,36 @@
 {
   "target": "https://labri.brewen.dev",
+  "finetuning": {
+    "hue_distance": 0.1,
+    "saturation_distance": 0.2,
+    "lightness_distance": 0.2,
+    "max_neighbor_radius": 200,
+    "angle_distance": 2,
+    "selectors": {
+      "button": [
+        "button",
+        "input[type='submit']"
+      ],
+      "textbox": [
+        "input[type='text']",
+        "input[type='password']",
+        "input[type='email']",
+        "textarea"
+      ],
+      "link": [
+        "a"
+      ],
+      "combobox": [
+        "select"
+      ]
+    }
+  },
   "api": {
     "model": "gpt-4o",
     "ratelimit": 0.5,
     "delay": 5000,
     "max_tokens": 2000,
-    "max_cycles": 3
+    "max_cycles": 1
   },
   "browser": {
     "type": "chromium",
@@ -24,8 +49,8 @@
       "scenario": [
         [
           "Click on the 'login' link",
-          "Type 'robot' in the 'username' input field",
-          "Type '12345678' in the 'password' input field",
+          "Type 'robot' in the input field next to 'username'",
+          "Type '12345678' in the input field next to 'password'",
           "Click on the 'submit' button"
         ]
       ]

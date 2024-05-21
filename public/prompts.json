@@ -7,7 +7,10 @@
     "Unlike humans, you may directly type without focusing on the input field. However, you must first click on a dropdown before selecting an option.",
     "You can only try one action at a time, and you must wait for the user to respond before trying another action.",
     "If the last message is the result of an action, you must wait for the user to respond before trying another action.",
-    "You can describe what you did after an action, in maximum 3 sentences, to help the user understand your reasoning."
+    "You can describe what you did after an action, in maximum 3 sentences, to help the user understand your reasoning.",
+    "When you make an action, add as much detail as possible to the element you are interacting with, including its role, name and even neighbors.",
+    "If there is no clear text on the element (e.g. text next to it), avoid giving a name and describe neighbors instead. For example, an input does not usually have a name.",
+    "If the element has a distinct background color, you can use it to identify it. However, avoid common colors like white, black, or gray."
   ],
   "tools": [
     {
@@ -28,7 +31,7 @@
             },
             "element": {
               "type": "object",
-              "description": "The element to apply the action to, as detailed as possible.",
+              "description": "The element to apply the action to, as detailed as possible.\nEvery field should be filled in as much as possible.",
               "properties": {
                 "role": {
                   "type": "string",
@@ -41,12 +44,63 @@
                 },
                 "name": {
                   "type": "string",
-                  "description": "The name of the element to apply the action to.\nThis name must be unique relative to the type of element.\nIf you aren't sure for a part of the name, you can indicate only a part of it as long as it is unique."
+                  "description": "The name of the element to apply the action to.\nThis name must be unique relative to the type of element.\nIf you aren't sure for a part of the name, you can indicate only a part of it as long as it is unique.\nIf there is no clear name on the element, leave it empty."
+                },
+                "background_color": {
+                  "type": "string",
+                  "description": "The background color of the element to apply the action to.\nThis is a hexadecimal color code.",
+                  "pattern": "^#[A-Fa-f0-9]{6}$"
+                },
+                "neighbors": {
+                  "type": "array",
+                  "description": "The neighbors of the element to apply the action to, as detailed as possible.\nThey must be in the order of closeness to the element.",
+                  "maxItems": 3,
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "role": {
+                        "type": "string",
+                        "description": "The role of the neighbor element. (as in playwright roles)",
+                        "enum": [
+                          "text",
+                          "button",
+                          "link",
+                          "input"
+                        ]
+                      },
+                      "name": {
+                        "type": "string",
+                        "description": "The name of the neighbor element.\nThis name must be unique relative to the type of element.\nIf you aren't sure for a part of the name, you can indicate only a part of it as long as it is unique."
+                      },
+                      "background_color": {
+                        "type": "string",
+                        "description": "The background color of the neighbor element.\nThis is a hexadecimal color code.",
+                        "pattern": "^#[A-Fa-f0-9]{6}$"
+                      },
+                      "direction": {
+                        "type": "string",
+                        "description": "The direction of the neighbor element relative to the element.\nThis is a cardinal direction.",
+                        "enum": [
+                          "north",
+                          "north-east",
+                          "north-west",
+                          "east",
+                          "south",
+                          "south-east",
+                          "south-west",
+                          "west"
+                        ]
+                      }
+                    }
+                  },
+                  "required": [
+                    "role",
+                    "direction"
+                  ]
                 }
               },
               "required": [
-                "role",
-                "name"
+                "role"
               ]
             },
             "value": {

@@ -1,18 +1,16 @@
 import { Agent } from './Agent'
-import { PageController } from '../services/Playwright.service'
+import { ElementPointer, PageController } from '../services/Playwright.service'
 import { OpenAIService } from '../services/OpenAI.service'
 import { PromptsTransformer } from '../transformers/Prompts.transformer'
 import { useConfig, usePrompts } from '../hooks'
 
 import { Logger } from 'pino'
 import OpenAI from 'openai'
+import { Err, Ok, Result } from 'oxide.ts'
 
 type Action = {
     type: 'click' | 'type',
-    element: {
-        role: 'button' | 'link' | 'input'
-        name: string
-    },
+    element: ElementPointer,
     value?: string
 }
 
@@ -27,15 +25,20 @@ export class Runner {
     ) {
     }
 
-    async handleAction(action: Action) {
+    async handleAction(action: Action): Promise<Result<string, string>> {
+        const element = await this.page.resolve(action.element);
+        if (element.isNone()) {
+            return Err('Element not found with pointer:\n' + JSON.stringify(action.element, null, 2))
+        }
+        
+        
         switch (action.type) {
             case 'click':
-                return this.page.click(action.element)
+                await element.unwrap().click();
+                return Ok('Clicked')
             case 'type':
-                return this.page.type({
-                    text: action.value || '',
-                    name: action.element.name,
-                })
+                await element.unwrap().fill(action.value || '');
+                return Ok('Typed')
         }
     }
 
@@ -102,9 +105,9 @@ export class Runner {
                 const result = await this.openai.completion(messages, usePrompts().tools, 'required')
                 cycles++;
 
-                this.logger.debug(result, 'Result for cycle');
-
                 const choice = result.choices[0]
+
+                this.logger.debug(result.usage, 'Cycle finished: ' + choice.finish_reason)
 
                 messages.push(choice.message);
 
@@ -123,10 +126,11 @@ export class Runner {
                     for (const tool_call of choice.message.tool_calls) {
                         const action: Action = JSON.parse(tool_call.function.arguments)
                         const output = await this.handleAction(action);
+
                         messages.push({
                             tool_call_id: tool_call.id,
                             role: 'tool',
-                            content: output,
+                            content: output.expect('Failed to handle action:\n- ' + output.unwrapUnchecked()),
                         })
                     }
                 } else {
