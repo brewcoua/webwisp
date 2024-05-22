@@ -169,25 +169,26 @@ export class PageController {
                 return false
             }
 
-            // Check if direction is right
+            // Check if direction is right (the direction is the one from the pointer to the neighbor)
+            // Namely, we want to find the element for which the handle is the neighbor and in the given direction
             const angle = Math.atan2(box.y - neighBox.y, box.x - neighBox.x)
             const isDirection = () => {
                 switch (direction) {
-                    case Direction.North:
-                        return angle < Math.PI / 2 && angle > -Math.PI / 2
-                    case Direction.NorthEast:
-                        return angle < 0 && angle > -Math.PI / 2
-                    case Direction.NorthWest:
-                        return angle < Math.PI / 2 && angle > 0
-                    case Direction.East:
-                        return angle < Math.PI / 2 && angle > -Math.PI / 2
                     case Direction.South:
-                        return angle > Math.PI / 2 || angle < -Math.PI / 2
-                    case Direction.SouthEast:
-                        return angle > 0 && angle < Math.PI / 2
+                        return angle < Math.PI / 2 && angle > -Math.PI / 2
                     case Direction.SouthWest:
-                        return angle > -Math.PI / 2 && angle < 0
+                        return angle < 0 && angle > -Math.PI / 2
+                    case Direction.SouthEast:
+                        return angle < Math.PI / 2 && angle > 0
                     case Direction.West:
+                        return angle < Math.PI / 2 && angle > -Math.PI / 2
+                    case Direction.North:
+                        return angle > Math.PI / 2 || angle < -Math.PI / 2
+                    case Direction.NorthWest:
+                        return angle > 0 && angle < Math.PI / 2
+                    case Direction.NorthEast:
+                        return angle > -Math.PI / 2 && angle < 0
+                    case Direction.East:
                         return angle < Math.PI && angle > Math.PI / 2
                 }
             }
@@ -200,6 +201,8 @@ export class PageController {
                 const isBackground = await this.is_background(handle, pointer.background_color)
                 if (!isBackground) return false
             }
+
+            this.pw.debug(`Found neighbor at distance ${distance}`)
 
             return [handle, distance]
         }))
@@ -228,7 +231,23 @@ export class PageController {
             }
 
             if (pointer.neighbors) {
+                this.pw.debug('Checking neighbors')
                 const neighbors = await Promise.all(pointer.neighbors.map(async neighbor => {
+                    // Resolve the neighbor
+                    let loc;
+                    if (neighbor.role === 'text') {
+                        loc = this.page.getByText(neighbor.name || '').first()
+                    } else {
+                        loc = this.page.getByRole(
+                            neighbor.role,
+                            { name: neighbor.name }
+                        ).first()
+                    }
+
+                    const handle = await loc.elementHandle();
+                    if (!handle) return false;
+                    this.pw.debug('Resolved neighbor handle')
+
                     const neighborHandles = await this.get_neighbors(handle, neighbor.direction, pointer)
                     return neighborHandles.length > 0
                 }))
@@ -239,7 +258,9 @@ export class PageController {
         }))
         const flattened = filtered.filter(Boolean) as ElementHandle[];
 
-        return flattened.length === 1 ? Some(flattened[0]) : None
+        this.pw.debug(`Filtered ${flattened.length} elements by background color and neighbors`)
+
+        return flattened.length > 0 ? Some(flattened[0]) : None
     }
 
     public async resolve(pointer: ElementPointer): Promise<Option<ElementHandle>> {
@@ -250,6 +271,7 @@ export class PageController {
         if (element1.isSome()) {
             return element1
         }
+        this.pw.debug('Element not found by role and name, trying by label and placeholder')
 
         // Second iteration: if name is set, try by label and by placeholder
         if (!pointer.name) {
@@ -272,6 +294,7 @@ export class PageController {
 
     public async screenshot(): Promise<string> {
         const buf = await this.page.screenshot()
+        this.pw.debug('Took screenshot of size ' + buf.length / (1024 * 1024) + 'MB')
         return `data:image/png;base64,${buf.toString('base64')}`
     }
 }

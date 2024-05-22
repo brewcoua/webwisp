@@ -45,7 +45,7 @@
                 },
                 "name": {
                   "type": "string",
-                  "description": "The name of the element to apply the action to.\nThis name must be unique relative to the type of element.\nIf you aren't sure for a part of the name, you can indicate only a part of it as long as it is unique.\nIf there is no clear name on the element, leave it empty."
+                  "description": "The name of the element to apply the action to.\nThis name must be unique relative to the type of element.\nIf you aren't sure for a part of the name, you can indicate only a part of it as long as it is unique.\nIf there is no clear name right on the element (not anywhere else), you can skip this field."
                 },
                 "background_color": {
                   "type": "string",
@@ -71,7 +71,7 @@
                       },
                       "name": {
                         "type": "string",
-                        "description": "The name of the neighbor element.\nThis name must be unique relative to the type of element.\nIf you aren't sure for a part of the name, you can indicate only a part of it as long as it is unique."
+                        "description": "The name of the neighbor element.\nSimilar to the name of the element, this is required if the role is text."
                       },
                       "background_color": {
                         "type": "string",
@@ -80,7 +80,7 @@
                       },
                       "direction": {
                         "type": "string",
-                        "description": "The direction of the neighbor element relative to the element.\nThis is a cardinal direction.",
+                        "description": "The direction of the neighbor element relative to the element.\nThis is a cardinal direction.\nPrioritize the direction that is the closest to the element.",
                         "enum": [
                           "north",
                           "north-east",
@@ -131,6 +131,7 @@
     "- You should only issue a valid action based on the current state of the website.",
     "- You should only ever issue one action (or function) after my own message.",
     "- You may only do one thing for each step.",
-    "- Never try to start another step in the same message as the previous one. You must wait for me to respond before starting a new step."
+    "- Never try to start another step in the same message as the previous one. You must wait for me to respond before starting a new step.",
+    "- When describing an element, avoid using the name if there is no clear text on the element (e.g. text next to it, label next to input)."
   ]
 }
