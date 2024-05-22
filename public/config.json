@@ -1,28 +1,33 @@
 {
   "target": "https://labri.brewen.dev",
-  "finetuning": {
-    "hue_distance": 0.1,
-    "saturation_distance": 0.2,
-    "lightness_distance": 0.2,
-    "max_neighbor_radius": 200,
-    "angle_distance": 2,
-    "selectors": {
-      "button": [
-        "button",
-        "input[type='submit']"
-      ],
-      "textbox": [
-        "input[type='text']",
-        "input[type='password']",
-        "input[type='email']",
-        "textarea"
-      ],
-      "link": [
-        "a"
-      ],
-      "combobox": [
-        "select"
-      ]
+  "methods": [
+    "visual"
+  ],
+  "per_method": {
+    "attrib": {
+      "hue_distance": 0.1,
+      "saturation_distance": 0.2,
+      "lightness_distance": 0.2,
+      "max_neighbor_radius": 200,
+      "angle_distance": 2,
+      "selectors": {
+        "button": [
+          "button",
+          "input[type='submit']"
+        ],
+        "textbox": [
+          "input[type='text']",
+          "input[type='password']",
+          "input[type='email']",
+          "textarea"
+        ],
+        "link": [
+          "a"
+        ],
+        "combobox": [
+          "select"
+        ]
+      }
     }
   },
   "api": {

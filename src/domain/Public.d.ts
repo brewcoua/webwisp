@@ -1,21 +1,25 @@
 import { LaunchOptions } from 'playwright'
-import { AssistantCreateParams } from 'openai/resources/beta'
 import OpenAI from 'openai'
-import { ClickableElement } from '../services/Playwright.service'
+import { ClickableElement } from '../grounding/Attributes.grounding'
 
 export type Config = {
     // If unspecified, the agent will prompt for a target URL
     target: URL,
-    finetuning: {
-        // HSL distance for background color matching
-        hue_distance: number,
-        saturation_distance: number,
-        lightness_distance: number,
-        // Maximum distance between two elements to be considered neighbors
-        max_neighbor_radius: number,
-        // Selectors for each clickable element
-        selectors: {
-            [key in ClickableElement]: string[]
+    // Grounding methods used for the target
+    methods: Methods[],
+    // Configuration for each method
+    per_method: {
+        attrib: {
+            // HSL distance for background color matching
+            hue_distance: number,
+            saturation_distance: number,
+            lightness_distance: number,
+            // Maximum distance between two elements to be considered neighbors
+            max_neighbor_radius: number,
+            // Selectors for each clickable element
+            selectors: {
+                [key in ClickableElement]: string[]
+            }
         }
     },
     api: {
@@ -45,6 +49,11 @@ export type Config = {
     tasks?: Task[],
 }
 
+export enum Methods {
+    Attributes = 'attrib',
+    Visual = 'visual',
+}
+
 type Task = {
     objective: string,
     scenario: string[][],
@@ -54,8 +63,14 @@ type URL = `http${'' | 's'}://${string}`;
 type BrowserType = 'chromium' | 'firefox';
 
 export type Prompts = {
-    assistant: AssistantCreateParams,
     system: string[],
     tools: OpenAI.ChatCompletionTool[],
     user: string[],
+    per_method: {
+        [key in Methods]: {
+            system?: string[],
+            user?: string[],
+            tools?: OpenAI.ChatCompletionTool[], // This will be merged with the global tools
+        }
+    }
 }
