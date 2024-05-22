@@ -71,6 +71,4 @@ export class PageController {
     public async getUrl(): Promise<string> {
         return this.page.url()
     }
-
-    public async
 }
