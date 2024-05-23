@@ -2,11 +2,10 @@ import { OpenAIService } from '../services/OpenAI.service'
 import { PlaywrightService } from '../services/Playwright.service'
 import { Service } from '../domain/Service'
 
-import pino, { Logger } from 'pino'
-import { useConfig, usePrompts } from '../hooks'
-import { PromptsTransformer } from '../transformers/Prompts.transformer'
-import OpenAI from 'openai'
-import { Runner } from './Runner'
+import pino from 'pino'
+import { useConfig } from '../hooks'
+import { input } from '@inquirer/prompts'
+import { RunnerTask } from './runner/RunnerTask'
 
 
 export class Agent extends Service {
@@ -17,6 +16,13 @@ export class Agent extends Service {
         super(
             pino({
                 level: process.env.NODE_ENV === 'production' ? 'info' : 'debug',
+                transport: {
+                    target: 'pino-pretty',
+                    options: {
+                        colorize: true,
+                        ignore: 'service,runner'
+                    }
+                },
             }).child({ service: 'agent' }),
             'agent',
         )
@@ -52,16 +58,37 @@ export class Agent extends Service {
 
         const config = useConfig()
 
-        const page = await this.pw.make_page(config.target)
-        const steps = config.tasks?.at(0)?.scenario[0] as string[]
+        let target = config.target;
+        if (!target) {
+            target = await input({
+                message: 'Enter the target URL',
+                validate: (input) => {
+                    try {
+                        new URL(input)
+                        return true
+                    } catch {
+                        return false
+                    }
+                },
+            }) as any;
+        }
 
-        const runner = new Runner(this, config.target, steps, page, this.openai, this.logger.child({
+        let task = config.task;
+        if (!task) {
+            task = await input({
+                message: 'Enter the task',
+            })
+        }
+
+        const page = await this.pw.make_page(target)
+
+        const runner = new RunnerTask(this, target as string, page, this.openai, this.logger.child({
             runner: 0,
-        }))
+        }), task)
 
-        await runner.run()
+        await runner.initialize()
 
-        await page.destroy()
+        await runner.launch()
 
         this.debug('Agent finished')
     }

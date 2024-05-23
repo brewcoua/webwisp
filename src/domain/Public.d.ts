@@ -1,4 +1,4 @@
-import { LaunchOptions } from 'playwright'
+import { BrowserContextOptions, LaunchOptions } from 'playwright'
 import OpenAI from 'openai'
 
 export enum Methods {
@@ -8,7 +8,9 @@ export enum Methods {
 
 export type Config = {
     // If unspecified, the agent will prompt for a target URL
-    target: URL,
+    target?: URL,
+    // If unspecified, the agent will prompt for a task
+    task?: string,
     // Grounding methods used for the target
     methods: Methods[],
     // Configuration for each method
@@ -37,12 +39,16 @@ export type Config = {
         max_tokens: number,
         // Maximum number of cycles to run on the same step before hard stopping
         max_cycles: number,
+        // Maximum number of failed cycles before hard stopping
+        max_failed_cycles: number,
     },
     browser: {
         // Browser type to use (e.g. chromium, firefox)
         type: BrowserType,
         // Browser options to use (for playwright)
         options: LaunchOptions,
+        // Browser context options to use (for playwright)
+        context: BrowserContextOptions,
         // Viewport size to use
         viewport?: {
             width: number,
@@ -65,9 +71,17 @@ type URL = `http${'' | 's'}://${string}`;
 type BrowserType = 'chromium' | 'firefox';
 
 export type Prompts = {
-    system: string[],
+    prompts: {
+        steps: {
+            user: string[],
+            system: string[],
+        },
+        task: {
+            user: string[],
+            system: string[],
+        }
+    }
     tools: OpenAI.ChatCompletionTool[],
-    user: string[],
     per_method: {
         [key in Methods]: {
             system?: string[],

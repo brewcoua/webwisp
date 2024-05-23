@@ -46,7 +46,7 @@ export class OpenAIService extends Service {
      */
     async completion(
         messages: OpenAI.ChatCompletionMessageParam[],
-        tools: OpenAI.ChatCompletionTool[],
+        tools?: OpenAI.ChatCompletionTool[],
         tool_choice?: OpenAI.ChatCompletionToolChoiceOption
     ): Promise<OpenAI.ChatCompletion> {
         return this.client.chat.completions.create({

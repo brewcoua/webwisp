@@ -2,12 +2,13 @@ import { Service } from '../domain/Service'
 import { useConfig } from '../hooks'
 
 import { Logger } from 'pino'
-import { Browser, chromium, firefox, Page } from 'playwright'
+import { Browser, BrowserContext, chromium, firefox, Page } from 'playwright'
 
 
 
 export class PlaywrightService extends Service {
     private browser!: Browser
+    private context!: BrowserContext
     private pages: Page[] = []
 
     constructor(logger: Logger) {
@@ -30,19 +31,24 @@ export class PlaywrightService extends Service {
                 this.browser = await firefox.launch(config.browser.options)
                 break
         }
+
+        this.context = await this.browser.newContext(config.browser.context)
     }
 
     public async destroy(): Promise<void> {
         for (const page of this.pages) {
             await page.close()
         }
+        await this.context.close()
         await this.browser.close()
     }
 
     public async make_page(url?: string): Promise<Page> {
-        const page = await this.browser.newPage()
+        const page = await this.context.newPage()
         if (url) {
-            await page.goto(url)
+            await page.goto(url, {
+                waitUntil: 'domcontentloaded',
+            })
         }
 
         const config = useConfig()

@@ -23,7 +23,7 @@
     "npm": ">=10.5.0"
   },
   "scripts": {
-    "start": "dotenvx run -- bun ./src/index.ts | pino-pretty -i service",
+    "start": "dotenvx run -- bun ./src/index.ts",
     "build": "bun build ./src/index.ts --target=bun --outfile ./dist/e2e-agent.js --external=playwright --external=openai --minify",
     "format": "prettier --write ./src/**/*.ts"
   },
@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@andreekeberg/imagedata": "^1.0.2",
+    "@inquirer/prompts": "^5.0.4",
     "deepmerge": "^4.3.1",
     "env-var": "^7.4.2",
     "extract-colors": "^4.0.6",

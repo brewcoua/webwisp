@@ -1,5 +1,6 @@
 {
-  "target": "https://labri.brewen.dev",
+  "target": "https://allrecipes.com/",
+  "task": "Find a recipe for a chocolate cake",
   "methods": [
     "visual"
   ],
@@ -33,15 +34,25 @@
   "api": {
     "model": "gpt-4o",
     "ratelimit": 0.5,
-    "delay": 5000,
-    "max_tokens": 2000,
-    "max_cycles": 1
+    "delay": 2500,
+    "max_tokens": 1500,
+    "max_cycles": 10,
+    "max_failed_cycles": 3
   },
   "browser": {
     "type": "chromium",
     "options": {
       "headless": false,
-      "slowMo": 50
+      "slowMo": 50,
+      "args": [
+        "--disable-web-security"
+      ]
+    },
+    "context": {
+      "bypassCSP": true,
+      "recordVideo": {
+        "dir": "videos"
+      }
     },
     "viewport": {
       "width": 1280,

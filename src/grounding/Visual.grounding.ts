@@ -13,6 +13,12 @@ export class VisualGrounding extends Grounding {
     }
 
     public async getScreenshot(): Promise<string> {
+        // Check that window.SoM is defined
+        const defined = await this.page.evaluate("typeof window.SoM !== 'undefined'")
+        if (!defined) {
+            await this.initialize();
+        }
+
         await this.page.evaluate("window.SoM.display()")
 
         const screenshot = await this.page.screenshot()

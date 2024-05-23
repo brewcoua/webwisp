@@ -2,11 +2,11 @@ import { useConfig, usePrompts } from '../hooks'
 import merge from 'deepmerge'
 
 export class PromptsTransformer {
-    public static transformSystemPrompt() {
+    public static transformTaskSystemPrompt() {
         const config = useConfig()
         const prompts = usePrompts()
 
-        return prompts.system.join('\n')
+        return prompts.prompts.task.system.join('\n')
             .concat(
                 config.methods.flatMap(method => prompts.per_method[method]
                     .system || [],
@@ -14,11 +14,19 @@ export class PromptsTransformer {
             )
     }
 
-    public static transformUserPrompt(placeholders: UserPromptPlaceholders) {
+    public static transformTaskUserPrompt(placeholders: UserPromptTaskPlaceholders) {
+        return usePrompts().prompts.task.user.join('\n')
+            .replace('%%URL%%', placeholders.url)
+            .replace('%%TITLE%%', placeholders.title)
+            .replace('%%TASK%%', placeholders.task)
+            .replace('%%ACTIONS%%', placeholders.actions.join('\n'))
+    }
+
+    public static transformUserPrompt(placeholders: UserPromptStepsPlaceholders) {
         const config = useConfig()
         const prompts = usePrompts()
 
-        const prompt = prompts.user.join('\n')
+        const prompt = prompts.prompts.steps.user.join('\n')
         const formattedSteps = placeholders.steps.map((step, index) => {
             if (index === placeholders.currentStep) {
                 return `${index + 1}. ++${step}++`
@@ -55,7 +63,14 @@ export class PromptsTransformer {
     }
 }
 
-export type UserPromptPlaceholders = {
+export type UserPromptTaskPlaceholders = {
+    url: string;
+    title: string;
+    task: string;
+    actions: string[];
+}
+
+export type UserPromptStepsPlaceholders = {
     currentStep: number;
     steps: string[];
     url: string;

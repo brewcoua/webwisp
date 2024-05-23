@@ -1,109 +1,32 @@
-import { Agent } from './Agent'
-import { OpenAIService } from '../services/OpenAI.service'
-import { PromptsTransformer } from '../transformers/Prompts.transformer'
-import { useConfig } from '../hooks'
-
-import { Logger } from 'pino'
-import OpenAI from 'openai'
-import { Err, Ok, Result } from 'oxide.ts'
 import { Page } from 'playwright'
+import { Logger } from 'pino'
 
-import { Grounding } from '../domain/Grounding'
-import { GroundingFactory } from '../domain/GroundingFactory'
-import { ElementPointer } from '../grounding/Attributes.grounding'
-import { Methods } from '../domain/Public.d'
-import { VisualGrounding } from '../grounding/Visual.grounding'
+import { Runner } from './Runner'
+import { Agent } from '../Agent'
 
+import { OpenAIService } from '../../services/OpenAI.service'
+import OpenAI from 'openai'
+import { useConfig } from '../../hooks'
+import { PromptsTransformer } from '../../transformers/Prompts.transformer'
 
-type Action = {
-    type: 'click' | 'type',
-    element?: ElementPointer,
-    label?: number,
-    value?: string
-}
-
-export class Runner {
+export class RunnerSteps extends Runner {
     constructor(
-        private readonly agent: Agent,
-        private readonly target: string,
+        agent: Agent,
+        target: string,
+        page: Page,
+        openai: OpenAIService,
+        logger: Logger,
         private readonly steps: string[],
-        private readonly page: Page,
-        private readonly openai: OpenAIService,
-        private readonly logger: Logger,
     ) {
+        super(agent, target, page, openai, logger)
     }
 
-    private groundings: {
-        [key in Methods]?: Grounding
-    } = {}
-
-    async handleAction(action: Action): Promise<Result<string, string>> {
-        let element
-        for (const method of Object.keys(this.groundings)) {
-            const grounding = this.groundings[method as Methods] as Grounding
-
-            switch (method) {
-                case Methods.Attributes:
-                    element = await grounding.resolve(action.element)
-                    break
-                case Methods.Visual:
-                    element = await grounding.resolve(action.label)
-                    break
-            }
-
-            if (element && element.isSome()) {
-                break
-            }
-        }
-
-        if (!element || element.isNone()) {
-            return Err(`Element not found with:\n- element: ${action.element ? JSON.stringify(action.element) : 'No element'}\n- label: ${action.label || 'No label'}`)
-        }
-
-
-        switch (action.type) {
-            case 'click':
-                await element.unwrap().click()
-                return Ok('Clicked')
-            case 'type':
-                await element.unwrap().fill(action.value || '')
-                return Ok('Typed')
-        }
-    }
-
-    async screenshot(): Promise<string> {
-        if (this.groundings.visual) {
-            return (this.groundings.visual as VisualGrounding).getScreenshot()
-        } else {
-            const buf = await this.page.screenshot()
-            return `data:image/png;base64,${buf.toString('base64')}`
-        }
-    }
-
-    async sleep(ms: number) {
-        return new Promise(resolve => setTimeout(resolve, ms))
-    }
-
-    async run() {
+    async launch() {
         this.logger.debug('Starting...')
 
         await this.sleep(10000);
 
         const config = useConfig()
-
-        this.groundings = Object.fromEntries(
-            await Promise.all(
-                config.methods.map(async (method) => {
-                    const grounding = GroundingFactory.create(method, this.page, this.logger)
-                    await grounding.initialize()
-
-                    return [
-                        method,
-                        grounding,
-                    ]
-                }),
-            ),
-        )
 
         const tools = PromptsTransformer.transformTools()
 
@@ -111,7 +34,7 @@ export class Runner {
         while (currentStep < this.steps.length) {
             this.logger.info(`Step ${currentStep}: ${this.steps[currentStep]}`)
 
-            const prompt = PromptsTransformer.transformUserPrompt({
+            const prompt = PromptsTransformer.transformStepsUserPrompt({
                 currentStep,
                 steps: this.steps,
                 url: this.page.url(),
