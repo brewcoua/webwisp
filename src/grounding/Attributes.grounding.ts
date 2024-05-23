@@ -4,7 +4,6 @@ import { get } from '@andreekeberg/imagedata'
 import { ElementHandle, Locator, Page } from 'playwright'
 
 import { useConfig } from '../hooks'
-import { PlaywrightService } from '../services/Playwright.service'
 import { Grounding } from '../domain/Grounding'
 
 export type Element = 'text' | ClickableElement;
@@ -139,7 +138,7 @@ export class AttributesGrounding extends Grounding {
                 if (!isBackground) return false
             }
 
-            this.pw.debug(`Found neighbor at distance ${distance}`)
+            this.logger.debug(`Found neighbor at distance ${distance}`)
 
             return [handle, distance]
         }))
@@ -168,7 +167,7 @@ export class AttributesGrounding extends Grounding {
             }
 
             if (pointer.neighbors) {
-                this.pw.debug('Checking neighbors')
+                this.logger.debug('Checking neighbors')
                 const neighbors = await Promise.all(pointer.neighbors.map(async neighbor => {
                     // Resolve the neighbor
                     let loc;
@@ -183,7 +182,7 @@ export class AttributesGrounding extends Grounding {
 
                     const handle = await loc.elementHandle();
                     if (!handle) return false;
-                    this.pw.debug('Resolved neighbor handle')
+                    this.logger.debug('Resolved neighbor handle')
 
                     const neighborHandles = await this.get_neighbors(handle, neighbor.direction, pointer)
                     return neighborHandles.length > 0
@@ -195,7 +194,7 @@ export class AttributesGrounding extends Grounding {
         }))
         const flattened = filtered.filter(Boolean) as ElementHandle[];
 
-        this.pw.debug(`Filtered ${flattened.length} elements by background color and neighbors`)
+        this.logger.debug(`Filtered ${flattened.length} elements by background color and neighbors`)
 
         return flattened.length > 0 ? Some(flattened[0]) : None
     }
@@ -208,7 +207,7 @@ export class AttributesGrounding extends Grounding {
         if (element1.isSome()) {
             return element1
         }
-        this.pw.debug('Element not found by role and name, trying by label and placeholder')
+        this.logger.debug('Element not found by role and name, trying by label and placeholder')
 
         // Second iteration: if name is set, try by label and by placeholder
         if (!pointer.name) {

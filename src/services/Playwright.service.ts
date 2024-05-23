@@ -2,13 +2,13 @@ import { Service } from '../domain/Service'
 import { useConfig } from '../hooks'
 
 import { Logger } from 'pino'
-import { Browser, chromium, ElementHandle, firefox, Locator, Page } from 'playwright'
+import { Browser, chromium, firefox, Page } from 'playwright'
 
 
 
 export class PlaywrightService extends Service {
     private browser!: Browser
-    private pages: PageController[] = []
+    private pages: Page[] = []
 
     constructor(logger: Logger) {
         super(
@@ -34,12 +34,12 @@ export class PlaywrightService extends Service {
 
     public async destroy(): Promise<void> {
         for (const page of this.pages) {
-            await page.destroy()
+            await page.close()
         }
         await this.browser.close()
     }
 
-    public async make_page(url?: string): Promise<PageController> {
+    public async make_page(url?: string): Promise<Page> {
         const page = await this.browser.newPage()
         if (url) {
             await page.goto(url)
@@ -50,25 +50,8 @@ export class PlaywrightService extends Service {
             await page.setViewportSize(config.browser.viewport)
         }
 
-        const controller = new PageController(this, page)
-        this.pages.push(controller)
+        this.pages.push(page)
 
-        return controller
-    }
-}
-
-export class PageController {
-    constructor(
-        private readonly pw: PlaywrightService,
-        private readonly page: Page,
-    ) {
-    }
-
-    async destroy(): Promise<void> {
-        await this.page.close()
-    }
-
-    public async getUrl(): Promise<string> {
-        return this.page.url()
+        return page
     }
 }
