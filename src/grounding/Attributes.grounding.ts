@@ -1,13 +1,11 @@
 import { None, Option, Some } from 'oxide.ts'
 import { extractColors } from 'extract-colors'
 import { get } from '@andreekeberg/imagedata'
-import { ElementHandle, Locator, Page } from 'playwright'
+import { ElementHandle, Locator } from 'playwright'
 
 import { useConfig } from '../hooks'
 import { Grounding } from '../domain/Grounding'
-
-export type Element = 'text' | ClickableElement;
-export type ClickableElement = 'button' | 'link' | 'textbox' | 'combobox';
+import type { ClickableElement, Element } from '../domain/Public'
 
 export enum Direction {
     North= "north",

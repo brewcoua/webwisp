@@ -1,16 +1,19 @@
 import { Agent } from './Agent'
 import { OpenAIService } from '../services/OpenAI.service'
 import { PromptsTransformer } from '../transformers/Prompts.transformer'
-import { useConfig, usePrompts } from '../hooks'
+import { useConfig } from '../hooks'
 
 import { Logger } from 'pino'
 import OpenAI from 'openai'
 import { Err, Ok, Result } from 'oxide.ts'
-import { Grounding, GroundingFactory } from '../domain/Grounding'
 import { Page } from 'playwright'
+
+import { Grounding } from '../domain/Grounding'
+import { GroundingFactory } from '../domain/GroundingFactory'
 import { ElementPointer } from '../grounding/Attributes.grounding'
-import { Methods } from '../domain/Public'
+import { Methods } from '../domain/Public.d'
 import { VisualGrounding } from '../grounding/Visual.grounding'
+
 
 type Action = {
     type: 'click' | 'type',
@@ -36,9 +39,19 @@ export class Runner {
 
     async handleAction(action: Action): Promise<Result<string, string>> {
         let element
-        for (const grounding of Object.values(this.groundings)) {
-            element = await grounding.resolve(action.element)
-            if (element.isSome()) {
+        for (const method of Object.keys(this.groundings)) {
+            const grounding = this.groundings[method as Methods] as Grounding
+
+            switch (method) {
+                case Methods.Attributes:
+                    element = await grounding.resolve(action.element)
+                    break
+                case Methods.Visual:
+                    element = await grounding.resolve(action.label)
+                    break
+            }
+
+            if (element && element.isSome()) {
                 break
             }
         }
@@ -74,13 +87,22 @@ export class Runner {
     async run() {
         this.logger.debug('Starting...')
 
+        await this.sleep(10000);
+
         const config = useConfig()
 
         this.groundings = Object.fromEntries(
-            config.methods.map(method => [
-                method,
-                GroundingFactory.create(method, this.page, this.logger),
-            ]),
+            await Promise.all(
+                config.methods.map(async (method) => {
+                    const grounding = GroundingFactory.create(method, this.page, this.logger)
+                    await grounding.initialize()
+
+                    return [
+                        method,
+                        grounding,
+                    ]
+                }),
+            ),
         )
 
         const tools = PromptsTransformer.transformTools()
@@ -113,7 +135,7 @@ export class Runner {
                             type: 'image_url',
                             image_url: {
                                 url: screenshot,
-                                detail: 'low',
+                                detail: config.methods.includes(Methods.Visual) ? 'auto' : 'low'
                             },
                         },
                     ],

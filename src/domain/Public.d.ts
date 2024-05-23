@@ -1,6 +1,10 @@
 import { LaunchOptions } from 'playwright'
 import OpenAI from 'openai'
-import { ClickableElement } from '../grounding/Attributes.grounding'
+
+export enum Methods {
+    Attributes = 'attrib',
+    Visual = 'visual',
+}
 
 export type Config = {
     // If unspecified, the agent will prompt for a target URL
@@ -49,10 +53,8 @@ export type Config = {
     tasks?: Task[],
 }
 
-export enum Methods {
-    Attributes = 'attrib',
-    Visual = 'visual',
-}
+export type Element = 'text' | ClickableElement;
+export type ClickableElement = 'button' | 'link' | 'textbox' | 'combobox';
 
 type Task = {
     objective: string,

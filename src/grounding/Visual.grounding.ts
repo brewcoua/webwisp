@@ -13,16 +13,19 @@ export class VisualGrounding extends Grounding {
     }
 
     public async getScreenshot(): Promise<string> {
-        await this.page.evaluate(() => window.SoM.display())
+        await this.page.evaluate("window.SoM.display()")
 
         const screenshot = await this.page.screenshot()
 
-        await this.page.evaluate(() => window.SoM.hide())
+        fs.writeFileSync('screenshot.png', screenshot)
+
+        await this.page.evaluate("window.SoM.hide()")
 
         return `data:image/png;base64,${screenshot.toString('base64')}`
     }
 
     public async resolve(id: number): Promise<Option<ElementHandle>> {
+        this.logger.debug(`Resolving SoM ${id}`)
         const element = await this.page.$(`[data-SoM="${id}"]`)
         return element ? Some(element) : None
     }

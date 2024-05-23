@@ -28,13 +28,14 @@
     "format": "prettier --write ./src/**/*.ts"
   },
   "devDependencies": {
+    "@dotenvx/dotenvx": "^0.44.0",
+    "madge": "^7.0.0",
     "pino-pretty": "^11.0.0",
     "prettier": "^3.2.5",
     "typescript": "^5.4.5"
   },
   "dependencies": {
     "@andreekeberg/imagedata": "^1.0.2",
-    "@dotenvx/dotenvx": "^0.39.0",
     "deepmerge": "^4.3.1",
     "env-var": "^7.4.2",
     "extract-colors": "^4.0.6",

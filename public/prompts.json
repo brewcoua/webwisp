@@ -63,7 +63,7 @@
         "If the element has a distinct background color, you can use it to identify it. However, avoid common colors like white, black, or gray."
       ],
       "user": [
-        "- When describing an element, avoid using the name if there is no clear text on the element (e.g. text next to it, label next to input).",
+        "- When describing an element, avoid using the name if there is no clear text on the element (e.g. text next to it, label next to input)."
       ],
       "tools": [
         {

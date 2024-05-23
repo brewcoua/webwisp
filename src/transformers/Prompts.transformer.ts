@@ -44,7 +44,10 @@ export class PromptsTransformer {
         config.methods.forEach(method => {
             const tools = prompts.per_method[method].tools;
             if (tools) {
-                globalTools = merge(globalTools, tools)
+                for (let i = 0; i < tools.length; i++) {
+                    const tool = tools[i]
+                    globalTools[i] = merge(globalTools[i], tool)
+                }
             }
         })
 

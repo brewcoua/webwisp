@@ -1,5 +1,5 @@
 import fs from 'node:fs'
-import { Config, Prompts } from './domain/Public'
+import type { Config, Prompts } from './domain/Public'
 import { None, Option, Some } from 'oxide.ts'
 
 const CACHE: {
