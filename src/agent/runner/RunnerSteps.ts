@@ -24,7 +24,7 @@ export class RunnerSteps extends Runner {
     async launch() {
         this.logger.debug('Starting...')
 
-        await this.sleep(10000);
+        await this.sleep(10000)
 
         const config = useConfig()
 
@@ -58,7 +58,7 @@ export class RunnerSteps extends Runner {
                             type: 'image_url',
                             image_url: {
                                 url: screenshot,
-                                detail: config.methods.includes(Methods.Visual) ? 'auto' : 'low'
+                                detail: config.methods.includes(Methods.Visual) ? 'auto' : 'low',
                             },
                         },
                     ],

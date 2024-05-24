@@ -1,35 +1,8 @@
 {
-  "target": "https://allrecipes.com/",
-  "task": "Find a recipe for a chocolate cake",
-  "methods": [
-    "visual"
-  ],
-  "per_method": {
-    "attrib": {
-      "hue_distance": 0.1,
-      "saturation_distance": 0.2,
-      "lightness_distance": 0.2,
-      "max_neighbor_radius": 200,
-      "angle_distance": 2,
-      "selectors": {
-        "button": [
-          "button",
-          "input[type='submit']"
-        ],
-        "textbox": [
-          "input[type='text']",
-          "input[type='password']",
-          "input[type='email']",
-          "textarea"
-        ],
-        "link": [
-          "a"
-        ],
-        "combobox": [
-          "select"
-        ]
-      }
-    }
+  "target": "https://www.u-bordeaux.fr",
+  "task": "Find the first required teaching unit for the second year bachelor's degree in computer science",
+  "fine_tuning": {
+
   },
   "api": {
     "model": "gpt-4o",
@@ -55,9 +28,10 @@
       }
     },
     "viewport": {
-      "width": 1280,
-      "height": 720
-    }
+      "width": 1024,
+      "height": 512
+    },
+    "screenshotsDir": "dist/img"
   },
   "tasks": [
     {

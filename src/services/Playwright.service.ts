@@ -5,7 +5,6 @@ import { Logger } from 'pino'
 import { Browser, BrowserContext, chromium, firefox, Page } from 'playwright'
 
 
-
 export class PlaywrightService extends Service {
     private browser!: Browser
     private context!: BrowserContext

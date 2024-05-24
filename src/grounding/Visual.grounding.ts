@@ -1,7 +1,10 @@
-import { ElementHandle, Page } from 'playwright'
+import { ElementHandle } from 'playwright'
 import fs from 'node:fs'
 import { None, Option, Some } from 'oxide.ts'
 import { Grounding } from '../domain/Grounding'
+import { useConfig } from '../hooks'
+import * as path from 'node:path'
+import sharp from 'sharp'
 
 export class VisualGrounding extends Grounding {
     public async initialize(): Promise<void> {
@@ -14,20 +17,38 @@ export class VisualGrounding extends Grounding {
 
     public async getScreenshot(): Promise<string> {
         // Check that window.SoM is defined
-        const defined = await this.page.evaluate("typeof window.SoM !== 'undefined'")
+        const defined = await this.page.evaluate('typeof window.SoM !== \'undefined\'')
         if (!defined) {
-            await this.initialize();
+            await this.initialize()
         }
 
-        await this.page.evaluate("window.SoM.display()")
+        await this.page.evaluate('window.SoM.display()')
 
-        const screenshot = await this.page.screenshot()
+        const imgPath = path.join(useConfig().browser.screenshotsDir, `${new Date().toISOString()}.png`)
+        await this.page.screenshot({
+            path: imgPath,
+        })
 
-        fs.writeFileSync('screenshot.png', screenshot)
+        await this.page.evaluate('window.SoM.hide()')
 
-        await this.page.evaluate("window.SoM.hide()")
+        let img = fs.readFileSync(imgPath)
 
-        return `data:image/png;base64,${screenshot.toString('base64')}`
+        const config = useConfig().fine_tuning
+        if (config.resize) {
+            img = await sharp(img)
+                .resize(
+                    config.resize.width,
+                    config.resize.height,
+                    {
+                        fit: config.resize.keep_aspect_ratio ? 'inside' : 'cover',
+                    },
+                )
+                .toBuffer()
+
+            fs.writeFileSync(imgPath, img)
+        }
+
+        return `data:image/png;base64,${img.toString('base64')}`
     }
 
     public async resolve(id: number): Promise<Option<ElementHandle>> {

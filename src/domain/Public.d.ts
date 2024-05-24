@@ -11,21 +11,13 @@ export type Config = {
     target?: URL,
     // If unspecified, the agent will prompt for a task
     task?: string,
-    // Grounding methods used for the target
-    methods: Methods[],
-    // Configuration for each method
-    per_method: {
-        attrib: {
-            // HSL distance for background color matching
-            hue_distance: number,
-            saturation_distance: number,
-            lightness_distance: number,
-            // Maximum distance between two elements to be considered neighbors
-            max_neighbor_radius: number,
-            // Selectors for each clickable element
-            selectors: {
-                [key in ClickableElement]: string[]
-            }
+    // Fine-tuning options for the agent
+    fine_tuning: {
+        // Whether to resize screenshots before sending them to the model, this allows saving tokens
+        resize?: {
+            width: number,
+            height: number,
+            keep_aspect_ratio?: boolean,
         }
     },
     api: {
@@ -53,7 +45,9 @@ export type Config = {
         viewport?: {
             width: number,
             height: number,
-        }
+        },
+        // Directory to save screenshots
+        screenshotsDir: string,
     },
     // List of predefined tasks to perform on the target
     tasks?: Task[],
@@ -79,14 +73,6 @@ export type Prompts = {
         task: {
             user: string[],
             system: string[],
-        }
-    }
-    tools: OpenAI.ChatCompletionTool[],
-    per_method: {
-        [key in Methods]: {
-            system?: string[],
-            user?: string[],
-            tools?: OpenAI.ChatCompletionTool[], // This will be merged with the global tools
         }
     }
 }

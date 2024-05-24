@@ -6,7 +6,8 @@ export abstract class Grounding {
     constructor(
         protected readonly page: Page,
         protected readonly logger: Logger,
-    ) { }
+    ) {
+    }
 
     async initialize(): Promise<void> {
         return Promise.resolve()

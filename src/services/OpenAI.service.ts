@@ -1,5 +1,5 @@
 import { Service } from '../domain/Service'
-import { useConfig, usePrompts } from '../hooks'
+import { useConfig } from '../hooks'
 
 import { Logger } from 'pino'
 import * as env from 'env-var'
@@ -47,7 +47,7 @@ export class OpenAIService extends Service {
     async completion(
         messages: OpenAI.ChatCompletionMessageParam[],
         tools?: OpenAI.ChatCompletionTool[],
-        tool_choice?: OpenAI.ChatCompletionToolChoiceOption
+        tool_choice?: OpenAI.ChatCompletionToolChoiceOption,
     ): Promise<OpenAI.ChatCompletion> {
         return this.client.chat.completions.create({
             model: useConfig().api.model,

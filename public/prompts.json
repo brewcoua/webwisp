@@ -9,7 +9,9 @@
         "Unlike humans, you may directly type without focusing on the input field. However, you must first click on a dropdown before selecting an option.",
         "You can only try one action at a time, and you must wait for the user to respond before trying another action.",
         "If the last message is the result of an action, you must wait for the user to respond before trying another action.",
-        "You can describe what you did after an action, in maximum 3 sentences, to help the user understand your reasoning."
+        "You can describe what you did after an action, in maximum 3 sentences, to help the user understand your reasoning.",
+        "There are labels on all visible clickable elements on the website, which are colored.",
+        "Use this label to identify the element you are interacting with, and the action you are applying to it."
       ],
       "user": [
         "The screenshot below displays the current state of the website. The full url is `%%URL%%`.",
@@ -37,7 +39,10 @@
         "You have access to a few functions to interact with the website, such as clicking on clickable elements and typing in text fields.",
         "You can only try one action at a time, and you must wait for the user to respond before trying another action.",
         "If the last message is the result of an action, you must wait for the user to respond before trying another action.",
-        "On the given screenshot, all interactive elements are labeled with a colored label, which you can use to identify the element you are interacting with."
+        "On the given screenshot, all interactive elements are labeled with a colored label, which you can use to identify the element you are interacting with.",
+        "There are labels on all visible clickable elements on the website, which are colored.",
+        "Use this label to identify the element you are interacting with, and the action you are applying to it.",
+        "Respect the given template and provide clear and concise answers to complete the task successfully (e.g. KEEP the triple quotes)."
       ],
       "user": [
         "TITLE: %%TITLE%%",
@@ -52,15 +57,12 @@
         "3. Based on your analysis, decide the next action to take relative to the current state of the website and the actions you have done so far.",
         "You must absolutely follow the rules below:",
         "- You should only issue a valid action based on the current state of the website.",
-        "- You should only ever issue one action (or function) after my own message.",
-        "- You may only do one thing for each step.",
-        "- Never try to start another step in the same message as the previous one. You must wait for me to respond before starting a new step.",
-        "- Keep your answers clear and concise, and follow the template provided.",
-        "- Use the `done` action to indicate that you have completed the task and the `fail` action to indicate that you cannot complete the task.",
-        "- Always use triple quotes (`\"\"\"`) as shown in the template.",
-        "- If the task seems completed, DO NOT issue any more actions other than `done` or `fail`, and especially not looping actions.",
+        "- Keep your answers clear and concise, and follow the template provided. Especially, keep the triple quotes (`\"\"\"`) intact as to allow parsing.",
+        "- If based on the screenshot, the task seems already complete, use the `done` action to indicate that you have completed the task and the `fail` action to indicate that you cannot complete the task.",
+        "- If you encounter a cookie consent banner, ignore it as long as it does not block the main content of the website. If it does, you can accept it.",
+        "- AVOID as much as possible repeating the same action multiple times in a row, unless it is absolutely necessary.",
         "Follow this template for your answer:",
-        "```markdown",
+        "```",
         "## Current State",
         "Describe the current state of the website.",
         "## Actions Done So Far",
@@ -68,158 +70,12 @@
         "## Next Action",
         "Describe the next action to take.",
         "\"\"\"",
+        "DESCRIPTION: [description of the action, to be recalled later (e.g. Click on the 'Next' button), REQUIRED]",
         "ACTION: [click|type|scroll_down|scroll_up|done|fail]",
         "ELEMENT: [label of the element, MUST be a valid number, optional when not interacting]",
         "VALUE: [optional, value to type in the element]",
         "\"\"\"",
         "```"
-      ]
-    }
-  },
-  "tools": [
-    {
-      "type": "function",
-      "function": {
-        "name": "action",
-        "description": "Apply an action to the website.",
-        "parameters": {
-          "type": "object",
-          "properties": {
-            "type": {
-              "type": "string",
-              "description": "The type of action to apply.",
-              "enum": [
-                "click",
-                "type"
-              ]
-            },
-            "value": {
-              "type": "string",
-              "description": "The value used in the action, if any. This is required for type actions."
-            }
-          },
-          "required": [
-            "type",
-            "element"
-          ]
-        }
-      }
-    }
-  ],
-  "per_method": {
-    "attrib": {
-      "system": [
-        "When you make an action, add as much detail as possible to the element you are interacting with, including its role, name and even neighbors. However, avoid adding too many neighbors, one is usually enough.",
-        "If there is no clear text on the element (e.g. text next to it), avoid giving a name and describe neighbors instead. For example, an input does not usually have a name.",
-        "If the element has a distinct background color, you can use it to identify it. However, avoid common colors like white, black, or gray."
-      ],
-      "user": [
-        "- When describing an element, avoid using the name if there is no clear text on the element (e.g. text next to it, label next to input)."
-      ],
-      "tools": [
-        {
-          "function": {
-            "parameters": {
-              "properties": {
-                "attributes": {
-                  "type": "object",
-                  "description": "The attributes of the element to apply the action to, as detailed as possible.\nEvery field should be filled in as much as possible.",
-                  "properties": {
-                    "role": {
-                      "type": "string",
-                      "description": "The role of the element to apply the action to. (as in playwright roles)",
-                      "enum": [
-                        "button",
-                        "link",
-                        "textbox",
-                        "combobox"
-                      ]
-                    },
-                    "name": {
-                      "type": "string",
-                      "description": "The name of the element to apply the action to.\nThis name must be unique relative to the type of element.\nIf you aren't sure for a part of the name, you can indicate only a part of it as long as it is unique.\nIf there is no clear name right on the element (not anywhere else), you can skip this field."
-                    },
-                    "background_color": {
-                      "type": "string",
-                      "description": "The background color of the element to apply the action to.\nThis is a hexadecimal color code.",
-                      "pattern": "^#[A-Fa-f0-9]{6}$"
-                    },
-                    "neighbors": {
-                      "type": "array",
-                      "description": "The neighbors of the element to apply the action to, as detailed as possible.\nThey must be in the order of closeness to the element.",
-                      "maxItems": 3,
-                      "items": {
-                        "type": "object",
-                        "properties": {
-                          "role": {
-                            "type": "string",
-                            "description": "The role of the neighbor element. (as in playwright roles)",
-                            "enum": [
-                              "text",
-                              "button",
-                              "link",
-                              "textbox"
-                            ]
-                          },
-                          "name": {
-                            "type": "string",
-                            "description": "The name of the neighbor element.\nSimilar to the name of the element, this is required if the role is text."
-                          },
-                          "background_color": {
-                            "type": "string",
-                            "description": "The background color of the neighbor element.\nThis is a hexadecimal color code.",
-                            "pattern": "^#[A-Fa-f0-9]{6}$"
-                          },
-                          "direction": {
-                            "type": "string",
-                            "description": "The direction of the neighbor element relative to the element.\nThis is a cardinal direction.\nPrioritize the direction that is the closest to the element.",
-                            "enum": [
-                              "north",
-                              "north-east",
-                              "north-west",
-                              "east",
-                              "south",
-                              "south-east",
-                              "south-west",
-                              "west"
-                            ]
-                          }
-                        }
-                      },
-                      "required": [
-                        "role",
-                        "direction"
-                      ]
-                    }
-                  },
-                  "required": [
-                    "role"
-                  ]
-                }
-              }
-            }
-          }
-        }
-      ]
-    },
-    "visual": {
-      "system": [
-        "There are labels on all visible clickable elements on the website, which are colored.",
-        "Use this label to identify the element you are interacting with, and the action you are applying to it."
-      ],
-      "tools": [
-        {
-          "function": {
-            "parameters": {
-              "properties": {
-                "label": {
-                  "type": "number",
-                  "description": "Label on the image of the element to apply the action to.\nThis is a number that corresponds to a colored element on the image."
-                }
-              }
-            }
-          }
-        }
       ]
     }
   }

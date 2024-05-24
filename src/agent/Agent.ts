@@ -20,8 +20,8 @@ export class Agent extends Service {
                     target: 'pino-pretty',
                     options: {
                         colorize: true,
-                        ignore: 'service,runner'
-                    }
+                        ignore: 'service,runner',
+                    },
                 },
             }).child({ service: 'agent' }),
             'agent',
@@ -58,7 +58,7 @@ export class Agent extends Service {
 
         const config = useConfig()
 
-        let target = config.target;
+        let target = config.target
         if (!target) {
             target = await input({
                 message: 'Enter the target URL',
@@ -70,10 +70,10 @@ export class Agent extends Service {
                         return false
                     }
                 },
-            }) as any;
+            }) as any
         }
 
-        let task = config.task;
+        let task = config.task
         if (!task) {
             task = await input({
                 message: 'Enter the task',
@@ -82,7 +82,7 @@ export class Agent extends Service {
 
         const page = await this.pw.make_page(target)
 
-        const runner = new RunnerTask(this, target as string, page, this.openai, this.logger.child({
+        const runner = new RunnerTask(this, target as string, page, this.openai, this.pw, this.logger.child({
             runner: 0,
         }), task)
 

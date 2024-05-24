@@ -8,14 +8,14 @@ import { Grounding } from '../domain/Grounding'
 import type { ClickableElement, Element } from '../domain/Public'
 
 export enum Direction {
-    North= "north",
-    NorthEast = "north-east",
-    NorthWest = "north-west",
-    East = "east",
-    South = "south",
-    SouthEast = "south-east",
-    SouthWest = "south-west",
-    West = "west"
+    North = 'north',
+    NorthEast = 'north-east',
+    NorthWest = 'north-west',
+    East = 'east',
+    South = 'south',
+    SouthEast = 'south-east',
+    SouthWest = 'south-west',
+    West = 'west'
 }
 
 export type ElementPointer = {
@@ -33,6 +33,31 @@ type ElementNeighbor = {
 }
 
 export class AttributesGrounding extends Grounding {
+    public async resolve(pointer: ElementPointer): Promise<Option<ElementHandle>> {
+        // First iteration: name & role
+        const selector1 = this.page.getByRole(pointer.role, { name: pointer.name })
+        const element1 = await this.resolve_loc(selector1, pointer)
+
+        if (element1.isSome()) {
+            return element1
+        }
+        this.logger.debug('Element not found by role and name, trying by label and placeholder')
+
+        // Second iteration: if name is set, try by label and by placeholder
+        if (!pointer.name) {
+            return None
+        }
+
+        const selector2 = this.page.getByLabel(pointer.name)
+        const element2 = await this.resolve_loc(selector2, pointer)
+        if (element2.isSome()) {
+            return element2
+        }
+
+        const selector3 = this.page.getByPlaceholder(pointer.name)
+        return await this.resolve_loc(selector3, pointer)
+    }
+
     private get_hsl(color: string): [number, number, number] {
         if (color.startsWith('#')) color = color.substring(1)
         const r = parseInt(color.substring(0, 2), 16) / 255
@@ -168,18 +193,18 @@ export class AttributesGrounding extends Grounding {
                 this.logger.debug('Checking neighbors')
                 const neighbors = await Promise.all(pointer.neighbors.map(async neighbor => {
                     // Resolve the neighbor
-                    let loc;
+                    let loc
                     if (neighbor.role === 'text') {
                         loc = this.page.getByText(neighbor.name || '').first()
                     } else {
                         loc = this.page.getByRole(
                             neighbor.role,
-                            { name: neighbor.name }
+                            { name: neighbor.name },
                         ).first()
                     }
 
-                    const handle = await loc.elementHandle();
-                    if (!handle) return false;
+                    const handle = await loc.elementHandle()
+                    if (!handle) return false
                     this.logger.debug('Resolved neighbor handle')
 
                     const neighborHandles = await this.get_neighbors(handle, neighbor.direction, pointer)
@@ -190,35 +215,10 @@ export class AttributesGrounding extends Grounding {
 
             return handle
         }))
-        const flattened = filtered.filter(Boolean) as ElementHandle[];
+        const flattened = filtered.filter(Boolean) as ElementHandle[]
 
         this.logger.debug(`Filtered ${flattened.length} elements by background color and neighbors`)
 
         return flattened.length > 0 ? Some(flattened[0]) : None
-    }
-
-    public async resolve(pointer: ElementPointer): Promise<Option<ElementHandle>> {
-        // First iteration: name & role
-        const selector1 = this.page.getByRole(pointer.role, { name: pointer.name })
-        const element1 = await this.resolve_loc(selector1, pointer)
-
-        if (element1.isSome()) {
-            return element1
-        }
-        this.logger.debug('Element not found by role and name, trying by label and placeholder')
-
-        // Second iteration: if name is set, try by label and by placeholder
-        if (!pointer.name) {
-            return None
-        }
-
-        const selector2 = this.page.getByLabel(pointer.name)
-        const element2 = await this.resolve_loc(selector2, pointer)
-        if (element2.isSome()) {
-            return element2
-        }
-
-        const selector3 = this.page.getByPlaceholder(pointer.name)
-        return await this.resolve_loc(selector3, pointer)
     }
 }
