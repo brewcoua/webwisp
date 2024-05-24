@@ -34,7 +34,8 @@ export class RunnerTask extends Runner {
         let failed_cycles = 0
 
         while (cycles < config.api.max_cycles && failed_cycles < config.api.max_failed_cycles) {
-            await this.page.waitForLoadState('domcontentloaded')
+            // Check if page is loading to avoid context loss
+            await this.page.waitForFunction(() => document.readyState === 'complete');
 
             this.logger.info(`Cycle ${cycles}`)
 

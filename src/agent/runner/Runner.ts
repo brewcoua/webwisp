@@ -96,10 +96,10 @@ export abstract class Runner {
                     action.type = value.trim() as ActionType
                     break
                 case 'ELEMENT':
-                    action['label'] = parseInt(value.trim())
+                    action.label = parseInt(value.trim())
                     break
                 case 'VALUE':
-                    action['value'] = value.trim()
+                    action.value = value.trim()
                     break
             }
         })

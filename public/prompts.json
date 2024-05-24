@@ -6,6 +6,7 @@
     "There are labels on all visible clickable elements on the website, which are colored. Use the label number to identify the element you are interacting with.",
     "If you encounter a cookie consent banner, ignore it as long as it does not block the main content of the website. If it does, you can accept it.",
     "If based on the screenshot, the task seems already complete, use the `done` action to indicate that you have completed the task and the `fail` action to indicate that you cannot complete the task.",
+    "Possible actions are: `click`, `type`, `press_enter` (not on an element), `scroll_down`, `scroll_up`, `done`, `fail`.",
     "For your answer, you must follow the template below, without including <template> tags:",
     "<template>",
     "## Current State ##",
