@@ -6,11 +6,10 @@ import { Err, Ok, Result } from 'oxide.ts'
 import { Page } from 'playwright'
 
 import { VisualGrounding } from '../../grounding/Visual.grounding'
-import { useConfig } from '../../hooks'
 import { PlaywrightService } from '../../services/Playwright.service'
 
 
-type ActionType = 'click' | 'type' | 'scroll_down' | 'scroll_up' | 'done' | 'fail'
+type ActionType = 'click' | 'type' | 'press_enter' | 'scroll_down' | 'scroll_up' | 'done' | 'fail'
 type Action = {
     type: ActionType,
     description: string,
@@ -43,8 +42,12 @@ export abstract class Runner {
             await this.page.evaluate(`window.scrollBy({ top: ${
                 direction === 'down' ? '-' : ''
             }window.innerHeight, behavior: 'smooth' })`)
-            return Ok(`Scroll ${direction} [DONE]`)
+            return Ok(`${action.description} [DONE]`)
+        } else if (action.type === 'press_enter') {
+            await this.page.keyboard.press('Enter')
+            return Ok(`${action.description} [DONE]`)
         }
+
 
         const element = await this.grounding.resolve(action.label || 0)
 
@@ -69,8 +72,8 @@ export abstract class Runner {
     }
 
     protected parseAction(message: string): Action {
-        // First get stuff between """
-        const raw = message.match(/"""([^]*)"""/)
+        // First get stuff between ~~~
+        const raw = message.match(/~~~([^]*)~~~/)
         if (!raw) {
             throw new Error('No action found')
         }

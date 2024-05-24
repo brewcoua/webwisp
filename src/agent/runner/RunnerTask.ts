@@ -28,10 +28,14 @@ export class RunnerTask extends Runner {
 
         const config = useConfig()
 
+        await this.sleep(1000)
+
         let cycles = 0
         let failed_cycles = 0
 
         while (cycles < config.api.max_cycles && failed_cycles < config.api.max_failed_cycles) {
+            await this.page.waitForLoadState('domcontentloaded')
+
             this.logger.info(`Cycle ${cycles}`)
 
             const prompt = PromptsTransformer.transformTaskUserPrompt({

@@ -65,14 +65,6 @@ type URL = `http${'' | 's'}://${string}`;
 type BrowserType = 'chromium' | 'firefox';
 
 export type Prompts = {
-    prompts: {
-        steps: {
-            user: string[],
-            system: string[],
-        },
-        task: {
-            user: string[],
-            system: string[],
-        }
-    }
+    user: string[],
+    system: string[],
 }
