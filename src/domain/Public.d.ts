@@ -13,6 +13,8 @@ export type Config = {
     task?: string,
     // Fine-tuning options for the agent
     fine_tuning: {
+        // Temperature to use for completions
+        temperature?: number,
         // Whether to resize screenshots before sending them to the model, this allows saving tokens
         resize?: {
             width: number,

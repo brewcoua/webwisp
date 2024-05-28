@@ -37,8 +37,6 @@ export class RunnerTask extends Runner {
             // Check if page is loading to avoid context loss
             await this.page.waitForFunction(() => document.readyState === 'complete');
 
-            this.logger.info(`Cycle ${cycles}`)
-
             const prompt = PromptsTransformer.transformTaskUserPrompt({
                 url: this.page.url(),
                 title: await this.page.title(),
@@ -83,7 +81,7 @@ export class RunnerTask extends Runner {
                 break
             }
 
-            this.logger.info(message)
+            console.log(`[${cycles}/${config.api.max_cycles}]: ${result.usage?.total_tokens} (${choice.finish_reason})\n${message}`)
 
             const action = this.parseAction(message)
             if (action.type === 'done') {
@@ -96,11 +94,6 @@ export class RunnerTask extends Runner {
 
             const actionResult = await this.handleAction(action)
             this.actions.push(actionResult.unwrapUnchecked())
-
-            this.logger.info({
-                usage: result.usage,
-                finish_reason: choice.finish_reason,
-            }, `Cycle ${cycles} finished`)
 
             if (actionResult.isErr())
                 failed_cycles++

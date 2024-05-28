@@ -55,6 +55,7 @@ export class OpenAIService extends Service {
             tools,
             tool_choice,
             max_tokens: useConfig().api.max_tokens,
+            temperature: useConfig().fine_tuning.temperature,
         })
     }
 }

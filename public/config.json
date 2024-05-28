@@ -1,8 +1,8 @@
 {
-  "target": "https://duckduckgo.com/",
-  "task": "Search for the best restaurants in New York City",
+  "target": "https://labri.brewen.dev",
+  "task": "On this website, is it possible to login with username 'robot' and password '12345678'?",
   "fine_tuning": {
-
+    "temperature": 0.5
   },
   "api": {
     "model": "gpt-4o",
