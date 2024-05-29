@@ -8,6 +8,10 @@ import { REGEX } from './constants'
 import { Agent } from './agent'
 import { Logger } from './logger'
 
+import { waitPress } from './cli/prompts'
+import { promptVoice } from './cli/voice'
+
+
 const cli = meow(`
     Usage
       $ webwisp
@@ -134,7 +138,15 @@ function bindSignals(agent: Agent) {
     })
 }
 
+
+
 async function main() {
+    if (cli.flags.voice) {
+        await promptVoice()
+    }
+
+    await waitPress({ message: 'Press enter to start the agent' })
+
     let target = cli.flags.target
     if (!target) {
         target = await promptTarget()
@@ -157,6 +169,9 @@ async function main() {
     bindSignals(agent);
 
     await agent.initialize()
+
+    await waitPress({ message: 'Press enter to start the task' })
+
     const result = await agent.spawn_task(target, task)
 
     await agent.destroy()

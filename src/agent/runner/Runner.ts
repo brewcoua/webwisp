@@ -37,9 +37,10 @@ export abstract class Runner {
         if (action.type.startsWith('scroll')) {
             const direction = action.type === 'scroll_down' ? 'down' : 'up'
 
+            // Scroll by 2/3 of the window height
             await this.page.evaluate(`window.scrollBy({ top: ${
                 direction === 'down' ? '' : '-'
-            }window.innerHeight, behavior: 'smooth' })`)
+            }((window.innerHeight / 3) * 2), behavior: 'smooth' })`)
 
             return Ok(action.description)
         } else if (action.type === ActionType.PressEnter) {

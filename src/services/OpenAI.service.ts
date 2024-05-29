@@ -12,13 +12,17 @@ export class OpenAIService extends Service {
         super('openai')
     }
 
-    async initialize(): Promise<void> {
-        Logger.debug('Initializing OpenAI service')
-        this.client = new OpenAI({
+    public static makeClient(): OpenAI {
+        return new OpenAI({
             apiKey: env.get('OPENAI_API_KEY').required().asString(),
             organization: env.get('OPENAI_ORG').asString(),
             project: env.get('OPENAI_PROJECT').asString(),
         })
+    }
+
+    async initialize(): Promise<void> {
+        Logger.debug('Initializing OpenAI service')
+        this.client = OpenAIService.makeClient()
     }
 
     async destroy(): Promise<void> {}

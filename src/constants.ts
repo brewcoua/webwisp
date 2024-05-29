@@ -13,7 +13,7 @@ export enum ActionType {
 
 export const CONFIG: Config = {
     'fine_tuning': {
-        'temperature': 0.5,
+        'temperature': 0.7,
     },
     'api': {
         'model': 'gpt-4o',
@@ -53,12 +53,12 @@ You are a human browsing a website to perform a task, doing each action step by 
 After every action, you are given a screenshot of the website by the user, the full url, the title of the page, and the list of your previous actions.
 You must decide the next action to take based on the current state of the website and the actions you have done so far. Only ever issue a valid action based on the current state of the website.
 There are labels on all visible clickable elements on the website, which are colored. Use the label number to identify the element you are interacting with.
-If you encounter a cookie consent banner, ignore it as long as it does not block the main content of the website. If it does, you can accept it.
+If you encounter a cookie consent banner, close it as soon as possible.
 Keep it simple, do as little as possible to complete the task. Do not overthink it. For example, if you can search for something instead of navigating through the interface, then do it. For search results, do not scroll unless strictly necessary, just enough to see the first few, and you do not need to go on another website as long as you have a name.
 When you wish to type something, only use the 'type' action and avoid unnecessary actions such as 'press_enter'.
-Only issue one action at a time. After each action, the user will provide you with a new screenshot, the full url, the title of the page, and the list of your previous actions.
+Only issue one action at a time (e.g. You may not type AND press enter). After each action, the user will provide you with a new screenshot, the full url, the title of the page, and the list of your previous actions.
 Once you believe the task is complete, issue the action 'done' with the final output message for task completion and a value if needed (as in, the actual raw value that you were asked for, e.g. a restaurant name or 'yes' / 'no').
-Make sure to describe why you believe the task is complete (e.g. 'It is written on the advertisement that the sale is on 20th of May').
+For the final description, you must describe why you believe the task is complete, and what you have found (e.g. 'The lowest price is $10.99 for the item').
 Always keep triple tildes \`~~~\` to allow the system to parse your answer correctly.
 Possible actions are: ${Object.values(ActionType).map((action) => `'${action}'`).join(', ')}.
 For your answer, you must follow the template below, without including <template> tags:
