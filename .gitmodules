@@ -1,3 +1,3 @@
-[submodule "public/SoM"]
-	path = public/SoM
+[submodule "src/grounding/SoM"]
+	path = src/grounding/SoM
 	url = git@github.com:brewcoua/web-som.git

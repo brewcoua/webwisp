@@ -1,39 +1,44 @@
+import { Page } from 'playwright'
+import OpenAI from 'openai'
+
 import { Runner } from './Runner'
 import { Agent } from '../Agent'
-import { Page } from 'playwright'
-import { OpenAIService } from '../../services/OpenAI.service'
-import { Logger } from 'pino'
-import { useConfig } from '../../hooks'
 import { PromptsTransformer } from '../../transformers/Prompts.transformer'
-import OpenAI from 'openai'
+import { OpenAIService } from '../../services/OpenAI.service'
 import { PlaywrightService } from '../../services/Playwright.service'
+import { ActionType, CONFIG } from '../../constants'
+import { Logger } from '../../logger'
+
+export type TaskResult = {
+    success: boolean,
+    message: string,
+    value?: string,
+}
 
 export class RunnerTask extends Runner {
     private actions: string[] = []
 
     constructor(
         agent: Agent,
-        target: string,
         page: Page,
         openai: OpenAIService,
         pw: PlaywrightService,
-        logger: Logger,
         private readonly task: string,
     ) {
-        super(agent, target, page, openai, pw, logger)
+        super(agent, page, openai, pw)
     }
 
-    async launch() {
-        this.logger.debug('Starting...')
-
-        const config = useConfig()
+    async launch(): Promise<TaskResult> {
+        Logger.debug('Starting...')
 
         await this.sleep(1000)
 
         let cycles = 0
         let failed_cycles = 0
 
-        while (cycles < config.api.max_cycles && failed_cycles < config.api.max_failed_cycles) {
+        while (cycles < CONFIG.api.max_cycles && failed_cycles < CONFIG.api.max_failed_cycles) {
+            const cycleStart = Date.now()
+
             // Check if page is loading to avoid context loss
             await this.page.waitForFunction(() => document.readyState === 'complete');
 
@@ -77,37 +82,57 @@ export class RunnerTask extends Runner {
             const message = choice.message.content
 
             if (!message) {
-                this.logger.error('No message returned from OpenAI')
+                Logger.error('No message returned from OpenAI')
                 break
             }
 
-            console.log(`[${cycles}/${config.api.max_cycles}]: ${result.usage?.total_tokens} (${choice.finish_reason})\n${message}`)
+            Logger.debug(`[${cycles}/${CONFIG.api.max_cycles}]: ${result.usage?.total_tokens} (${choice.finish_reason})\n${message}`)
 
             const action = this.parseAction(message)
-            if (action.type === 'done') {
-                this.logger.info('Task completed')
-                break
-            } else if (action.type === 'fail') {
-                this.logger.error('Task failed')
-                break
+            if (action.type === ActionType.Done) {
+                return {
+                    success: true,
+                    message: action.description,
+                    value: action.value,
+                }
+            } else if (action.type === ActionType.Fail) {
+                return {
+                    success: false,
+                    message: action.description,
+                    value: action.value,
+                }
             }
 
             const actionResult = await this.handleAction(action)
-            this.actions.push(actionResult.unwrapUnchecked())
+            this.actions.push(actionResult.unwrapUnchecked() + ` ${
+                actionResult.isErr() ? '[FAIL]' : '[DONE]'
+            }`)
+
+            Logger.action(
+                action.type,
+                actionResult.unwrapUnchecked(),
+                actionResult.isOk(),
+                Date.now() - cycleStart,
+                result.usage?.total_tokens,
+            )
 
             if (actionResult.isErr())
                 failed_cycles++
             cycles++
 
-            await this.sleep(config.api.delay)
+            await this.sleep(CONFIG.api.delay)
         }
 
-        if (failed_cycles >= config.api.max_failed_cycles) {
-            this.logger.error('Task failed, reached maximum failed cycles')
-        } else if (cycles >= config.api.max_cycles) {
-            this.logger.error('Task failed, reached maximum cycles')
+        if (failed_cycles >= CONFIG.api.max_failed_cycles) {
+            return {
+                success: false,
+                message: 'Reached maximum failed actions',
+            }
+        } else if (cycles >= CONFIG.api.max_cycles) {
+            return {
+                success: false,
+                message: 'Reached maximum actions',
+            }
         }
-
-        this.logger.debug('Finished')
     }
 }

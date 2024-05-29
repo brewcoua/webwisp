@@ -1,37 +1,27 @@
-import { Service } from '../domain/Service'
-import { useConfig } from '../hooks'
-
-import { Logger } from 'pino'
 import * as env from 'env-var'
-
 import OpenAI from 'openai'
+
+import { Logger } from '../logger'
+import { Service } from '../domain/Service'
+import { CONFIG } from '../constants'
 
 export class OpenAIService extends Service {
     private client!: OpenAI
 
-    constructor(logger: Logger) {
-        super(
-            logger.child({ service: 'openai' }),
-            'openai',
-        )
+    constructor() {
+        super('openai')
     }
 
     async initialize(): Promise<void> {
-        this.debug('Initializing OpenAI service')
+        Logger.debug('Initializing OpenAI service')
         this.client = new OpenAI({
-            apiKey: env.get('OPENAI_API_KEY')
-                .required()
-                .asString(),
-            organization: env.get('OPENAI_ORG')
-                .asString(),
-            project: env.get('OPENAI_PROJECT')
-                .asString(),
+            apiKey: env.get('OPENAI_API_KEY').required().asString(),
+            organization: env.get('OPENAI_ORG').asString(),
+            project: env.get('OPENAI_PROJECT').asString(),
         })
     }
 
-    async destroy(): Promise<void> {
-
-    }
+    async destroy(): Promise<void> {}
 
     // Completions
 
@@ -47,15 +37,15 @@ export class OpenAIService extends Service {
     async completion(
         messages: OpenAI.ChatCompletionMessageParam[],
         tools?: OpenAI.ChatCompletionTool[],
-        tool_choice?: OpenAI.ChatCompletionToolChoiceOption,
+        tool_choice?: OpenAI.ChatCompletionToolChoiceOption
     ): Promise<OpenAI.ChatCompletion> {
         return this.client.chat.completions.create({
-            model: useConfig().api.model,
+            model: CONFIG.api.model,
             messages,
             tools,
             tool_choice,
-            max_tokens: useConfig().api.max_tokens,
-            temperature: useConfig().fine_tuning.temperature,
+            max_tokens: CONFIG.api.max_tokens,
+            temperature: CONFIG.fine_tuning.temperature,
         })
     }
 }

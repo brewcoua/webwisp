@@ -1,5 +1,5 @@
 {
-  "name": "e2e-agent",
+  "name": "webwisp",
   "version": "1.0.0",
   "description": "An agent for generating end-to-end tests from a given URL",
   "license": "(MIT OR Apache-2.0)",
@@ -11,11 +11,11 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com:brewcoua/e2e-agent.git"
+    "url": "git@github.com:brewcoua/webwisp.git"
   },
-  "homepage": "https://github.com/brewcoua/e2e-agent#readme",
+  "homepage": "https://github.com/brewcoua/webwisp#readme",
   "bugs": {
-    "url": "https://github.com/brewcoua/e2e-agent/issues",
+    "url": "https://github.com/brewcoua/webwisp/issues",
     "email": "contact@brewen.dev"
   },
   "engines": {
@@ -23,27 +23,25 @@
     "npm": ">=10.5.0"
   },
   "scripts": {
-    "start": "dotenvx run -- bun ./src/index.ts",
-    "build": "bun build ./src/index.ts --target=bun --outfile ./dist/e2e-agent.js --external=playwright --external=openai --minify",
+    "start": "dotenvx run -q -- bun ./src/main.ts",
+    "demo": "bun pack && dotenvx run -q -- ./dist/webwisp -t https://www.amazon.fr -k \"Can we buy an hp laptop for less than 500€ and add it to the cart ?\"",
+    "pack": "bun ./scripts/build.ts",
     "format": "prettier --write ./src/**/*.ts"
   },
   "devDependencies": {
     "@dotenvx/dotenvx": "^0.44.0",
-    "madge": "^7.0.0",
-    "pino-pretty": "^11.0.0",
-    "prettier": "^3.2.5",
-    "typescript": "^5.4.5"
+    "prettier": "^3.2.5"
   },
   "dependencies": {
-    "@andreekeberg/imagedata": "^1.0.2",
     "@inquirer/prompts": "^5.0.4",
-    "deepmerge": "^4.3.1",
+    "chalk": "^5.3.0",
     "env-var": "^7.4.2",
-    "extract-colors": "^4.0.6",
+    "meow": "^13.2.0",
     "openai": "^4.47.1",
     "oxide.ts": "^1.1.0",
-    "pino": "^9.1.0",
-    "playwright": "^1.44.0",
-    "sharp": "^0.33.4"
+    "playwright": "^1.44.0"
+  },
+  "bin": {
+    "webwisp": "./dist/webwisp"
   }
 }

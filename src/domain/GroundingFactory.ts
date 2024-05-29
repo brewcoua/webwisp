@@ -8,7 +8,11 @@ import { AttributesGrounding } from '../grounding/Attributes.grounding'
 import { Grounding } from './Grounding'
 
 export class GroundingFactory {
-    public static create(method: Methods, page: Page, logger: Logger): Grounding {
+    public static create(
+        method: Methods,
+        page: Page,
+        logger: Logger
+    ): Grounding {
         logger = logger.child({ task: 'grounding', method: method })
         switch (method) {
             case Methods.Visual:

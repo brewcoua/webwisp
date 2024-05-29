@@ -1,15 +1,14 @@
-import { Agent } from '../Agent'
-import { OpenAIService } from '../../services/OpenAI.service'
-
-import { Logger } from 'pino'
 import { Err, Ok, Result } from 'oxide.ts'
 import { Page } from 'playwright'
 
+import { Agent } from '../Agent'
+import { OpenAIService } from '../../services/OpenAI.service'
 import { VisualGrounding } from '../../grounding/Visual.grounding'
 import { PlaywrightService } from '../../services/Playwright.service'
+import { ActionType } from '../../constants'
+import { Logger } from '../../logger'
 
 
-type ActionType = 'click' | 'type' | 'press_enter' | 'scroll_down' | 'scroll_up' | 'done' | 'fail'
 type Action = {
     type: ActionType,
     description: string,
@@ -22,53 +21,57 @@ export abstract class Runner {
 
     protected constructor(
         protected readonly agent: Agent,
-        protected readonly target: string,
         protected readonly page: Page,
         protected readonly openai: OpenAIService,
         protected readonly pw: PlaywrightService,
-        protected readonly logger: Logger,
     ) { }
 
     public async initialize(): Promise<void> {
-        this.grounding = new VisualGrounding(this.page, this.logger)
+        this.grounding = new VisualGrounding(this.page)
         await this.grounding.initialize()
     }
 
-    abstract launch(): Promise<void>
+    abstract launch(): Promise<any>
 
     protected async handleAction(action: Action): Promise<Result<string, string>> {
         if (action.type.startsWith('scroll')) {
             const direction = action.type === 'scroll_down' ? 'down' : 'up'
+
             await this.page.evaluate(`window.scrollBy({ top: ${
-                direction === 'down' ? '-' : ''
+                direction === 'down' ? '' : '-'
             }window.innerHeight, behavior: 'smooth' })`)
-            return Ok(`${action.description} [DONE]`)
-        } else if (action.type === 'press_enter') {
+
+            return Ok(action.description)
+        } else if (action.type === ActionType.PressEnter) {
             await this.page.keyboard.press('Enter')
-            return Ok(`${action.description} [DONE]`)
+            return Ok(action.description)
         }
 
 
         const element = await this.grounding.resolve(action.label || 0)
 
         if (!element || element.isNone()) {
-            return Err(`${action.type}: #${action.label} not found [FAIL]`)
+            return Err(`${action.type}: #${action.label} not found`)
         }
 
-        switch (action.type) {
-            case 'click':
-                await element.unwrap().click()
-                break
-            case 'type':
-                await element.unwrap().fill(action.value || '')
-                break
-            default:
-                return Err('Unknown action')
+        try {
+            switch (action.type) {
+                case ActionType.Click:
+                    await element.unwrap().click()
+                    break
+                case ActionType.Type:
+                    await element.unwrap().fill(action.value || '')
+                    break
+                default:
+                    return Err(`Unknown action type: ${action.type}`)
+            }
+
+            Logger.debug(`Action ${action.type} on #${action.label} (${action.description}) [DONE]`)
+
+            return Ok(action.description)
+        } catch(err) {
+            return Err(`Error while performing ${action.type} on #${action.label} (${action.description}): ${err.message}`)
         }
-
-        this.logger.debug(`Action ${action.type} on #${action.label} (${action.description}) [DONE]`)
-
-        return Ok(`${action.description} [DONE]`)
     }
 
     protected parseAction(message: string): Action {
@@ -104,7 +107,7 @@ export abstract class Runner {
             }
         })
 
-        this.logger.debug(action, 'Action parsed')
+        Logger.debug(`Parsed action: ${JSON.stringify(action)}`)
         return action
     }
 

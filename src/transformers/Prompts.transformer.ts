@@ -1,12 +1,14 @@
-import { usePrompts } from '../hooks'
+import { PROMPTS } from '../constants'
 
 export class PromptsTransformer {
     public static transformTaskSystemPrompt() {
-        return usePrompts().system.join('\n');
+        return PROMPTS.system
     }
 
-    public static transformTaskUserPrompt(placeholders: UserPromptTaskPlaceholders) {
-        return usePrompts().user.join('\n')
+    public static transformTaskUserPrompt(
+        placeholders: UserPromptTaskPlaceholders
+    ) {
+        return PROMPTS.user
             .replace('%%URL%%', placeholders.url)
             .replace('%%TITLE%%', placeholders.title)
             .replace('%%TASK%%', placeholders.task)
@@ -15,8 +17,8 @@ export class PromptsTransformer {
 }
 
 export type UserPromptTaskPlaceholders = {
-    url: string;
-    title: string;
-    task: string;
-    actions: string[];
+    url: string
+    title: string
+    task: string
+    actions: string[]
 }

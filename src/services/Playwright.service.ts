@@ -1,37 +1,31 @@
-import { Service } from '../domain/Service'
-import { useConfig } from '../hooks'
-
-import { Logger } from 'pino'
 import { Browser, BrowserContext, chromium, firefox, Page } from 'playwright'
 
+import { Service } from '../domain/Service'
+import { CONFIG } from '../constants'
+import { Logger } from '../logger'
 
 export class PlaywrightService extends Service {
     private browser!: Browser
     private context!: BrowserContext
     private pages: Page[] = []
 
-    constructor(logger: Logger) {
-        super(
-            logger.child({ service: 'playwright' }),
-            'playwright',
-        )
+    constructor() {
+        super('playwright')
     }
 
     public async initialize(): Promise<void> {
-        this.debug('Initializing Playwright service')
+        Logger.debug('Initializing Playwright service')
 
-        const config = useConfig()
-
-        switch (config.browser.type) {
+        switch (CONFIG.browser.type) {
             case 'chromium':
-                this.browser = await chromium.launch(config.browser.options)
+                this.browser = await chromium.launch(CONFIG.browser.options)
                 break
             case 'firefox':
-                this.browser = await firefox.launch(config.browser.options)
+                this.browser = await firefox.launch(CONFIG.browser.options)
                 break
         }
 
-        this.context = await this.browser.newContext(config.browser.context)
+        this.context = await this.browser.newContext(CONFIG.browser.context)
     }
 
     public async destroy(): Promise<void> {
@@ -50,9 +44,8 @@ export class PlaywrightService extends Service {
             })
         }
 
-        const config = useConfig()
-        if (config.browser.viewport) {
-            await page.setViewportSize(config.browser.viewport)
+        if (CONFIG.browser.viewport) {
+            await page.setViewportSize(CONFIG.browser.viewport)
         }
 
         this.pages.push(page)
