@@ -4,21 +4,24 @@ import fs from 'node:fs'
 import * as path from 'node:path'
 
 import { Grounding } from '../domain/Grounding'
-import { CONFIG, SoM } from '../constants'
+import { CONFIG } from '../constants'
 import { Logger } from '../logger'
+
+import SoMScript from '../../lib/SoM/dist/SoM.min.js'
+import SoMStyle from '../../lib/SoM/dist/SoM.min.css'
 
 export class VisualGrounding extends Grounding {
     public async initialize(): Promise<void> {
-        await this.page.addStyleTag({ content: SoM.style })
-        await this.page.addScriptTag({ content: SoM.script })
+        await this.page.addStyleTag({ content: SoMStyle })
+        await this.page.addScriptTag({ content: SoMScript })
     }
 
     public async getScreenshot(): Promise<string> {
         // Check that window.SoM is defined
-        const defined = await this.page.evaluate(
+        const isDefined = await this.page.evaluate(
             "typeof window.SoM !== 'undefined'"
         )
-        if (!defined) {
+        if (!isDefined) {
             await this.initialize()
         }
 
@@ -31,8 +34,6 @@ export class VisualGrounding extends Grounding {
         await this.page.screenshot({
             path: imgPath,
         })
-
-        await this.page.evaluate('window.SoM.hide()')
 
         // Workaround to make sure image is valid (buffer-only ends up being invalid in some cases)
         let img = fs.readFileSync(imgPath)

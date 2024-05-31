@@ -12,43 +12,40 @@ export enum ActionType {
 }
 
 export const CONFIG: Config = {
-    'fine_tuning': {
-        'temperature': 0.7,
+    fine_tuning: {
+        temperature: 0.7,
     },
-    'api': {
-        'model': 'gpt-4o',
-        'ratelimit': 0.5,
-        'delay': 0,
-        'max_tokens': 1500,
-        'max_cycles': 10,
-        'max_failed_cycles': 3,
+    api: {
+        model: 'gpt-4o',
+        ratelimit: 0.5,
+        delay: 0,
+        max_tokens: 1500,
+        max_cycles: 10,
+        max_failed_cycles: 3,
     },
-    'browser': {
-        'type': 'chromium',
-        'options': {
-            'headless': false,
-            'slowMo': 50,
-            'args': [
-                '--disable-web-security',
-            ],
+    browser: {
+        type: 'chromium',
+        options: {
+            headless: false,
+            slowMo: 50,
+            args: ['--disable-web-security'],
         },
-        'context': {
-            'bypassCSP': true,
-            'recordVideo': {
-                'dir': 'videos',
+        context: {
+            bypassCSP: true,
+            recordVideo: {
+                dir: 'videos',
             },
         },
-        'viewport': {
-            'width': 1280,
-            'height': 720,
+        viewport: {
+            width: 1280,
+            height: 720,
         },
-        'screenshotsDir': 'dist/img',
+        screenshotsDir: 'dist/img',
     },
 }
 
-
 export const PROMPTS: Prompts = {
-    'system': `
+    system: `
 You are a human browsing a website to perform a task, doing each action step by step.
 After every action, you are given a screenshot of the website by the user, the full url, the title of the page, and the list of your previous actions.
 You must decide the next action to take based on the current state of the website and the actions you have done so far. Only ever issue a valid action based on the current state of the website.
@@ -60,7 +57,9 @@ Only issue one action at a time (e.g. You may not type AND press enter). After e
 Once you believe the task is complete, issue the action 'done' with the final output message for task completion and a value if needed (as in, the actual raw value that you were asked for, e.g. a restaurant name or 'yes' / 'no').
 For the final description, you must describe why you believe the task is complete, and what you have found (e.g. 'The lowest price is $10.99 for the item').
 Always keep triple tildes \`~~~\` to allow the system to parse your answer correctly.
-Possible actions are: ${Object.values(ActionType).map((action) => `'${action}'`).join(', ')}.
+Possible actions are: ${Object.values(ActionType)
+        .map((action) => `'${action}'`)
+        .join(', ')}.
 For your answer, you must follow the template below, without including <template> tags:
 <template>
 ## Current State ##
@@ -71,12 +70,14 @@ Describe the actions you have done so far.
 Describe the next action to take.
 ~~~
 DESCRIPTION: <REQUIRED, description of the action, to be recalled later (e.g. Click on the \'Next\' button), or final output message for task completion>
-ACTION: <${Object.values(ActionType).map((action) => `'${action}'`).join(' | ')}>
+ACTION: <${Object.values(ActionType)
+        .map((action) => `'${action}'`)
+        .join(' | ')}>
 ELEMENT: <label of the element, MUST be a valid number, optional when not interacting>
 VALUE: <optional, value to type or value for task completion, on done>
 ~~~
 </template>`,
-    'user': `
+    user: `
 TITLE: %%TITLE%%
 URL: \`%%URL%%\`
 TASK: %%TASK%%
@@ -91,14 +92,6 @@ export const REGEX = {
     localhost: /^localhost(:\d{1,5})?$/,
 }
 
-import SoMStyle from './grounding/SoM/SoM.inline.css'
-import SoMScript from './grounding/SoM/SoM.inline.js'
-
-export const SoM = {
-    style: SoMStyle,
-    script: SoMScript,
-}
-
 // TYPES
 
 export type Config = {
@@ -106,52 +99,52 @@ export type Config = {
     fine_tuning: {
         // Temperature to use for completions
         temperature?: number
-    },
+    }
     api: {
         // Model to be used for completions. (MUST be multimodal)
-        model: OpenAI.ChatModel,
+        model: OpenAI.ChatModel
         // Rate limit for OpenAI API, in requests per second
-        ratelimit: number,
+        ratelimit: number
         // Time in ms to wait between each step. Useful for debugging
-        delay: number,
+        delay: number
         // Maximum number of tokens to use in each completion
-        max_tokens: number,
+        max_tokens: number
         // Maximum number of cycles to run on the same step before hard stopping
-        max_cycles: number,
+        max_cycles: number
         // Maximum number of failed cycles before hard stopping
-        max_failed_cycles: number,
-    },
+        max_failed_cycles: number
+    }
     browser: {
         // Browser type to use (e.g. chromium, firefox)
-        type: BrowserType,
+        type: BrowserType
         // Browser options to use (for playwright)
-        options: LaunchOptions,
+        options: LaunchOptions
         // Browser context options to use (for playwright)
-        context: BrowserContextOptions,
+        context: BrowserContextOptions
         // Viewport size to use
         viewport?: {
-            width: number,
-            height: number,
-        },
+            width: number
+            height: number
+        }
         // Directory to save screenshots
-        screenshotsDir: string,
-    },
+        screenshotsDir: string
+    }
     // List of predefined tasks to perform on the target
-    tasks?: Task[],
+    tasks?: Task[]
 }
 
-export type Element = 'text' | ClickableElement;
-export type ClickableElement = 'button' | 'link' | 'textbox' | 'combobox';
+export type Element = 'text' | ClickableElement
+export type ClickableElement = 'button' | 'link' | 'textbox' | 'combobox'
 
 type Task = {
-    objective: string,
-    scenario: string[][],
+    objective: string
+    scenario: string[][]
 }
 
-type URL = `http${'' | 's'}://${string}`;
-type BrowserType = 'chromium' | 'firefox';
+type URL = `http${'' | 's'}://${string}`
+type BrowserType = 'chromium' | 'firefox'
 
 export type Prompts = {
-    user: string,
-    system: string,
+    user: string
+    system: string
 }

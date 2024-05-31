@@ -2,10 +2,11 @@ import type { BunPlugin } from 'bun'
 import { exec } from 'child_process'
 import chalk from 'chalk'
 
-const InlineScriptPlugin: BunPlugin = {
-    name: 'inline-script-as-string',
-    setup(build) { // Inline js and css
-        build.onLoad({ filter: /\.inline\.(js|css)$/ }, async (args) => {
+const InlineScriptsPlugin: BunPlugin = {
+    name: 'inline-scripts',
+    setup(build) {
+        // Bundle all js and css as text
+        build.onLoad({ filter: /\.min\.(js|css)$/ }, async (args) => {
             return {
                 contents: await Bun.file(args.path).text(),
                 loader: 'text',
@@ -21,7 +22,7 @@ async function main() {
         minify: true,
         target: 'bun',
         outdir: './dist',
-        plugins: [InlineScriptPlugin],
+        plugins: [InlineScriptsPlugin],
         external: ['playwright', 'openai'],
     })
     result.logs.forEach(console.log)
@@ -35,13 +36,16 @@ async function main() {
     // Set color env
     process.env.FORCE_COLOR = '1'
 
-    exec(`bun build ./dist/main.js --compile --target=bun --outfile ./dist/webwisp -e playwright -e openai`, (err, stdout, stderr) => {
-        if (err) {
-            console.error(err)
-            process.exit(1)
+    exec(
+        `bun build ./dist/main.js --compile --target=bun --outfile ./dist/webwisp -e playwright -e openai`,
+        (err, stdout, stderr) => {
+            if (err) {
+                console.error(err)
+                process.exit(1)
+            }
+            console.log(stdout)
         }
-        console.log(stdout)
-    })
+    )
 }
 
 main().catch(console.error)
