@@ -7,7 +7,9 @@ import { Grounding } from '../domain/Grounding'
 import { CONFIG } from '../constants'
 import { Logger } from '../logger'
 
+// @ts-ignore
 import SoMScript from '../../lib/SoM/dist/SoM.min.js'
+// @ts-ignore
 import SoMStyle from '../../lib/SoM/dist/SoM.min.css'
 
 export class VisualGrounding extends Grounding {
@@ -18,14 +20,12 @@ export class VisualGrounding extends Grounding {
 
     public async getScreenshot(): Promise<string> {
         // Check that window.SoM is defined
-        const isDefined = await this.page.evaluate(
-            "typeof window.SoM !== 'undefined'"
-        )
+        const isDefined = await this.page.evaluate("typeof SoM !== 'undefined'")
         if (!isDefined) {
             await this.initialize()
         }
 
-        await this.page.evaluate('window.SoM.display()')
+        await this.page.evaluate('SoM.display()')
 
         const imgPath = path.join(
             CONFIG.browser.screenshotsDir,

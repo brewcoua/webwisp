@@ -11,8 +11,8 @@ import { Logger } from './logger'
 import { waitPress } from './cli/prompts'
 import { promptVoice } from './cli/voice'
 
-
-const cli = meow(`
+const cli = meow(
+    `
     Usage
       $ webwisp
 
@@ -27,30 +27,32 @@ const cli = meow(`
       $ webwisp -V
       ${pkg.version}
       $ webwisp --target https://example.com --task "Give me the contact email address"
-`, {
-    importMeta: import.meta,
-    flags: {
-        version: {
-            type: 'boolean',
-            shortFlag: 'V',
+`,
+    {
+        importMeta: import.meta,
+        flags: {
+            version: {
+                type: 'boolean',
+                shortFlag: 'V',
+            },
+            verbose: {
+                type: 'boolean',
+            },
+            target: {
+                type: 'string',
+                shortFlag: 't',
+            },
+            task: {
+                type: 'string',
+                shortFlag: 'k',
+            },
+            voice: {
+                type: 'boolean',
+                shortFlag: 'v',
+            },
         },
-        verbose: {
-            type: 'boolean',
-        },
-        target: {
-            type: 'string',
-            shortFlag: 't',
-        },
-        task: {
-            type: 'string',
-            shortFlag: 'k',
-        },
-        voice: {
-            type: 'boolean',
-            shortFlag: 'v',
-        },
-    },
-})
+    }
+)
 
 if (cli.flags.version) {
     console.log(pkg.version)
@@ -102,6 +104,10 @@ async function promptTarget() {
 }
 
 async function promptTask() {
+    if (cli.flags.voice) {
+        return await promptVoice('Task')
+    }
+
     return input({
         message: 'Task',
         validate: (input: string) => {
@@ -122,29 +128,22 @@ function bindSignals(agent: Agent) {
     }
 
     process.on('unhandledRejection', (reason, promise) => {
-        Logger.error(`Unhandled Rejection: ${reason}`);
-        terminate();
+        Logger.error(`Unhandled Rejection: ${reason}`)
+        terminate()
     })
-    process.on('uncaughtException', error => {
-        Logger.error(`Uncaught Exception: ${error}`);
-        terminate();
-    });
-
-    ['SIGHUP', 'SIGINT', 'SIGKILL', 'SIGQUIT', 'SIGTERM'].forEach(signal => {
+    process.on('uncaughtException', (error) => {
+        Logger.error(`Uncaught Exception: ${error}`)
+        terminate()
+    })
+    ;['SIGHUP', 'SIGINT', 'SIGKILL', 'SIGQUIT', 'SIGTERM'].forEach((signal) => {
         process.on(signal, () => {
-            Logger.warn(`Received ${signal}, shutting down`);
+            Logger.warn(`Received ${signal}, shutting down`)
             terminate(0)
         })
     })
 }
 
-
-
 async function main() {
-    if (cli.flags.voice) {
-        await promptVoice()
-    }
-
     await waitPress({ message: 'Press enter to start the agent' })
 
     let target = cli.flags.target
@@ -166,7 +165,7 @@ async function main() {
     console.log(chalk.gray.bold('—'.repeat(terminalWidth)))
 
     const agent = new Agent()
-    bindSignals(agent);
+    bindSignals(agent)
 
     await agent.initialize()
 
@@ -178,5 +177,4 @@ async function main() {
     Logger.taskResult(result)
 }
 
-main()
-    .catch(console.error)
+main().catch(console.error)

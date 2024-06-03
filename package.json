@@ -24,7 +24,7 @@
     },
     "scripts": {
         "start": "dotenvx run -q -- bun ./src/main.ts",
-        "demo": "bun pack && dotenvx run -q -- ./dist/webwisp -t https://www.amazon.fr -k \"Is it possible to buy an AMD ThreadRipper processor for less than 1500€ ?\"",
+        "demo": "bun pack && dotenvx run -q -- ./dist/webwisp -t https://www.amazon.fr -k \"With a budget of 500€, add a PS5 and as many controllers as you can to my cart.\"",
         "pack": "bun ./scripts/build.ts",
         "format": "prettier --write ./src/**/*.ts"
     },

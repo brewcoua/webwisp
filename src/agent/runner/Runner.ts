@@ -8,12 +8,11 @@ import { PlaywrightService } from '../../services/Playwright.service'
 import { ActionType } from '../../constants'
 import { Logger } from '../../logger'
 
-
 type Action = {
-    type: ActionType,
-    description: string,
-    label?: number,
-    value?: string,
+    type: ActionType
+    description: string
+    label?: number
+    value?: string
 }
 
 export abstract class Runner {
@@ -23,8 +22,8 @@ export abstract class Runner {
         protected readonly agent: Agent,
         protected readonly page: Page,
         protected readonly openai: OpenAIService,
-        protected readonly pw: PlaywrightService,
-    ) { }
+        protected readonly pw: PlaywrightService
+    ) {}
 
     public async initialize(): Promise<void> {
         this.grounding = new VisualGrounding(this.page)
@@ -33,21 +32,24 @@ export abstract class Runner {
 
     abstract launch(): Promise<any>
 
-    protected async handleAction(action: Action): Promise<Result<string, string>> {
+    protected async handleAction(
+        action: Action
+    ): Promise<Result<string, string>> {
         if (action.type.startsWith('scroll')) {
             const direction = action.type === 'scroll_down' ? 'down' : 'up'
 
             // Scroll by 2/3 of the window height
-            await this.page.evaluate(`window.scrollBy({ top: ${
-                direction === 'down' ? '' : '-'
-            }((window.innerHeight / 3) * 2), behavior: 'smooth' })`)
+            await this.page.evaluate(
+                `window.scrollBy({ top: ${
+                    direction === 'down' ? '' : '-'
+                }((window.innerHeight / 3) * 2) })`
+            )
 
             return Ok(action.description)
         } else if (action.type === ActionType.PressEnter) {
             await this.page.keyboard.press('Enter')
             return Ok(action.description)
         }
-
 
         const element = await this.grounding.resolve(action.label || 0)
 
@@ -67,11 +69,15 @@ export abstract class Runner {
                     return Err(`Unknown action type: ${action.type}`)
             }
 
-            Logger.debug(`Action ${action.type} on #${action.label} (${action.description}) [DONE]`)
+            Logger.debug(
+                `Action ${action.type} on #${action.label} (${action.description}) [DONE]`
+            )
 
             return Ok(action.description)
-        } catch(err) {
-            return Err(`Error while performing ${action.type} on #${action.label} (${action.description}): ${err.message}`)
+        } catch (err) {
+            return Err(
+                `Error while performing ${action.type} on #${action.label} (${action.description}): ${err.message}`
+            )
         }
     }
 
@@ -87,8 +93,7 @@ export abstract class Runner {
 
         let action = {} as Action
         lines.forEach((line) => {
-            if (line.trim() === '')
-                return
+            if (line.trim() === '') return
 
             const [key, value] = line.split(':')
 
@@ -117,6 +122,6 @@ export abstract class Runner {
     }
 
     protected async sleep(ms: number) {
-        return new Promise(resolve => setTimeout(resolve, ms))
+        return new Promise((resolve) => setTimeout(resolve, ms))
     }
 }
