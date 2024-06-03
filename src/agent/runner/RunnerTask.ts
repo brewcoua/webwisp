@@ -10,9 +10,9 @@ import { ActionType, CONFIG } from '../../constants'
 import { Logger } from '../../logger'
 
 export type TaskResult = {
-    success: boolean,
-    message: string,
-    value?: string,
+    success: boolean
+    message: string
+    value?: string
 }
 
 export class RunnerTask extends Runner {
@@ -23,7 +23,7 @@ export class RunnerTask extends Runner {
         page: Page,
         openai: OpenAIService,
         pw: PlaywrightService,
-        private readonly task: string,
+        private readonly task: string
     ) {
         super(agent, page, openai, pw)
     }
@@ -36,11 +36,16 @@ export class RunnerTask extends Runner {
         let cycles = 0
         let failed_cycles = 0
 
-        while (cycles < CONFIG.api.max_cycles && failed_cycles < CONFIG.api.max_failed_cycles) {
+        while (
+            cycles < CONFIG.api.max_cycles &&
+            failed_cycles < CONFIG.api.max_failed_cycles
+        ) {
             const cycleStart = Date.now()
 
             // Check if page is loading to avoid context loss
-            await this.page.waitForFunction(() => document.readyState === 'complete');
+            await this.page.waitForFunction(
+                () => document.readyState === 'complete'
+            )
 
             const prompt = PromptsTransformer.transformTaskUserPrompt({
                 url: this.page.url(),
@@ -74,9 +79,7 @@ export class RunnerTask extends Runner {
                 },
             ]
 
-            const result = await this.openai.completion(
-                messages,
-            )
+            const result = await this.openai.completion(messages)
 
             const choice = result.choices[0]
             const message = choice.message.content
@@ -86,8 +89,11 @@ export class RunnerTask extends Runner {
                 break
             }
 
-            Logger.debug(`[${cycles}/${CONFIG.api.max_cycles}]: ${result.usage?.total_tokens} (${choice.finish_reason})\n${message}`)
+            Logger.debug(
+                `[${cycles}/${CONFIG.api.max_cycles}]: ${result.usage?.total_tokens} (${choice.finish_reason})\n${message}`
+            )
 
+            const reasoning = this.parseReasoning(message)
             const action = this.parseAction(message)
             if (action.type === ActionType.Done) {
                 return {
@@ -104,20 +110,21 @@ export class RunnerTask extends Runner {
             }
 
             const actionResult = await this.handleAction(action)
-            this.actions.push(actionResult.unwrapUnchecked() + ` ${
-                actionResult.isErr() ? '[FAIL]' : '[DONE]'
-            }`)
+            this.actions.push(
+                actionResult.unwrapUnchecked() +
+                    ` ${actionResult.isErr() ? '[FAIL]' : '[DONE]'}`
+            )
 
             Logger.action(
                 action.type,
                 actionResult.unwrapUnchecked(),
                 actionResult.isOk(),
+                reasoning.unwrapOr(''),
                 Date.now() - cycleStart,
-                result.usage?.total_tokens,
+                result.usage?.total_tokens
             )
 
-            if (actionResult.isErr())
-                failed_cycles++
+            if (actionResult.isErr()) failed_cycles++
             cycles++
 
             await this.sleep(CONFIG.api.delay)
@@ -128,7 +135,7 @@ export class RunnerTask extends Runner {
                 success: false,
                 message: 'Reached maximum failed actions',
             }
-        } else if (cycles >= CONFIG.api.max_cycles) {
+        } else {
             return {
                 success: false,
                 message: 'Reached maximum actions',

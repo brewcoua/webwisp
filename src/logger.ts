@@ -12,35 +12,23 @@ export class Logger {
     static debug(message: string) {
         if (!this.verbose) return
 
-        console.log(
-            chalk.cyan.bold('DEBUG'),
-            message,
-        )
+        console.log(chalk.cyan.bold('DEBUG'), message)
     }
 
     static error(message: string) {
-        console.log(
-            chalk.red.bold('ERROR'),
-            message,
-        )
+        console.log(chalk.red.bold('ERROR'), message)
     }
 
     static warn(message: string) {
-        console.log(
-            chalk.yellow.bold('WARN'),
-            message,
-        )
+        console.log(chalk.yellow.bold('WARN'), message)
     }
 
-    static prompt(
-        title: string,
-        value: string,
-    ) {
+    static prompt(title: string, value: string) {
         // Simulate inquirer prompt format
         console.log(
             chalk.green('$'),
             chalk.whiteBright.bold(title),
-            chalk.reset.cyan(value),
+            chalk.reset.cyan(value)
         )
     }
 
@@ -48,8 +36,9 @@ export class Logger {
         kind: ActionType,
         action: string,
         success: boolean,
+        reasoning?: string,
         duration?: number,
-        usage?: number,
+        usage?: number
     ) {
         // Use an emote to represent each action kind
         let emote
@@ -71,6 +60,11 @@ export class Logger {
                 emote = '❓'
         }
 
+        // First, output the reasoning if any
+        if (reasoning) {
+            console.log(chalk.bold.whiteBright(`🧠?`), chalk.italic(reasoning))
+        }
+
         console.log(
             chalk.bold.whiteBright(`${emote}❯`),
             chalk.white(action),
@@ -78,21 +72,21 @@ export class Logger {
             // Duration
             duration && chalk.gray.italic(`(${duration}ms)`),
             // Usage
-            usage && chalk.gray.italic(`[${usage} tok]`),
+            usage && chalk.gray.italic(`[${usage} tok]`)
         )
     }
 
     static taskResult(result: TaskResult) {
         console.log(
-            result.success ?
-                chalk.green.bold('Done!') :
-                chalk.red.bold('Failed!'),
-            chalk.whiteBright(result.message),
+            result.success
+                ? chalk.green.bold('Done!')
+                : chalk.red.bold('Failed!'),
+            chalk.whiteBright(result.message)
         )
         if (result.value) {
             console.log(
                 chalk.whiteBright.bold('Value:'),
-                chalk.cyan(result.value),
+                chalk.cyan(result.value)
             )
         }
     }

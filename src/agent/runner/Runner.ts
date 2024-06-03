@@ -1,4 +1,4 @@
-import { Err, Ok, Result } from 'oxide.ts'
+import { Err, None, Ok, Option, Result, Some } from 'oxide.ts'
 import { Page } from 'playwright'
 
 import { Agent } from '../Agent'
@@ -115,6 +115,16 @@ export abstract class Runner {
 
         Logger.debug(`Parsed action: ${JSON.stringify(action)}`)
         return action
+    }
+
+    protected parseReasoning(message: string): Option<string> {
+        // Parse stuff after "## Next Action ##\n" and before "~~~"
+        const raw = message.split('## Next Action ##\n')?.at(1)?.split('~~~')
+        if (!raw) {
+            return None
+        }
+
+        return Some(raw[0].trim())
     }
 
     protected async screenshot(): Promise<string> {

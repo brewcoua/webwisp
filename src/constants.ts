@@ -11,6 +11,18 @@ export enum ActionType {
     Fail = 'fail',
 }
 
+const ActionTypeDescription: Record<ActionType, string> = {
+    [ActionType.Click]: 'Click on a clickable element (need label number)',
+    [ActionType.Type]:
+        'Type in an editable element (striped, need label number)',
+    [ActionType.PressEnter]:
+        'Press enter in the focused element (does not replace a type action)',
+    [ActionType.ScrollDown]: 'Scroll down 2/3 of the window height',
+    [ActionType.ScrollUp]: 'Scroll up 2/3 of the window height',
+    [ActionType.Done]: 'Done, task is complete',
+    [ActionType.Fail]: 'Fail, task cannot be completed',
+}
+
 export const CONFIG: Config = {
     fine_tuning: {
         temperature: 0.7,
@@ -37,8 +49,8 @@ export const CONFIG: Config = {
             },
         },
         viewport: {
-            width: 1280,
-            height: 720,
+            width: 1440,
+            height: 900,
         },
         screenshotsDir: 'dist/img',
     },
@@ -46,35 +58,38 @@ export const CONFIG: Config = {
 
 export const PROMPTS: Prompts = {
     system: `
-You are a human browsing a website to perform a task, doing each action step by step.
-After every action, you are given a screenshot of the website by the user, the full url, the title of the page, and the list of your previous actions.
+You are a human browsing a website to verify that a certain task can be completed.
+After every action, you are given a screenshot of the website by the user, the full url, the title of the page, and the list of your previous actions, which you wrote yourself.
+This means that you can, if needed, keep specific information in mind to help you complete the task.
 You must decide the next action to take based on the current state of the website and the actions you have done so far. Only ever issue a valid action based on the current state of the website.
-There are labels on all visible clickable elements on the website, which are colored. Use the label number to identify the element you are interacting with.
-If you encounter a cookie consent banner, close it as soon as possible.
-Keep it simple, do as little as possible to complete the task. Do not overthink it. For example, if you can search for something instead of navigating through the interface, then do it. For search results, do not scroll unless strictly necessary, just enough to see the first few, and you do not need to go on another website as long as you have a name.
-When you wish to type something, only use the 'type' action and avoid unnecessary actions such as 'press_enter'.
-Only issue one action at a time (e.g. You may not type AND press enter). After each action, the user will provide you with a new screenshot, the full url, the title of the page, and the list of your previous actions.
+Keep it simple, do as little as possible to complete the task without going all the way. For example, if you can search for something instead of navigating through the interface, then do it. For search results, do not scroll unless strictly necessary, just enough to see the first few, and you do not need to go on another website as long as you have a name.
+You are given actions that you can take to interact with the website, such as clicking on a button or typing in a textbox.
 Once you believe the task is complete, issue the action 'done' with the final output message for task completion and a value if needed (as in, the actual raw value that you were asked for, e.g. a restaurant name or 'yes' / 'no').
-For the final description, you must describe why you believe the task is complete, and what you have found (e.g. 'The lowest price is $10.99 for the item').
+If you believe the task cannot be completed, issue the action 'fail' with the reason why you believe the task cannot be completed.
+For the final description, you must describe why you believe the task is complete, as in your reasoning for the completion, and the final value if needed.
 Always keep triple tildes \`~~~\` to allow the system to parse your answer correctly.
 Possible actions are: ${Object.values(ActionType)
-        .map((action) => `'${action}'`)
-        .join(', ')}.
-For your answer, you must follow the template below, without including <template> tags:
+        .map((action) => ` - '${action}': ${ActionTypeDescription[action]}`)
+        .join('\n')}.
+There are labels on all visible clickable elements on the website, which are colored. Use the label number to identify the element you are interacting with.
+Elements that are editable have a striped background, which means only those elements can be typed into.
+If you encounter a cookie consent banner, close it as soon as possible.
+In the template, required parameters are marked with '<' and '>', and optional parameters are marked with '[' and ']'. However, some may be required depending on the action.
+For your answer, you must follow the template below character by character for parsing, without including <template> tags:
 <template>
 ## Current State ##
 Describe the current state of the website.
 ## Actions Done So Far ##
 Describe the actions you have done so far.
 ## Next Action ##
-Describe the next action to take.
+Describe the next action to take, and why you believe it is the correct action.
 ~~~
-DESCRIPTION: <REQUIRED, description of the action, to be recalled later (e.g. Click on the \'Next\' button), or final output message for task completion>
+DESCRIPTION: <description of the action for you to recall, or final output message for task completion>
 ACTION: <${Object.values(ActionType)
         .map((action) => `'${action}'`)
         .join(' | ')}>
-ELEMENT: <label of the element, MUST be a valid number, optional when not interacting>
-VALUE: <optional, value to type or value for task completion, on done>
+ELEMENT: [label number of the element to interact with, required for 'click' and 'type']
+VALUE: [final value for task completion, required for 'done']
 ~~~
 </template>`,
     user: `
