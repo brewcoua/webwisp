@@ -26,9 +26,10 @@ bun install # Or any other package manager
 Then, you can run WebWisp with the following command, depending on your runtime:
 
 ```bash
-bun start:bun # Bun only
-npm start:node # Node only
+npm start # Or 'bun start'
 ```
+
+This will prioritize running with `bun`, but if it is not installed, it will default to `npm` and `node`.
 
 It can also be built by itself using:
 
