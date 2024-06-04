@@ -25,7 +25,7 @@
     },
     "scripts": {
         "start:bun": "bun pack && dotenvx run -q -- bun ./dist/main.js",
-        "start:node": "npm pack && dotenvx run -q -- node ./dist/main.js",
+        "start:node": "npm run pack && dotenvx run -q -- node ./dist/main.js",
         "demo": "bun start:bun -- -t https://www.amazon.fr -k \"Check that it is possible to add a PS5 to the cart and display it\"",
         "pack": "vite build",
         "format": "prettier --write ./src/**/*.ts"
