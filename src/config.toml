@@ -63,25 +63,21 @@ $ [single-sentence action description for what you want to do]
 
 [prompts.system.examples]
 message = "To help you with the task, here are some examples of input/output pairs:"
-list = [
-    {
-        screenshot = "./assets/examples/1.png",
-        prompt = """Title: Amazon.fr : livres, DVD, jeux vidéo, musique, high-tech, informatique, jouets, vêtements, chaussures, sport, bricolage, maison, beauté, puériculture, épicerie et plus encore !
-        URL: https://www.amazon.fr/
-        Task: Check that we can add a PlayStation 5 to the cart and proceed to checkout.
-        Previous actions:
-        None""",
-        completion = """## Current State ##
-        Let's think step by step. The website is on the Amazon.fr homepage. Various categories are displayed, such as High-Tech, Cuisine et maison, Jardin, etc. The search bar is available at the top of the page.
+list = [ 
+    { screenshot = "./assets/examples/1.png", prompt = """Title: Amazon.fr : livres, DVD, jeux vidéo, musique, high-tech, informatique, jouets, vêtements, chaussures, sport, bricolage, maison, beauté, puériculture, épicerie et plus encore !
+URL: https://www.amazon.fr/
+Task: Check that we can add a PlayStation 5 to the cart and proceed to checkout.
+Previous actions:
+None""", completion = """## Current State ##
+Let's think step by step. The website is on the Amazon.fr homepage. Various categories are displayed, such as High-Tech, Cuisine et maison, Jardin, etc. The search bar is available at the top of the page.
 
-        ## Action ##
-        We need to use the search bar to search for a PlayStation 5, with the search bar being orange with stripes and a label that says "Rechercher Amazon.fr".
+## Action ##
+We need to use the search bar to search for a PlayStation 5, with the search bar being orange with stripes and a label that says "Rechercher Amazon.fr".
 
-        ~~~
-        $ Type "PlayStation 5" into the search bar
-        type 4 "PlayStation 5"
-        ~~~"""
-    }
+~~~
+$ Type "PlayStation 5" into the search bar
+type 4 "PlayStation 5"
+~~~""" }
 ]
 
 [prompts.user]
@@ -98,26 +94,14 @@ Screenshot:"""
 [actions.click]
 description = "Click on an element on the page."
 arguments = [
-    {
-        name = "label",
-        type = "number",
-        required = true,
-    }
+    { name = "label", type = "number", required = true }
 ]
 
 [actions.type]
 description = "Type text into an editable, striped, element on the page."
 arguments = [
-    {
-        name = "label",
-        type = "number",
-        required = true,
-    },
-    {
-        name = "text",
-        type = "string",
-        required = true,
-    }
+    { name = "label", type = "number", required = true },
+    { name = "text", type = "string", required = true }
 ]
 
 [actions.press_enter]
@@ -126,12 +110,7 @@ description = "Press the enter key on the keyboard. This does not replace typing
 [actions.scroll]
 description = "Scroll the page up or down, for 2/3 of the viewport height."
 arguments = [
-    {
-        name = "direction",
-        type = "string",
-        enum = ["up", "down"],
-        required = true,
-    }
+    { name = "direction", type = "string", enum = ["up", "down"], required = true }
 ]
 
 [actions.back]
@@ -143,15 +122,6 @@ description = "Go forward to the next page in the browser history. This requires
 [actions.done]
 description = "Finish the task and give the final verdict of the task completion."
 arguments = [
-    {
-        name = "value",
-        type = "string",
-        enum = ["success", "failure"],
-        required = true,
-    },
-    {
-        name = "reason",
-        type = "string",
-        required = false,
-    }
+    { name = "value", type = "string", enum = ["success", "failure"], required = true },
+    { name = "reason", type = "string", required = false }
 ]
