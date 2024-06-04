@@ -135,7 +135,7 @@ function bindSignals(agent: Agent) {
         Logger.error(`Uncaught Exception: ${error}`)
         terminate()
     })
-    ;['SIGHUP', 'SIGINT', 'SIGKILL', 'SIGQUIT', 'SIGTERM'].forEach((signal) => {
+    ;['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGTERM'].forEach((signal) => {
         process.on(signal, () => {
             Logger.warn(`Received ${signal}, shutting down`)
             terminate(0)

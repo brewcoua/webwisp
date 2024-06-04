@@ -1,4 +1,3 @@
-import * as env from 'env-var'
 import OpenAI from 'openai'
 
 import { Logger } from '../logger'
@@ -13,10 +12,15 @@ export class OpenAIService extends Service {
     }
 
     public static makeClient(): OpenAI {
+        const apiKey = process.env.OPENAI_API_KEY
+        if (!apiKey) {
+            throw new Error('No OpenAI API key provided')
+        }
+
         return new OpenAI({
-            apiKey: env.get('OPENAI_API_KEY').required().asString(),
-            organization: env.get('OPENAI_ORG').asString(),
-            project: env.get('OPENAI_PROJECT').asString(),
+            apiKey,
+            organization: process.env.OPENAI_ORG,
+            project: process.env.OPENAI_PROJECT,
         })
     }
 
