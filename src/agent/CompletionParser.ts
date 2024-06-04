@@ -80,7 +80,7 @@ export default class CompletionParser {
         actionType: ActionType,
         actionInfo: Action
     ): Record<string, string | number | boolean> {
-        const parsedArgs = {}
+        const parsedArgs = {} as Record<string, string | number | boolean>
         if (!actionInfo.arguments) {
             return parsedArgs
         }

@@ -1,4 +1,5 @@
 import ora from 'ora'
+// @ts-ignore
 import AudioRecorder from 'node-audiorecorder'
 import fs from 'node:fs'
 import chalk from 'chalk'
@@ -34,8 +35,8 @@ async function recordVoice() {
         })
     })
 
-    recorder.on('error', (error) => {
-        console.log(chalk.redBright.bold('Error!'), chalk.white(error))
+    recorder.on('error', (error: any) => {
+        console.log(chalk.redBright.bold('Error!'), chalk.white(error.message))
     })
 
     const fileStream = fs.createWriteStream(RECORD_PATH, { encoding: 'binary' })

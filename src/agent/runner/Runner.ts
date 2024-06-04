@@ -1,9 +1,9 @@
-import { Err, None, Ok, Option, Result, Some } from 'oxide.ts'
+import { Err, Ok, Result } from 'oxide.ts'
 import { Page } from 'playwright'
 
 import { Agent } from '../Agent'
 import { OpenAIService } from '../../services/OpenAI.service'
-import { VisualGrounding } from '../../grounding/Visual.grounding'
+import { Grounding } from '../Grounding'
 import { PlaywrightService } from '../../services/Playwright.service'
 import { useConfig } from '../../constants'
 import { Logger } from '../../logger'
@@ -18,7 +18,7 @@ import PromptBuilder from '../PromptBuilder'
 import CompletionParser from '../CompletionParser'
 
 export class Runner {
-    private grounding!: VisualGrounding
+    private grounding!: Grounding
 
     public constructor(
         private readonly agent: Agent,
@@ -29,7 +29,7 @@ export class Runner {
     ) {}
 
     public async initialize(): Promise<void> {
-        this.grounding = new VisualGrounding(this.page)
+        this.grounding = new Grounding(this.page)
         await this.grounding.initialize()
     }
 
@@ -110,7 +110,7 @@ export class Runner {
                     }
                     cycles++
                     break
-                } catch (err) {
+                } catch (err: any) {
                     Logger.error(
                         `Error while parsing completion: ${err.message}`
                     )
@@ -200,7 +200,7 @@ export class Runner {
                     )
 
                     return Ok(action.description)
-                } catch (err) {
+                } catch (err: any) {
                     return Err(
                         `Error while performing ${action.type} on #${action.arguments.label} (${action.description}): ${err.message}`
                     )

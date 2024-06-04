@@ -1,5 +1,5 @@
 import { useConfig } from '../constants'
-import { Action, CalledAction } from '../domain/config'
+import { Action, ActionType, CalledAction } from '../domain/config'
 import { readFileSync } from 'fs'
 import OpenAI from 'openai'
 
@@ -10,16 +10,15 @@ export default class PromptBuilder {
         const actions = useConfig().actions
         const actionList = Object.keys(actions)
             .map((action) => {
-                const info: Action = actions[action]
+                const info: Action = actions[action as ActionType]
 
-                const args = Object.keys(info.arguments || {})
-                    .map((argName) => {
-                        const arg = (info.arguments || {})[argName]
-
-                        return `${arg.required ? '<' : '['}${arg.name};${arg.type}${
-                            arg.enum ? `;${arg.enum.join('|')}` : ''
-                        }${arg.required ? '>' : ']'}`
-                    })
+                const args = (info.arguments || [])
+                    .map(
+                        (arg) =>
+                            `${arg.required ? '<' : '['}${arg.name};${arg.type}${
+                                arg.enum ? `;${arg.enum.join('|')}` : ''
+                            }${arg.required ? '>' : ']'}`
+                    )
                     .join(' ')
 
                 return `- ${action} ${args} : ${info.description}`

@@ -1,16 +1,17 @@
-import { ElementHandle } from 'playwright'
+import { ElementHandle, Page } from 'playwright'
 import { None, Option, Some } from 'oxide.ts'
 import fs from 'node:fs'
 import * as path from 'node:path'
 
-import { Grounding } from '../domain/Grounding'
-import { useConfig } from '../constants'
-import { Logger } from '../logger'
+import { useConfig } from '../constants.js'
+import { Logger } from '../logger.js'
 
 // @ts-ignore
 import SoMScript from '../../lib/SoM/dist/SoM.min.js'
 
-export class VisualGrounding extends Grounding {
+export class Grounding {
+    constructor(private readonly page: Page) {}
+
     public async initialize(): Promise<void> {
         await this.page.addScriptTag({
             content: `(function() { ${SoMScript} })()`,

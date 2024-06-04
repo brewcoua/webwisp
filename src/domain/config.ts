@@ -81,24 +81,26 @@ export enum ActionType {
 
 export type Action = {
     description: string
-    arguments?: {
-        name: string
-        type: 'string' | 'number' | 'boolean'
-        enum?: string[]
-        required?: boolean
-    }[]
+    arguments?: ActionArgument[]
+}
+export type ActionArgument = {
+    name: string
+    type: 'string' | 'number' | 'boolean'
+    enum?: string[]
+    required?: boolean
 }
 
 export type CalledAction = {
     type: ActionType
     description: string
-    arguments: Record<string, string | number | boolean>
+    arguments: CalledActionArguments
     status?: CalledActionStatus
 }
 export enum CalledActionStatus {
     Success = 'success',
     Failed = 'failed',
 }
+export type CalledActionArguments = Record<string, string | number | boolean>
 
 export type TaskResult = {
     success: boolean
