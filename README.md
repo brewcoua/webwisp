@@ -17,7 +17,11 @@ bun install # Or any other package manager
 ```
 
 > [!IMPORTANT]
-> Make sure to install browsers for Playwright to use. This can be done using the command `npx playwright install` (or `bunx playwright install` if you are using Bun).
+> Make sure to install browsers for Playwright to use. This can be done with the following:
+>
+> ```bash
+> npx playwright install # Or 'bunx playwright install'
+> ```
 
 Then, you can run WebWisp with the following command, depending on your runtime:
 
