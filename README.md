@@ -5,34 +5,34 @@ testing it. The agent uses OpenAI's GPT-4o model to generate the actions to take
 
 ## Installation
 
-The repository uses [Bun](https://bun.sh) to manage the project.
-To install Bun, run the following command:
+> [!NOTE]
+> The repository mainly uses [Bun](https://bun.sh) to manage the project, but any other package manager can be used.
 
-```bash
-curl -fsSL https://bun.sh/install | bash
-```
-
-Then, clone the repository and install the dependencies:
+First, clone the repository and install the dependencies:
 
 ```bash
 git clone git@github.com:brewcoua/webwisp.git --recursive
 cd webwisp
-bun install
+bun install # Or any other package manager
 ```
 
-Finally, you can run WebWisp with the following command:
+> [!IMPORTANT]
+> Make sure to install browsers for Playwright to use. This can be done using the command `npx playwright install` (or `bunx playwright install` if you are using Bun).
+
+Then, you can run WebWisp with the following command, depending on your runtime:
 
 ```bash
-bun start
+bun start:bun # Bun only
+npm start:node # Node only
 ```
 
-It can also be fully built and compiled with the following command:
+It can also be built by itself using:
 
 ```bash
-bun build
+bun pack
 ```
 
-and found at `./dist/webwisp`. It will however require the `openai` and `playwright` packages to be available as they are kept external to the binary.
+and found at `./dist/main.js`. Most dependencies are kept external however, so you will still need `node_modules` to run the agent.
 
 ## Configuration
 
