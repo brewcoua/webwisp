@@ -1,6 +1,5 @@
 import chalk from 'chalk'
-import { ActionType } from './constants'
-import { TaskResult } from './agent/runner/RunnerTask'
+import { ActionType, CalledAction, TaskResult } from './domain/config'
 
 export class Logger {
     private static verbose = process.env.NODE_ENV === 'development'
@@ -33,16 +32,14 @@ export class Logger {
     }
 
     static action(
-        kind: ActionType,
-        action: string,
-        success: boolean,
+        action: CalledAction,
         reasoning?: string,
         duration?: number,
         usage?: number
     ) {
         // Use an emote to represent each action kind
         let emote
-        switch (kind) {
+        switch (action.type) {
             case ActionType.Click:
                 emote = '🖱️ '
                 break
@@ -52,9 +49,14 @@ export class Logger {
             case ActionType.PressEnter:
                 emote = '⌨️ '
                 break
-            case ActionType.ScrollDown:
-            case ActionType.ScrollUp:
+            case ActionType.Scroll:
                 emote = '📜'
+                break
+            case ActionType.Back:
+                emote = '🔙'
+                break
+            case ActionType.Forward:
+                emote = '🔜'
                 break
             default:
                 emote = '❓'
@@ -67,8 +69,8 @@ export class Logger {
 
         console.log(
             chalk.bold.whiteBright(`${emote}❯`),
-            chalk.white(action),
-            chalk.bold(success ? chalk.green('✔') : chalk.red('✘')),
+            chalk.white(action.description),
+            chalk.bold(action.status ? chalk.green('✔') : chalk.red('✘')),
             // Duration
             duration && chalk.gray.italic(`(${duration}ms)`),
             // Usage

@@ -1,0 +1,157 @@
+[fine_tuning]
+temperature = 0.7
+
+
+[api]
+model = "gpt-4o"
+ratelimit = 0.5
+delay = 0
+max_tokens = 4000
+max_cycles = 10
+max_failed_cycles = 3
+max_failed_formatting = 3
+
+
+[browser]
+type = "chromium"
+screenshotsDir = "./dist/img"
+
+[browser.options]
+headless = false
+slowMo = 50
+args = ['--disable-web-security']
+
+[browser.context]
+bypassCSP = true
+recordVideo = { dir = "./videos" }
+
+[browser.viewport]
+width = 1440
+height = 900
+
+[prompts]
+
+[prompts.system]
+introduction = """You are an autonomous agent browsing a website to test a particular feature, verifying that a certain task can be completed.
+You are given a set of possible actions to interact with the website, and you can choose to perform any of them.
+However, you must only issue one action at a time, in a format consistent with the instructions provided as to allow parsing. Unlike a human, you may directly type into an editable element without needing to click on it first.
+To make your decision, you will be given everytime a screenshot of the current state of the website, the url and title of the page, and the full list of your previous actions, written by yourself in previous steps.
+When completing the task, make as little actions as possible, and try to avoid unnecessary actions. This means that you should only perform actions that are strictly necessary to complete the task, and avoid any other actions that do not contribute to the task completion.
+If you believe that you have completed the task or that it cannot be completed, regardless of success of failure, you can issue the 'done' action to finish the task, while also giving the final verdict of the task completion.
+If you believe that the previous action was wrong, you can interact with the page history to go back to the previous state with the 'back' action and try a different action.
+Actions such as scroll up or down, cancel each other out, and may be used instead if you want to revert the previous action.
+When selecting an element (for a click action for example), you need to specify the label of the element, which is the text displayed next to all interactive elements on the website.
+Editable elements however, have stripes on them, and are the only ones that can be typed into.
+If you encounter a cookie consent banner, close it as soon as possible, as it may block the view of the website.
+
+The possible actions are the following:
+{{actions}}
+
+For your answer, you must follow the format below, while ommiting the <template> tags:
+<template>
+## Current State ##
+Describe the current state of the website, including the screenshot, url, title, and previous actions.
+
+## Action ##
+Describe the action you want to perform, including why you want to perform it, and what you expect to happen.
+
+~~~
+$ [single-sentence action description for what you want to do]
+<action> [arg1] [arg2] ...
+~~~
+</template>"""
+
+[prompts.system.examples]
+message = "To help you with the task, here are some examples of input/output pairs:"
+list = [
+    {
+        screenshot = "./assets/examples/1.png",
+        prompt = """Title: Amazon.fr : livres, DVD, jeux vidéo, musique, high-tech, informatique, jouets, vêtements, chaussures, sport, bricolage, maison, beauté, puériculture, épicerie et plus encore !
+        URL: https://www.amazon.fr/
+        Task: Check that we can add a PlayStation 5 to the cart and proceed to checkout.
+        Previous actions:
+        None""",
+        completion = """## Current State ##
+        Let's think step by step. The website is on the Amazon.fr homepage. Various categories are displayed, such as High-Tech, Cuisine et maison, Jardin, etc. The search bar is available at the top of the page.
+
+        ## Action ##
+        We need to use the search bar to search for a PlayStation 5, with the search bar being orange with stripes and a label that says "Rechercher Amazon.fr".
+
+        ~~~
+        $ Type "PlayStation 5" into the search bar
+        type 4 "PlayStation 5"
+        ~~~"""
+    }
+]
+
+[prompts.user]
+prompt = """Title: {{title}}
+URL: {{url}}
+Task: {{task}}
+Previous actions:
+{{previous_actions}}
+Screenshot:"""
+
+
+[actions]
+
+[actions.click]
+description = "Click on an element on the page."
+arguments = [
+    {
+        name = "label",
+        type = "number",
+        required = true,
+    }
+]
+
+[actions.type]
+description = "Type text into an editable, striped, element on the page."
+arguments = [
+    {
+        name = "label",
+        type = "number",
+        required = true,
+    },
+    {
+        name = "text",
+        type = "string",
+        required = true,
+    }
+]
+
+[actions.press_enter]
+description = "Press the enter key on the keyboard. This does not replace typing into an element."
+
+[actions.scroll]
+description = "Scroll the page up or down, for 2/3 of the viewport height."
+arguments = [
+    {
+        name = "direction",
+        type = "string",
+        enum = ["up", "down"],
+        required = true,
+    }
+]
+
+[actions.back]
+description = "Go back to the previous page in the browser history."
+
+[actions.forward]
+description = "Go forward to the next page in the browser history. This requires going back first."
+
+[actions.done]
+description = "Finish the task and give the final verdict of the task completion."
+arguments = [
+    {
+        name = "value",
+        type = "string",
+        enum = ["success", "failure"],
+        required = true,
+    },
+    {
+        name = "reason",
+        type = "string",
+        required = false,
+    }
+]

@@ -1,7 +1,7 @@
 import { OpenAIService } from '../services/OpenAI.service'
 import { PlaywrightService } from '../services/Playwright.service'
 import { Service } from '../domain/Service'
-import { RunnerTask } from './runner/RunnerTask'
+import { Runner } from './runner'
 import { Logger } from '../logger'
 
 export class Agent extends Service {
@@ -36,7 +36,7 @@ export class Agent extends Service {
 
         const page = await this.pw.make_page(target)
 
-        const runner = new RunnerTask(this, page, this.openai, this.pw, task)
+        const runner = new Runner(this, page, this.openai, this.pw, task)
 
         await runner.initialize()
 

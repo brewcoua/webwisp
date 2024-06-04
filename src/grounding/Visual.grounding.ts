@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import * as path from 'node:path'
 
 import { Grounding } from '../domain/Grounding'
-import { CONFIG } from '../constants'
+import { useConfig } from '../constants'
 import { Logger } from '../logger'
 
 // @ts-ignore
@@ -29,7 +29,7 @@ export class VisualGrounding extends Grounding {
             await this.page.evaluate('window.SoM.display()')
 
             const imgPath = path.join(
-                CONFIG.browser.screenshotsDir,
+                useConfig().browser.screenshotsDir,
                 `${new Date().toISOString()}.png`
             )
             await this.page.screenshot({
