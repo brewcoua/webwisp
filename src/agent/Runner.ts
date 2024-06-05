@@ -184,7 +184,7 @@ export default class Runner {
                             await element.click()
                             break
                         case ActionType.Type:
-                            await element.fill(action.arguments.value as string)
+                            await element.fill(action.arguments.text as string)
                             break
                     }
 
