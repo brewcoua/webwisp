@@ -30,7 +30,7 @@
         "demo": "(which bun && bun demo:bun) || npm run demo:node",
         "demo:bun": "bun start:bun -- -t https://www.amazon.fr -k \"Check that it is possible to add a PS5 to the cart and display it\"",
         "demo:node": "bun start:node -- -t https://www.amazon.fr -k \"Check that it is possible to add a PS5 to the cart and display it\"",
-        "pack": "vite build",
+        "pack": "npx tsc --noEmit && npx vite build",
         "format": "prettier --write ./src/**/*.ts"
     },
     "devDependencies": {
@@ -38,6 +38,7 @@
         "prettier": "^3.2.5",
         "stylelint": "^16.6.1",
         "toml": "^3.0.0",
+        "typescript": "^5.4.5",
         "vite": "^5.2.12",
         "vite-plugin-checker": "^0.6.4",
         "vite-plugin-toml": "^0.7.0",
