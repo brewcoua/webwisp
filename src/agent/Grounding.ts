@@ -30,7 +30,7 @@ export default class Grounding {
 
             const imgPath = joinPath(
                 getConfig().browser.screenshotsDir,
-                `${new Date().toISOString()}.png`
+                `${Date.now()}.png`
             )
             // Make sure the directory exists
             fs.mkdirSync(getConfig().browser.screenshotsDir, {
