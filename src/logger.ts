@@ -1,25 +1,28 @@
 import chalk from 'chalk'
-import { ActionType, CalledAction, TaskResult } from './domain/config'
 
-export class Logger {
+import CalledAction from './domain/CalledAction'
+import ActionType from './domain/ActionType'
+import TaskResult from './domain/TaskResult'
+
+export default class Logger {
     private static verbose = process.env.NODE_ENV === 'development'
 
     static setVerbose(verbose: boolean) {
         this.verbose = verbose
     }
 
-    static debug(message: string) {
+    static debug(...message: any[]) {
         if (!this.verbose) return
 
-        console.log(chalk.cyan.bold('DEBUG'), message)
+        console.log(chalk.cyan.bold('DEBUG'), ...message)
     }
 
-    static error(message: string) {
-        console.log(chalk.red.bold('ERROR'), message)
+    static error(...message: any[]) {
+        console.log(chalk.red.bold('ERROR'), ...message)
     }
 
-    static warn(message: string) {
-        console.log(chalk.yellow.bold('WARN'), message)
+    static warn(...message: any[]) {
+        console.log(chalk.yellow.bold('WARN'), ...message)
     }
 
     static prompt(title: string, value: string) {

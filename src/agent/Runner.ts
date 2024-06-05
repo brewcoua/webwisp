@@ -1,30 +1,25 @@
-import { Err, Ok, Result } from 'oxide.ts'
 import { Page } from 'playwright'
 
-import { Agent } from '../Agent'
-import { OpenAIService } from '../../services/OpenAI.service'
-import { Grounding } from '../Grounding'
-import { PlaywrightService } from '../../services/Playwright.service'
-import { useConfig } from '../../constants'
-import { Logger } from '../../logger'
-import {
-    ActionType,
-    CalledAction,
-    CalledActionStatus,
-    ImageURL,
-    TaskResult,
-} from '../../domain/config'
-import PromptBuilder from '../PromptBuilder'
-import CompletionParser from '../CompletionParser'
+import Logger from '@/logger'
+import OpenAIService from '@/services/OpenAIService'
 
-export class Runner {
+import type TaskResult from '@/domain/TaskResult'
+import type CalledAction from '@/domain/CalledAction'
+import { getConfig } from '@/domain/Config'
+import ActionType from '@/domain/ActionType'
+import CalledActionStatus from '@/domain/CalledActionStatus'
+import type ImageURL from '@/domain/ImageURL'
+
+import Grounding from './Grounding'
+import PromptBuilder from './PromptBuilder'
+import CompletionParser from './CompletionParser'
+
+export default class Runner {
     private grounding!: Grounding
 
     public constructor(
-        private readonly agent: Agent,
         private readonly page: Page,
         private readonly openai: OpenAIService,
-        private readonly pw: PlaywrightService,
         private readonly task: string
     ) {}
 
@@ -37,7 +32,7 @@ export class Runner {
         let cycles = 0,
             failedCycles = 0
 
-        const config = useConfig()
+        const config = getConfig()
         const actions: CalledAction[] = []
 
         while (
@@ -91,10 +86,14 @@ export class Runner {
                         }
                     }
 
-                    const actionResult = await this.handleAction(parsed.action)
-                    parsed.action.status = actionResult.isOk()
-                        ? CalledActionStatus.Success
-                        : CalledActionStatus.Failed
+                    try {
+                        await this.handleAction(parsed.action)
+                        parsed.action.status = CalledActionStatus.Success
+                    } catch (err: any) {
+                        parsed.action.status = CalledActionStatus.Failed
+                        failedCycles++
+                        Logger.error(err.message)
+                    }
 
                     actions.push(parsed.action)
 
@@ -105,9 +104,6 @@ export class Runner {
                         completion.usage?.total_tokens
                     )
 
-                    if (actionResult.isErr()) {
-                        failedCycles++
-                    }
                     cycles++
                     break
                 } catch (err: any) {
@@ -141,9 +137,7 @@ export class Runner {
         }
     }
 
-    private async handleAction(
-        action: CalledAction
-    ): Promise<Result<string, string>> {
+    private async handleAction(action: CalledAction): Promise<void> {
         switch (action.type) {
             case ActionType.Scroll: {
                 const direction = action.arguments.direction as 'up' | 'down'
@@ -154,24 +148,23 @@ export class Runner {
                         direction === 'down' ? '' : '-'
                     }((window.innerHeight / 3) * 2) })`
                 )
-
-                return Ok(action.description)
+                break
             }
             case ActionType.PressEnter: {
                 await this.page.keyboard.press('Enter')
-                return Ok(action.description)
+                break
             }
             case ActionType.Back: {
                 await this.page.goBack({
                     waitUntil: 'domcontentloaded',
                 })
-                return Ok(action.description)
+                break
             }
             case ActionType.Forward: {
                 await this.page.goForward({
                     waitUntil: 'domcontentloaded',
                 })
-                return Ok(action.description)
+                break
             }
             case ActionType.Click:
             case ActionType.Type: {
@@ -179,35 +172,33 @@ export class Runner {
                     action.arguments.label as number
                 )
 
-                if (!element || element.isNone()) {
-                    return Err(`#${action.arguments.label} not found`)
+                if (!element) {
+                    throw new Error(
+                        `Element #${action.arguments.label} not found`
+                    )
                 }
 
                 try {
                     switch (action.type) {
                         case ActionType.Click:
-                            await element.unwrap().click()
+                            await element.click()
                             break
                         case ActionType.Type:
-                            await element
-                                .unwrap()
-                                .fill(action.arguments.value as string)
+                            await element.fill(action.arguments.value as string)
                             break
                     }
 
                     Logger.debug(
                         `Action ${action.type} on #${action.arguments.label} (${action.description}) [DONE]`
                     )
-
-                    return Ok(action.description)
                 } catch (err: any) {
-                    return Err(
+                    throw new Error(
                         `Error while performing ${action.type} on #${action.arguments.label} (${action.description}): ${err.message}`
                     )
                 }
             }
             default:
-                return Err(
+                throw new Error(
                     `Unknown action type '${action.type}' to be performed`
                 )
         }

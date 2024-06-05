@@ -29,6 +29,7 @@ recordVideo = { dir = "./videos" }
 width = 1440
 height = 900
 
+
 [prompts]
 
 [prompts.system]

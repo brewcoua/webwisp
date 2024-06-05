@@ -1,4 +1,4 @@
-export abstract class Service {
+export default abstract class Service {
     protected name: string
 
     protected constructor(name: string) {

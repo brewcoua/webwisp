@@ -1,10 +1,10 @@
 import OpenAI from 'openai'
 
-import { Logger } from '../logger'
-import { Service } from '../domain/Service'
-import { useConfig } from '../constants'
+import Logger from '../logger'
+import Service from '../domain/Service'
+import { getConfig } from '@/domain/Config'
 
-export class OpenAIService extends Service {
+export default class OpenAIService extends Service {
     private client!: OpenAI
 
     constructor() {
@@ -48,12 +48,12 @@ export class OpenAIService extends Service {
         tool_choice?: OpenAI.ChatCompletionToolChoiceOption
     ): Promise<OpenAI.ChatCompletion> {
         return this.client.chat.completions.create({
-            model: useConfig().api.model,
+            model: getConfig().api.model,
             messages,
             tools,
             tool_choice,
-            max_tokens: useConfig().api.max_tokens,
-            temperature: useConfig().fine_tuning.temperature,
+            max_tokens: getConfig().api.max_tokens,
+            temperature: getConfig().fine_tuning.temperature,
         })
     }
 }

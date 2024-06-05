@@ -1,61 +1,60 @@
 {
-  "name": "webwisp",
-  "version": "1.0.0",
-  "description": "An agent for generating end-to-end tests from a given URL",
-  "license": "(MIT OR Apache-2.0)",
-  "private": true,
-  "type": "module",
-  "author": {
-    "name": "Brewen Couaran",
-    "email": "brewcoua@brewen.dev",
-    "url": "https://brewen.dev"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:brewcoua/webwisp.git"
-  },
-  "homepage": "https://github.com/brewcoua/webwisp#readme",
-  "bugs": {
-    "url": "https://github.com/brewcoua/webwisp/issues",
-    "email": "contact@brewen.dev"
-  },
-  "engines": {
-    "node": ">=20.13.0",
-    "npm": ">=10.5.0"
-  },
-  "scripts": {
-    "start": "(which bun && bun start:bun) || npm run start:node",
-    "start:bun": "bun pack && dotenvx run -q -- bun ./dist/main.js",
-    "start:node": "npm run pack && dotenvx run -q -- node ./dist/main.js",
-    "demo": "(which bun && bun demo:bun) || npm run demo:node",
-    "demo:bun": "bun start:bun -- -t https://www.amazon.fr -k \"Check that it is possible to add a PS5 to the cart and display it\"",
-    "demo:node": "bun start:node -- -t https://www.amazon.fr -k \"Check that it is possible to add a PS5 to the cart and display it\"",
-    "pack": "npx tsc --noEmit && npx vite build",
-    "format": "prettier --write ./src/**/*.ts"
-  },
-  "devDependencies": {
-    "@dotenvx/dotenvx": "^0.44.1",
-    "prettier": "^3.2.5",
-    "stylelint": "^16.6.1",
-    "toml": "^3.0.0",
-    "typescript": "^5.4.5",
-    "vite": "^5.2.12",
-    "vite-plugin-toml": "^0.7.0",
-    "vite-raw-plugin": "^1.0.2",
-    "vite-tsconfig-paths": "^4.3.2"
-  },
-  "dependencies": {
-    "@inquirer/core": "^8.2.1",
-    "@inquirer/prompts": "^5.0.4",
-    "chalk": "^5.3.0",
-    "meow": "^13.2.0",
-    "node-audiorecorder": "^3.0.0",
-    "openai": "^4.47.1",
-    "ora": "^8.0.1",
-    "oxide.ts": "^1.1.0",
-    "playwright": "^1.44.0"
-  },
-  "bin": {
-    "webwisp": "./dist/webwisp"
-  }
+    "name": "webwisp",
+    "version": "1.0.0",
+    "description": "An agent for generating end-to-end tests from a given URL",
+    "license": "(MIT OR Apache-2.0)",
+    "private": true,
+    "type": "module",
+    "author": {
+        "name": "Brewen Couaran",
+        "email": "brewcoua@brewen.dev",
+        "url": "https://brewen.dev"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git@github.com:brewcoua/webwisp.git"
+    },
+    "homepage": "https://github.com/brewcoua/webwisp#readme",
+    "bugs": {
+        "url": "https://github.com/brewcoua/webwisp/issues",
+        "email": "contact@brewen.dev"
+    },
+    "engines": {
+        "node": ">=20.13.0",
+        "npm": ">=10.5.0"
+    },
+    "scripts": {
+        "start": "(which bun && bun start:bun) || npm run start:node",
+        "start:bun": "bun pack && dotenvx run -q -- bun ./dist/main.js",
+        "start:node": "npm run pack && dotenvx run -q -- node ./dist/main.js",
+        "demo": "(which bun && bun demo:bun) || npm run demo:node",
+        "demo:bun": "bun start:bun -- -t https://www.amazon.fr -k \"Check that it is possible to add a PS5 to the cart and display it\"",
+        "demo:node": "npm run start:node -- -t https://www.amazon.fr -k \"Check that it is possible to add a PS5 to the cart and display it\"",
+        "pack": "npx tsc --noEmit && npx vite build",
+        "format": "prettier --write ./src/**/*.ts"
+    },
+    "devDependencies": {
+        "@dotenvx/dotenvx": "^0.44.1",
+        "prettier": "^3.2.5",
+        "terser": "^5.31.0",
+        "toml": "^3.0.0",
+        "typescript": "^5.4.5",
+        "vite": "^5.2.12",
+        "vite-plugin-toml": "^0.7.0",
+        "vite-raw-plugin": "^1.0.2",
+        "vite-tsconfig-paths": "^4.3.2"
+    },
+    "dependencies": {
+        "@inquirer/core": "^8.2.1",
+        "@inquirer/prompts": "^5.0.4",
+        "chalk": "^5.3.0",
+        "meow": "^13.2.0",
+        "node-audiorecorder": "^3.0.0",
+        "openai": "^4.47.1",
+        "ora": "^8.0.1",
+        "playwright": "^1.44.0"
+    },
+    "bin": {
+        "webwisp": "./dist/webwisp"
+    }
 }

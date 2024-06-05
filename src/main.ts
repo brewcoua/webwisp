@@ -5,8 +5,8 @@ import chalk from 'chalk'
 
 import pkg from '../package.json'
 import { REGEX } from './constants'
-import { Agent } from './agent'
-import { Logger } from './logger'
+import Agent from './agent'
+import Logger from './logger'
 
 import { waitPress } from './cli/prompts'
 import { promptVoice } from './cli/voice'
@@ -144,8 +144,6 @@ function bindSignals(agent: Agent) {
 }
 
 async function main() {
-    await waitPress({ message: 'Press enter to start the agent' })
-
     let target = cli.flags.target
     if (!target) {
         target = await promptTarget()

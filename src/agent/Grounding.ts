@@ -1,15 +1,14 @@
 import { ElementHandle, Page } from 'playwright'
-import { None, Option, Some } from 'oxide.ts'
 import fs from 'node:fs'
-import * as path from 'node:path'
+import { join as joinPath } from 'node:path'
 
-import { useConfig } from '../constants.js'
-import { Logger } from '../logger.js'
+import Logger from '@/logger'
+import { getConfig } from '@/domain/Config'
 
-// @ts-ignore
+// @ts-ignore - This is imported raw, as a string to be injected into the page
 import SoMScript from '../../lib/SoM/dist/SoM.min.js'
 
-export class Grounding {
+export default class Grounding {
     constructor(private readonly page: Page) {}
 
     public async initialize(): Promise<void> {
@@ -29,8 +28,8 @@ export class Grounding {
 
             await this.page.evaluate('window.SoM.display()')
 
-            const imgPath = path.join(
-                useConfig().browser.screenshotsDir,
+            const imgPath = joinPath(
+                getConfig().browser.screenshotsDir,
                 `${new Date().toISOString()}.png`
             )
             await this.page.screenshot({
@@ -46,9 +45,8 @@ export class Grounding {
         }
     }
 
-    public async resolve(id: number): Promise<Option<ElementHandle>> {
+    public async resolve(id: number): Promise<ElementHandle | null> {
         Logger.debug(`Resolving SoM ${id}`)
-        const element = await this.page.$(`[data-SoM="${id}"]`)
-        return element ? Some(element) : None
+        return this.page.$(`[data-SoM="${id}"]`)
     }
 }

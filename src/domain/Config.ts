@@ -1,5 +1,8 @@
 import { BrowserContextOptions, LaunchOptions } from 'playwright'
 
+import ActionType from './ActionType'
+import type Action from './Action'
+
 export type Config = {
     // Fine-tuning options for the agent
     fine_tuning: {
@@ -65,53 +68,10 @@ export type Config = {
     actions: Record<ActionType, Action>
 }
 
+// @ts-ignore - Parsed by vite-plugin-toml
+import config from '@/config.toml'
+
+export const getConfig = (): Config => config
+
 type AvailableModels = 'gpt-4o'
 type BrowserType = 'chromium' | 'firefox' | 'webkit'
-
-export enum ActionType {
-    Click = 'click',
-    Type = 'type',
-    PressEnter = 'press_enter',
-    Scroll = 'scroll',
-
-    Back = 'back',
-    Forward = 'forward',
-    Done = 'done',
-}
-
-export type Action = {
-    description: string
-    arguments?: ActionArgument[]
-}
-export type ActionArgument = {
-    name: string
-    type: ActionArgumentType
-    enum?: string[]
-    required?: boolean
-}
-export type ActionArgumentRawType = string | number | boolean
-export enum ActionArgumentType {
-    String = 'string',
-    Number = 'number',
-    Boolean = 'boolean',
-}
-
-export type CalledAction = {
-    type: ActionType
-    description: string
-    arguments: CalledActionArguments
-    status?: CalledActionStatus
-}
-export enum CalledActionStatus {
-    Success = 'success',
-    Failed = 'failed',
-}
-export type CalledActionArguments = Record<string, ActionArgumentRawType>
-
-export type TaskResult = {
-    success: boolean
-    message: string
-    value?: string
-}
-
-export type ImageURL = `data:image/${string};base64,${string}`

@@ -1,10 +1,11 @@
-import { OpenAIService } from '../services/OpenAI.service'
-import { PlaywrightService } from '../services/Playwright.service'
-import { Service } from '../domain/Service'
-import { Runner } from './runner'
-import { Logger } from '../logger'
+import Logger from '@/logger'
+import OpenAIService from '@/services/OpenAIService'
+import PlaywrightService from '@/services/PlaywrightService'
+import Service from '@/domain/Service'
 
-export class Agent extends Service {
+import Runner from './Runner'
+
+export default class Agent extends Service {
     private openai!: OpenAIService
     private pw!: PlaywrightService
 
@@ -36,7 +37,7 @@ export class Agent extends Service {
 
         const page = await this.pw.make_page(target)
 
-        const runner = new Runner(this, page, this.openai, this.pw, task)
+        const runner = new Runner(page, this.openai, task)
 
         await runner.initialize()
 

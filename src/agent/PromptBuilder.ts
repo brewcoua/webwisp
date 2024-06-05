@@ -1,13 +1,16 @@
-import { useConfig } from '../constants'
-import { Action, ActionType, CalledAction } from '../domain/config'
 import { readFileSync } from 'fs'
 import OpenAI from 'openai'
 
+import { getConfig } from '@/domain/Config'
+import Action from '@/domain/Action'
+import ActionType from '@/domain/ActionType'
+import CalledAction from '@/domain/CalledAction'
+
 export default class PromptBuilder {
     public static makeSystem(): OpenAI.ChatCompletionMessageParam[] {
-        const systemPrompt = useConfig().prompts.system
+        const systemPrompt = getConfig().prompts.system
 
-        const actions = useConfig().actions
+        const actions = getConfig().actions
         const actionList = Object.keys(actions)
             .map((action) => {
                 const info: Action = actions[action as ActionType]
@@ -79,7 +82,7 @@ export default class PromptBuilder {
     public static makeUser(
         args: UserPromptPlaceholders
     ): OpenAI.ChatCompletionMessageParam {
-        const prompt = useConfig()
+        const prompt = getConfig()
             .prompts.user.prompt.replace('{{title}}', args.title)
             .replace('{{url}}', args.url)
             .replace('{{task}}', args.task)

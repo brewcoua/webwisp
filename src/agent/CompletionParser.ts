@@ -1,12 +1,11 @@
-import { useConfig } from '../constants'
-import {
-    Action,
-    ActionArgument,
-    ActionArgumentRawType,
+import Action from '@/domain/Action'
+import ActionArgument, {
+    ActionArgumentPrimitive,
     ActionArgumentType,
-    ActionType,
-    CalledAction,
-} from '../domain/config'
+} from '@/domain/ActionArgument'
+import ActionType from '@/domain/ActionType'
+import CalledAction from '@/domain/CalledAction'
+import { getConfig } from '@/domain/Config'
 
 const RAW_ACTION_REGEX = /~~~([^]*)~~~/
 
@@ -65,7 +64,7 @@ export default class CompletionParser {
         }
 
         const actionType = actionLine.split(' ')[0] as ActionType
-        const actionInfo = useConfig().actions[actionType]
+        const actionInfo = getConfig().actions[actionType]
         if (!actionInfo) {
             throw new CompletionFormatError(
                 `Action ${actionType} not found in config`
@@ -177,7 +176,7 @@ export default class CompletionParser {
     private static parseArg(
         buf: string,
         arg: ActionArgument
-    ): ActionArgumentRawType {
+    ): ActionArgumentPrimitive {
         switch (arg.type) {
             case ActionArgumentType.String:
                 if (arg.enum && !arg.enum.includes(buf)) {

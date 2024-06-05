@@ -1,11 +1,10 @@
 import ora from 'ora'
-// @ts-ignore
 import AudioRecorder from 'node-audiorecorder'
 import fs from 'node:fs'
 import chalk from 'chalk'
 import { confirm } from '@inquirer/prompts'
 
-import { OpenAIService } from '../services/OpenAI.service'
+import OpenAIService from '@/services/OpenAIService'
 
 const RECORD_PATH = './dist/voice.wav'
 

@@ -16,7 +16,16 @@
         "isolatedModules": true,
         "noEmit": true,
 
-        "lib": ["DOM", "DOM.Iterable", "ESNext"]
+        "lib": ["DOM", "ESNext"],
+
+        "baseUrl": ".",
+        "outDir": "dist",
+        "rootDir": "src",
+
+        "paths": {
+            "@/*": ["src/*"]
+        }
     },
-    "include": ["src/**/*.ts", "vite.config.ts"]
+    "include": ["src/**/*.ts", "types/**/*.d.ts"],
+    "exclude": ["node_modules", "dist"]
 }

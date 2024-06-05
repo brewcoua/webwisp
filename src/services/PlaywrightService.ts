@@ -1,10 +1,10 @@
 import { Browser, BrowserContext, chromium, firefox, Page } from 'playwright'
 
-import { Service } from '../domain/Service'
-import { useConfig } from '../constants'
-import { Logger } from '../logger'
+import Logger from '@/logger'
+import Service from '@/domain/Service'
+import { getConfig } from '@/domain/Config'
 
-export class PlaywrightService extends Service {
+export default class PlaywrightService extends Service {
     private browser!: Browser
     private context!: BrowserContext
     private pages: Page[] = []
@@ -15,7 +15,7 @@ export class PlaywrightService extends Service {
 
     public async initialize(): Promise<void> {
         Logger.debug('Initializing Playwright service')
-        const config = useConfig()
+        const config = getConfig()
 
         switch (config.browser.type) {
             case 'chromium':
@@ -45,7 +45,7 @@ export class PlaywrightService extends Service {
             })
         }
 
-        await page.setViewportSize(useConfig().browser.viewport)
+        await page.setViewportSize(getConfig().browser.viewport)
 
         this.pages.push(page)
 

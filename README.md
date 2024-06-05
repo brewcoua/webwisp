@@ -31,6 +31,16 @@ npm start # Or 'bun start'
 
 This will prioritize running with `bun`, but if it is not installed, it will default to `npm` and `node`.
 
+> [!WARNING]
+> The voice flag requires `sox` to be installed on your system. You can install it with the following:
+>
+> ```bash
+> sudo apt-get install sox libsox-fmt-all # For Linux // Derive it from your package manager
+> brew install sox # For MacOS
+> ```
+>
+> If you are using Windows, you can download the binaries [here](http://sourceforge.net/projects/sox/files/latest/download).
+
 It can also be built by itself using:
 
 ```bash
