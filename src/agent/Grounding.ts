@@ -32,6 +32,11 @@ export default class Grounding {
                 getConfig().browser.screenshotsDir,
                 `${new Date().toISOString()}.png`
             )
+            // Make sure the directory exists
+            fs.mkdirSync(getConfig().browser.screenshotsDir, {
+                recursive: true,
+            })
+
             await this.page.screenshot({
                 path: imgPath,
             })

@@ -196,6 +196,7 @@ export default class Runner {
                         `Error while performing ${action.type} on #${action.arguments.label} (${action.description}): ${err.message}`
                     )
                 }
+                break
             }
             default:
                 throw new Error(
