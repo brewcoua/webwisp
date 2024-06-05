@@ -79,7 +79,7 @@ export class Runner {
                 Logger.debug(message)
 
                 try {
-                    const parsed = CompletionParser.parseCompletion(message)
+                    const parsed = CompletionParser.parse(message)
 
                     if (parsed.action.type === ActionType.Done) {
                         const success =

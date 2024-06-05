@@ -77,6 +77,21 @@ We need to use the search bar to search for a PlayStation 5, with the search bar
 ~~~
 $ Type "PlayStation 5" into the search bar
 type 4 "PlayStation 5"
+~~~""" },
+    { screenshot = "./assets/examples/2.png", prompt = """Reddit - Dive into anything
+URL: https://www.reddit.com/
+Task: Find the first post in the feed from r/technology and upvote it.
+Previous actions:
+- scroll down : Scroll down the page to see more posts [success]""", completion = """## Current State ##
+Let's think step by step. The website is on the Reddit homepage. The feed is displayed, showing various posts from different subreddits. The first post is from r/technology and talks about the diamond industry.
+The previous actions indicate that the page was scrolled down to see more posts.
+
+## Action ##
+We need to upvote the first post in the feed from r/technology. The upvote button is a small arrow pointing upwards next to the post. The label of the upvote button is 30, with a dark green color.
+
+~~~
+$ Click on the upvote button next to the first post
+click 30
 ~~~""" }
 ]
 

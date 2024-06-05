@@ -1,10 +1,17 @@
 import { useConfig } from '../constants'
-import { Action, ActionType, CalledAction } from '../domain/config'
+import {
+    Action,
+    ActionArgument,
+    ActionArgumentRawType,
+    ActionArgumentType,
+    ActionType,
+    CalledAction,
+} from '../domain/config'
 
 const RAW_ACTION_REGEX = /~~~([^]*)~~~/
 
 export default class CompletionParser {
-    public static parseCompletion(completion: string): Completion {
+    public static parse(completion: string): Completion {
         const rawAction = completion.match(RAW_ACTION_REGEX)
         if (!rawAction) {
             throw new CompletionFormatError('No action found in completion')
@@ -70,7 +77,7 @@ export default class CompletionParser {
 
         return {
             type: actionType,
-            description,
+            description: description.substring(2),
             arguments: parsedArgs,
         }
     }
@@ -107,37 +114,8 @@ export default class CompletionParser {
                 }
 
                 const currentArg = actionInfo.arguments[count]
+                parsedArgs[currentArg.name] = this.parseArg(buf, currentArg)
 
-                switch (currentArg.type) {
-                    case 'string':
-                        if (currentArg.enum && !currentArg.enum.includes(buf)) {
-                            throw new CompletionFormatError(
-                                `Invalid enum value for argument ${currentArg.name}: ${buf}`
-                            )
-                        }
-                        parsedArgs[currentArg.name] = buf
-                        break
-                    case 'number':
-                        const parsedNumber = parseInt(buf)
-                        if (isNaN(parsedNumber)) {
-                            throw new CompletionFormatError(
-                                `Invalid number format for argument ${currentArg.name}: ${buf}`
-                            )
-                        }
-                        parsedArgs[currentArg.name] = parsedNumber
-                        break
-                    case 'boolean':
-                        if (buf === 'true' || buf === '1') {
-                            parsedArgs[currentArg.name] = true
-                        } else if (buf === 'false' || buf === '0') {
-                            parsedArgs[currentArg.name] = false
-                        } else {
-                            throw new CompletionFormatError(
-                                `Invalid boolean format for argument ${currentArg.name}: ${buf}`
-                            )
-                        }
-                        break
-                }
                 buf = ''
                 count++
 
@@ -178,15 +156,59 @@ export default class CompletionParser {
             cursor++
         }
 
+        if (buf) {
+            const currentArg = actionInfo.arguments[count]
+            parsedArgs[currentArg.name] = this.parseArg(buf, currentArg)
+            count++
+        }
+
         // See if we're missing any required arguments
-        const requiredArgs = actionInfo.arguments.filter((arg) => arg.required)
+        const requiredArgs =
+            actionInfo.arguments?.filter((arg) => arg.required) || []
         if (requiredArgs.length > count) {
             throw new CompletionFormatError(
-                `Missing required arguments for action ${actionType}`
+                `Missing required arguments for action ${actionType}:\n'${Object.keys(parsedArgs).join(' ')}' != '${requiredArgs.map((arg) => `${arg.name}`).join(' ')}'`
             )
         }
 
         return parsedArgs
+    }
+
+    private static parseArg(
+        buf: string,
+        arg: ActionArgument
+    ): ActionArgumentRawType {
+        switch (arg.type) {
+            case ActionArgumentType.String:
+                if (arg.enum && !arg.enum.includes(buf)) {
+                    throw new CompletionFormatError(
+                        `Invalid enum value for argument ${arg.name}: ${buf}`
+                    )
+                }
+                return buf
+            case ActionArgumentType.Number:
+                const parsedNumber = parseInt(buf)
+                if (isNaN(parsedNumber)) {
+                    throw new CompletionFormatError(
+                        `Invalid number format for argument ${arg.name}: ${buf}`
+                    )
+                }
+                return parsedNumber
+            case ActionArgumentType.Boolean:
+                if (buf === 'true' || buf === '1') {
+                    return true
+                } else if (buf === 'false' || buf === '0') {
+                    return false
+                } else {
+                    throw new CompletionFormatError(
+                        `Invalid boolean format for argument ${arg.name}: ${buf}`
+                    )
+                }
+            default:
+                throw new CompletionFormatError(
+                    `Unknown argument type ${arg.type} for argument ${arg.name}`
+                )
+        }
     }
 }
 
