@@ -1,6 +1,7 @@
 #!/usr/bin/env bun
 import meow from 'meow'
 import chalk from 'chalk'
+import 'dotenv/config'
 
 import pkg from '../package.json'
 import Agent from './agent'
