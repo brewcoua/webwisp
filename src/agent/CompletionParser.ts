@@ -5,7 +5,13 @@ import ActionArgument, {
 } from '@/domain/ActionArgument'
 import ActionType from '@/domain/ActionType'
 import CalledAction from '@/domain/CalledAction'
+import Completion from '@/domain/Completion'
 import { getConfig } from '@/domain/Config'
+import {
+    CompletionActionNotFoundError,
+    CompletionFormatError,
+    CompletionMissingArgumentError,
+} from '@/domain/errors/CompletionParser'
 
 const RAW_ACTION_REGEX = /~~~([^]*)~~~/
 
@@ -13,7 +19,7 @@ export default class CompletionParser {
     public static parse(completion: string): Completion {
         const rawAction = completion.match(RAW_ACTION_REGEX)
         if (!rawAction) {
-            throw new CompletionFormatError('No action found in completion')
+            throw new CompletionActionNotFoundError()
         }
 
         const action = this.parseAction(rawAction[1].trim())
@@ -165,8 +171,9 @@ export default class CompletionParser {
         const requiredArgs =
             actionInfo.arguments?.filter((arg) => arg.required) || []
         if (requiredArgs.length > count) {
-            throw new CompletionFormatError(
-                `Missing required arguments for action ${actionType}:\n'${Object.keys(parsedArgs).join(' ')}' != '${requiredArgs.map((arg) => `${arg.name}`).join(' ')}'`
+            throw new CompletionMissingArgumentError(
+                actionType,
+                requiredArgs.slice(count).map((arg) => arg.name)
             )
         }
 
@@ -208,17 +215,5 @@ export default class CompletionParser {
                     `Unknown argument type ${arg.type} for argument ${arg.name}`
                 )
         }
-    }
-}
-
-export type Completion = {
-    reasoning?: string
-    action: CalledAction
-}
-
-export class CompletionFormatError extends Error {
-    constructor(message: string) {
-        super(message)
-        this.name = 'CompletionFormatError'
     }
 }

@@ -4,9 +4,10 @@ import { join as joinPath } from 'node:path'
 
 import Logger from '@/logger'
 import { getConfig } from '@/domain/Config'
+import { GroundingScreenshotError } from '@/domain/errors/Grounding.js'
 
 // @ts-ignore - This is imported raw, as a string to be injected into the page
-import SoMScript from '../../lib/SoM/dist/SoM.min.js'
+import SoMScript from '@lib/SoM/dist/SoM.min.js'
 
 export default class Grounding {
     constructor(private readonly page: Page) {}
@@ -32,6 +33,7 @@ export default class Grounding {
                 getConfig().browser.screenshotsDir,
                 `${Date.now()}.png`
             )
+
             // Make sure the directory exists
             fs.mkdirSync(getConfig().browser.screenshotsDir, {
                 recursive: true,
@@ -44,14 +46,12 @@ export default class Grounding {
             // Workaround to make sure image is valid (buffer-only ends up being invalid in some cases)
             let img = fs.readFileSync(imgPath)
             return `data:image/png;base64,${img.toString('base64')}`
-        } catch (e) {
-            Logger.error(`Failed to take screenshot: ${e}`)
-            return ''
+        } catch (err: any) {
+            throw new GroundingScreenshotError().withContext(err)
         }
     }
 
     public async resolve(id: number): Promise<ElementHandle | null> {
-        Logger.debug(`Resolving SoM ${id}`)
         return this.page.$(`[data-SoM="${id}"]`)
     }
 }

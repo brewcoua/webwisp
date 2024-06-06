@@ -3,6 +3,7 @@ import chalk from 'chalk'
 import CalledAction from './domain/CalledAction'
 import ActionType from './domain/ActionType'
 import TaskResult from './domain/TaskResult'
+import WebwispError from './domain/errors/Error'
 
 export default class Logger {
     private static verbose = process.env.NODE_ENV === 'development'
@@ -18,7 +19,13 @@ export default class Logger {
     }
 
     static error(...message: any[]) {
-        console.log(chalk.red.bold('ERROR'), ...message)
+        console.log(
+            chalk.redBright.bold('ERROR'),
+            ...message.map((m) => {
+                if (m instanceof WebwispError) return chalk.red(m.full)
+                return m
+            })
+        )
     }
 
     static warn(...message: any[]) {
@@ -78,6 +85,16 @@ export default class Logger {
             duration && chalk.gray.italic(`(${duration}ms)`),
             // Usage
             usage && chalk.gray.italic(`[${usage} tok]`)
+        )
+
+        console.log(
+            chalk.greenBright('$'),
+            chalk.whiteBright(action.type),
+            chalk.cyan(
+                Object.values(action.arguments).map((arg) =>
+                    typeof arg === 'string' ? `"${arg}"` : arg
+                )
+            )
         )
     }
 

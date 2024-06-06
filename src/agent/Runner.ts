@@ -13,6 +13,12 @@ import type ImageURL from '@/domain/ImageURL'
 import Grounding from './Grounding'
 import PromptBuilder from './PromptBuilder'
 import CompletionParser from './CompletionParser'
+import {
+    ActionFailedError,
+    ActionNotFoundError,
+    UnknownActionError,
+} from '@/domain/errors/Action'
+import WebwispError from '@/domain/errors/Error'
 
 export default class Runner {
     private grounding!: Grounding
@@ -39,86 +45,108 @@ export default class Runner {
             cycles < config.api.max_cycles &&
             failedCycles < config.api.max_failed_cycles
         ) {
-            const cycleStart = Date.now()
+            try {
+                const cycleStart = Date.now()
 
-            // Make sure the page is fully loaded
-            await this.page.waitForLoadState('domcontentloaded')
+                // Make sure the page is fully loaded
+                await this.page.waitForLoadState('domcontentloaded')
 
-            const screenshot = await this.screenshot()
+                const screenshot = await this.screenshot()
 
-            const system = PromptBuilder.makeSystem()
-            const user = PromptBuilder.makeUser({
-                title: await this.page.title(),
-                url: this.page.url(),
-                task: this.task,
-                previous_actions: actions,
-                screenshot,
-            })
+                const system = PromptBuilder.makeSystem()
+                const user = PromptBuilder.makeUser({
+                    title: await this.page.title(),
+                    url: this.page.url(),
+                    task: this.task,
+                    previous_actions: actions,
+                    screenshot,
+                })
 
-            let failedFormatting = 0
+                let failedFormatting = 0
 
-            while (failedFormatting < config.api.max_failed_formatting) {
-                const completion = await this.openai.completion(
-                    system.concat(user)
-                )
-
-                const choice = completion.choices[0]
-                const message = choice.message.content?.trim() || ''
-
-                if (!message) {
-                    Logger.error('Empty message received from OpenAI')
-                    failedFormatting++
-                    continue
-                }
-
-                Logger.debug(message)
-
-                try {
-                    const parsed = CompletionParser.parse(message)
-
-                    if (parsed.action.type === ActionType.Done) {
-                        const success =
-                            parsed.action.arguments.value === 'success'
-                        return {
-                            success,
-                            message: `Task completed with status: ${success ? 'success' : 'failure'}`,
-                            value: parsed.action.arguments.reason as string,
-                        }
-                    }
-
+                while (failedFormatting < config.api.max_failed_formatting) {
                     try {
-                        await this.handleAction(parsed.action)
-                        parsed.action.status = CalledActionStatus.Success
+                        const completion = await this.openai.completion(
+                            system.concat(user)
+                        )
+
+                        const choice = completion.choices[0]
+                        const message = choice.message.content?.trim() || ''
+
+                        if (!message) {
+                            Logger.error('Empty message received from OpenAI')
+                            failedFormatting++
+                            continue
+                        }
+
+                        Logger.debug(message)
+
+                        try {
+                            const parsed = CompletionParser.parse(message)
+
+                            if (parsed.action.type === ActionType.Done) {
+                                const success =
+                                    parsed.action.arguments.value === 'success'
+                                return {
+                                    success,
+                                    message: `Task completed with status: ${success ? 'success' : 'failure'}`,
+                                    value: parsed.action.arguments
+                                        .reason as string,
+                                }
+                            }
+
+                            try {
+                                await this.handleAction(parsed.action)
+                                parsed.action.status =
+                                    CalledActionStatus.Success
+                            } catch (err: any) {
+                                parsed.action.status = CalledActionStatus.Failed
+                                failedCycles++
+                                Logger.error(err.message)
+                            }
+
+                            actions.push(parsed.action)
+
+                            Logger.action(
+                                parsed.action,
+                                parsed.reasoning,
+                                Date.now() - cycleStart,
+                                completion.usage?.total_tokens
+                            )
+
+                            cycles++
+                            break
+                        } catch (err: any) {
+                            Logger.error(
+                                new WebwispError(
+                                    'Error while parsing completion'
+                                ).withContext(err)
+                            )
+                            failedFormatting++
+                        }
                     } catch (err: any) {
-                        parsed.action.status = CalledActionStatus.Failed
-                        failedCycles++
-                        Logger.error(err.message)
+                        Logger.error(
+                            new WebwispError(
+                                'Error while fetching completion'
+                            ).withContext(err)
+                        )
+                        failedFormatting++
                     }
-
-                    actions.push(parsed.action)
-
-                    Logger.action(
-                        parsed.action,
-                        parsed.reasoning,
-                        Date.now() - cycleStart,
-                        completion.usage?.total_tokens
-                    )
-
-                    cycles++
-                    break
-                } catch (err: any) {
-                    Logger.error(
-                        `Error while parsing completion: ${err.message}`
-                    )
-                    failedFormatting++
                 }
-            }
 
-            if (failedFormatting >= config.api.max_failed_formatting) {
+                if (failedFormatting >= config.api.max_failed_formatting) {
+                    Logger.error(
+                        `Failed to format completion after ${failedFormatting} attempts`
+                    )
+                    break
+                }
+            } catch (err: any) {
                 Logger.error(
-                    `Failed to format completion after ${failedFormatting} attempts`
+                    new WebwispError('Error while running cycle').withContext(
+                        err
+                    )
                 )
-                break
+                failedCycles++
             }
 
             await this.sleep(config.api.delay)
@@ -173,8 +201,8 @@ export default class Runner {
                 )
 
                 if (!element) {
-                    throw new Error(
-                        `Element #${action.arguments.label} not found`
+                    throw new ActionNotFoundError(
+                        action.arguments.label as number
                     )
                 }
 
@@ -192,16 +220,12 @@ export default class Runner {
                         `Action ${action.type} on #${action.arguments.label} (${action.description}) [DONE]`
                     )
                 } catch (err: any) {
-                    throw new Error(
-                        `Error while performing ${action.type} on #${action.arguments.label} (${action.description}): ${err.message}`
-                    )
+                    throw new ActionFailedError(action).withContext(err)
                 }
                 break
             }
             default:
-                throw new Error(
-                    `Unknown action type '${action.type}' to be performed`
-                )
+                throw new UnknownActionError(action.type)
         }
     }
 

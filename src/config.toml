@@ -18,7 +18,6 @@ screenshotsDir = "./dist/img"
 
 [browser.options]
 headless = false
-slowMo = 50
 args = ['--disable-web-security']
 
 [browser.context]

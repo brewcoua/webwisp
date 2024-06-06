@@ -27,7 +27,7 @@ export default class Agent extends Service {
     async destroy() {
         Logger.debug('Destroying agent')
 
-        await Promise.all([this.openai.destroy(), this.pw.destroy()])
+        await Promise.allSettled([this.openai.destroy(), this.pw.destroy()])
 
         Logger.debug('Agent destroyed')
     }
