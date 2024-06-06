@@ -1,25 +1,26 @@
-import { VALID_TARGET_REGEX, HTTPS_URL_REGEX } from '@/constants'
 import { input } from '@inquirer/prompts'
 
 export async function promptTarget(prefilled?: string): Promise<string> {
     if (prefilled && prefilled.trim().length > 0) {
-        if (prefilled.match(VALID_TARGET_REGEX)) {
-            return prefilled
+        try {
+            const url = new URL(prefilled)
+            return url.href
+        } catch (err) {
+            throw new Error('Invalid URL, domain name, or IP address')
         }
-
-        throw new Error('Invalid URL, domain name, or IP address')
     }
 
     const target = await input({
         message: 'Target',
         validate: (input: string) => {
-            if (input.match(VALID_TARGET_REGEX)) {
+            try {
+                new URL(input)
                 return true
+            } catch (err) {
+                return 'Invalid URL, domain name, or IP address'
             }
-
-            return 'Invalid URL, domain name, or IP address'
         },
     })
 
-    return target
+    return new URL(target).href
 }
