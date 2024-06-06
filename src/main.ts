@@ -1,15 +1,14 @@
 #!/usr/bin/env bun
 import meow from 'meow'
-import { input } from '@inquirer/prompts'
 import chalk from 'chalk'
 
 import pkg from '../package.json'
-import { REGEX } from './constants'
 import Agent from './agent'
 import Logger from './logger'
 
 import { waitPress } from './cli/prompts'
-import { promptVoice } from './cli/voice'
+import { promptTarget } from './cli/prompts/target'
+import { promptTask } from './cli/prompts/task'
 
 const cli = meow(
     `
@@ -63,64 +62,6 @@ if (cli.flags.verbose) {
     Logger.setVerbose(true)
 }
 
-async function promptTarget() {
-    const target = await input({
-        message: 'Target',
-        validate: (input: string) => {
-            if (
-                input.match(REGEX.url) ||
-                input.match(REGEX.domain) ||
-                input.match(REGEX.ip) ||
-                input.match(REGEX.localhost)
-            ) {
-                return true
-            }
-
-            return 'Invalid URL, domain name, or IP address'
-        },
-        transformer: (input: string) => {
-            // If it starts with http or https, return as is
-            if (input.match(/^https?:\/\//i)) {
-                return input
-            }
-
-            if (input.match(REGEX.domain)) {
-                return `https://${input}`
-            }
-
-            return `http://${input}`
-        },
-    })
-
-    if (target.match(REGEX.url)) {
-        return target
-    }
-
-    if (target.match(REGEX.domain)) {
-        return `https://${target}`
-    }
-
-    return `http://${target}`
-}
-
-async function promptTask() {
-    if (cli.flags.voice) {
-        return await promptVoice('Task')
-    }
-
-    return input({
-        message: 'Task',
-        validate: (input: string) => {
-            // Check that task must have a few words
-            if (input.split(' ').length >= 3) {
-                return true
-            }
-
-            return 'Task must have at least 3 words'
-        },
-    })
-}
-
 function bindSignals(agent: Agent) {
     const terminate = async (code: number = 1) => {
         await agent.destroy()
@@ -144,17 +85,13 @@ function bindSignals(agent: Agent) {
 }
 
 async function main() {
-    let target = cli.flags.target
-    if (!target) {
-        target = await promptTarget()
-    } else {
+    const target = await promptTarget(cli.flags.target)
+    if (cli.flags.target) {
         Logger.prompt('Target', target)
     }
 
-    let task = cli.flags.task
-    if (!task) {
-        task = await promptTask()
-    } else {
+    const task = await promptTask(cli.flags.task, cli.flags.voice)
+    if (cli.flags.task) {
         Logger.prompt('Task', task)
     }
 
