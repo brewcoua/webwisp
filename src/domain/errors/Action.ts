@@ -1,4 +1,4 @@
-import CalledAction from '../CalledAction'
+import Action from '../../services/runner/domain/Action'
 import WebwispError from './Error'
 
 export class ActionError extends WebwispError {
@@ -16,7 +16,7 @@ export class ActionNotFoundError extends ActionError {
 }
 
 export class ActionFailedError extends ActionError {
-    constructor(action: CalledAction) {
+    constructor(action: Action) {
         super(
             `Failed to perform ${action.type} on #${action.arguments.label} (${action.description})`
         )

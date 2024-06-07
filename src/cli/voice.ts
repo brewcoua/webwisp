@@ -3,8 +3,7 @@ import AudioRecorder from 'node-audiorecorder'
 import fs from 'node:fs'
 import chalk from 'chalk'
 import { confirm } from '@inquirer/prompts'
-
-import OpenAIService from '@/services/OpenAIService'
+import OpenAI from 'openai'
 
 const RECORD_PATH = './dist/voice.wav'
 
@@ -65,8 +64,15 @@ async function recordVoice() {
 
 async function transcriptVoice() {
     // Use whisper to transcribe the voice
+    if (!process.env.OPENAI_API_KEY) {
+        throw new Error('Missing OPENAI_API_KEY environment variable')
+    }
 
-    const client = OpenAIService.makeClient()
+    const client = new OpenAI({
+        apiKey: process.env.OPENAI_API_KEY,
+        organization: process.env.OPENAI_ORG,
+        project: process.env.OPENAI_PROJECT,
+    })
 
     const spinner = ora({
         text: 'Transcribing voice input',

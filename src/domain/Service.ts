@@ -5,7 +5,11 @@ export default abstract class Service {
         this.name = name
     }
 
-    abstract initialize(): Promise<void>
+    public initialize(): Promise<void> {
+        return Promise.resolve()
+    }
 
-    abstract destroy(): Promise<void>
+    public destroy(): Promise<void> {
+        return Promise.resolve()
+    }
 }

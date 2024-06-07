@@ -1,8 +1,8 @@
 import chalk from 'chalk'
 
-import CalledAction from './domain/CalledAction'
-import ActionType from './domain/ActionType'
-import TaskResult from './domain/TaskResult'
+import Action from './services/runner/domain/Action'
+import ActionType from './services/runner/domain/ActionType'
+import TaskResult from './services/runner/domain/TaskResult'
 import WebwispError from './domain/errors/Error'
 
 export default class Logger {
@@ -42,10 +42,10 @@ export default class Logger {
     }
 
     static action(
-        action: CalledAction,
+        action: Action,
         reasoning?: string,
         duration?: number,
-        usage?: number
+        meta?: any
     ) {
         // Use an emote to represent each action kind
         let emote
@@ -77,6 +77,8 @@ export default class Logger {
             console.log(chalk.bold.whiteBright(`🧠?`), chalk.italic(reasoning))
         }
 
+        const usage = meta && meta.usage ? meta.usage.total : null
+
         console.log(
             chalk.bold.whiteBright(`${emote}❯`),
             chalk.white(action.description),
@@ -94,7 +96,8 @@ export default class Logger {
                 Object.values(action.arguments).map((arg) =>
                     typeof arg === 'string' ? `"${arg}"` : arg
                 )
-            )
+            ),
+            '\n'
         )
     }
 

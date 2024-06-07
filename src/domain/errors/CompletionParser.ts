@@ -1,4 +1,4 @@
-import ActionType from '../ActionType'
+import ActionType from '../../services/runner/domain/ActionType'
 import WebwispError from './Error'
 
 export class CompletionParsingError extends WebwispError {

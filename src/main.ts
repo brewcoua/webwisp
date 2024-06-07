@@ -8,7 +8,7 @@ config({
 })
 
 import pkg from '../package.json'
-import Agent from './agent'
+import Agent from './Agent'
 import Logger from './logger'
 
 import { waitPress } from './cli/prompts'
@@ -111,7 +111,7 @@ async function main() {
 
     await waitPress({ message: 'Press enter to start the task' })
 
-    const result = await agent.spawn_task(target, task)
+    const result = await agent.spawn(target, task)
 
     await agent.destroy()
     Logger.taskResult(result)

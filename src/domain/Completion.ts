@@ -1,8 +1,8 @@
-import CalledAction from './CalledAction'
+import Action from '../services/runner/domain/Action'
 
 export type Completion = {
     reasoning?: string
-    action: CalledAction
+    action: Action
 }
 
 export default Completion

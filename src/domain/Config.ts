@@ -1,7 +1,7 @@
 import { BrowserContextOptions, LaunchOptions } from 'playwright'
 
-import ActionType from './ActionType'
-import type Action from './Action'
+import ActionType from '../services/runner/domain/ActionType'
+import type AbstractAction from '../services/runner/domain/AbstractAction'
 
 export type Config = {
     // Fine-tuning options for the agent
@@ -65,7 +65,7 @@ export type Config = {
         }
     }
     // Information about the available actions, later injected into the prompt
-    actions: Record<ActionType, Action>
+    actions: Record<ActionType, AbstractAction>
 }
 
 // @ts-ignore - Parsed by vite-plugin-toml
