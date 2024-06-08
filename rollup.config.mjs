@@ -12,7 +12,9 @@ export default {
         format: 'cjs',
     },
     plugins: [
-        typescript(),
+        typescript({
+            outputToFilesystem: true,
+        }),
         resolve({
             preferBuiltins: true,
         }),
