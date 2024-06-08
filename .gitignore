@@ -1,5 +1,6 @@
 node_modules/
 dist/
+.rollup.cache/
 coverage/
 videos/
 *.log

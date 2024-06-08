@@ -1,5 +1,5 @@
 import { input } from '@inquirer/prompts'
-import { promptVoice } from '../voice'
+import { promptVoice } from './voice'
 
 export async function promptTask(
     prefilled?: string,
@@ -14,7 +14,7 @@ export async function promptTask(
     }
 
     if (voice) {
-        return await promptVoice('Task')
+        return await promptVoice()
     }
 
     return input({

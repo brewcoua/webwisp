@@ -1,9 +1,11 @@
 import ora from 'ora'
-import AudioRecorder from 'node-audiorecorder'
 import fs from 'node:fs'
 import chalk from 'chalk'
 import { confirm } from '@inquirer/prompts'
 import OpenAI from 'openai'
+
+// @ts-ignore
+import AudioRecorder from 'node-audiorecorder'
 
 const RECORD_PATH = './dist/voice.wav'
 
@@ -22,7 +24,7 @@ async function recordVoice() {
         color: 'cyan',
     })
 
-    const waitForEnd = new Promise<void>((resolve, reject) => {
+    const waitForEnd = new Promise<void>((resolve) => {
         recorder.on('end', () => {
             spinner.stop()
             console.log(
@@ -33,7 +35,7 @@ async function recordVoice() {
         })
     })
 
-    recorder.on('error', (error: any) => {
+    recorder.on('error', (error: Error) => {
         console.log(chalk.redBright.bold('Error!'), chalk.white(error.message))
     })
 
@@ -47,7 +49,7 @@ async function recordVoice() {
     // Wait for the first to be resolved
     await Promise.race([
         waitForEnd,
-        new Promise<void>((resolve, reject) => {
+        new Promise<void>((resolve) => {
             setTimeout(() => {
                 spinner.stop()
                 console.log(
@@ -91,7 +93,7 @@ async function transcriptVoice() {
     return transcription.text
 }
 
-export async function promptVoice(title: string) {
+export async function promptVoice() {
     let isDone = false
     let result = ''
 

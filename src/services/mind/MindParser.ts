@@ -189,12 +189,13 @@ export default class MindParser {
                     return null // Bad enum
                 }
                 return buf
-            case AbstractArgumentType.Number:
+            case AbstractArgumentType.Number: {
                 const parsedNumber = parseInt(buf)
                 if (isNaN(parsedNumber)) {
                     return null // Bad number
                 }
                 return parsedNumber
+            }
             case AbstractArgumentType.Boolean:
                 if (buf === 'true' || buf === '1') {
                     return true

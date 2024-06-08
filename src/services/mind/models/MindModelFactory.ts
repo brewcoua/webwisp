@@ -1,5 +1,3 @@
-import WebwispError from '@/domain/errors/Error'
-
 import { MindModelType } from '../MindConfig'
 import MindModel from './MindModel'
 
@@ -10,8 +8,6 @@ export default class MindModelFactory {
         switch (type) {
             case 'openai':
                 return new OpenAIModel()
-            default:
-                throw new WebwispError(`Unknown model type: ${type}`)
         }
     }
 }

@@ -56,7 +56,7 @@ export default class MindTransformer {
                 content: this.fillPlaceholders(prompt.prompt, {
                     ...placeholders,
                     previous_actions: placeholders.previous_actions
-                        .map(this.mapAction)
+                        .map((action) => this.mapAction(action))
                         .join('\n'),
                 }),
             },

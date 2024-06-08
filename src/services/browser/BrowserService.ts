@@ -1,13 +1,3 @@
-import {
-    Browser,
-    BrowserContext,
-    Page,
-    chromium,
-    firefox,
-    webkit,
-} from 'playwright'
-
-import Logger from '@/logger'
 import Service from '@/domain/Service'
 import WebwispError from '@/domain/errors/Error'
 

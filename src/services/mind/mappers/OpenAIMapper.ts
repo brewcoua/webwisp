@@ -15,7 +15,7 @@ export type OpenAIMessage =
 
 export class OpenAIMessageMapper extends MindMessageMapper<OpenAIMessage> {
     public toDomains(messages: OpenAIMessage[]): Message[] {
-        return messages.map(this.toDomain)
+        return messages.map((message) => this.toDomain(message))
     }
 
     public toDomain(message: OpenAIMessage): Message {
@@ -37,7 +37,7 @@ export class OpenAIMessageMapper extends MindMessageMapper<OpenAIMessage> {
     }
 
     public toModels(messages: Message[]): OpenAIMessage[] {
-        return messages.map(this.toModel)
+        return messages.map((message) => this.toModel(message))
     }
 
     public toModel(message: Message): OpenAIMessage {

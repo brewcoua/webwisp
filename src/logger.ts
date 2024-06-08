@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access */
+
 import chalk from 'chalk'
 
 import Action from './services/runner/domain/Action'
@@ -12,13 +14,13 @@ export default class Logger {
         this.verbose = verbose
     }
 
-    static debug(...message: any[]) {
+    static debug(...message: ANY[]) {
         if (!this.verbose) return
 
         console.log(chalk.cyan.bold('DEBUG'), ...message)
     }
 
-    static error(...message: any[]) {
+    static error(...message: ANY[]) {
         console.log(
             chalk.redBright.bold('ERROR'),
             ...message.map((m) => {
@@ -28,7 +30,7 @@ export default class Logger {
         )
     }
 
-    static warn(...message: any[]) {
+    static warn(...message: ANY[]) {
         console.log(chalk.yellow.bold('WARN'), ...message)
     }
 
@@ -45,7 +47,7 @@ export default class Logger {
         action: Action,
         reasoning?: string,
         duration?: number,
-        meta?: any
+        meta?: ANY
     ) {
         // Use an emote to represent each action kind
         let emote
@@ -116,3 +118,6 @@ export default class Logger {
         }
     }
 }
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type ANY = any
