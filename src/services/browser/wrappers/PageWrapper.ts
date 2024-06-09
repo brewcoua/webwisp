@@ -7,8 +7,7 @@ import Action from '@/services/runner/domain/Action'
 import ActionType from '@/services/runner/domain/ActionType'
 import ActionStatus from '@/services/runner/domain/ActionStatus'
 
-const SoMUrl =
-    'https://raw.githubusercontent.com/brewcoua/web-som/master/dist/SoM.min.js'
+const SoMUrl = 'https://unpkg.com/@brewcoua/web-som'
 
 export default class PageWrapper {
     constructor(private readonly page: Page) {}
