@@ -53,12 +53,25 @@ export default class MindTransformer {
         return [
             {
                 role: 'user',
-                content: this.fillPlaceholders(prompt.prompt, {
-                    ...placeholders,
-                    previous_actions: placeholders.previous_actions
-                        .map((action) => this.mapAction(action))
-                        .join('\n'),
-                }),
+                content: [
+                    {
+                        type: 'text',
+                        text: this.fillPlaceholders(prompt.prompt, {
+                            ...placeholders,
+                            screenshot: '',
+                            previous_actions: placeholders.previous_actions
+                                .map((action) => this.mapAction(action))
+                                .join('\n'),
+                        }),
+                    },
+                    {
+                        type: 'image_url',
+                        image_url: {
+                            url: placeholders.screenshot,
+                            detail: 'auto',
+                        },
+                    },
+                ],
             },
         ]
     }

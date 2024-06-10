@@ -20,8 +20,8 @@ const config: BrowserConfig = {
         scale: 'css',
     },
     viewport: {
-        width: 1440,
-        height: 900,
+        width: 1280,
+        height: 720,
     },
 }
 

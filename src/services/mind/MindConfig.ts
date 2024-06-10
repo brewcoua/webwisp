@@ -2,7 +2,7 @@ const config: MindConfig = {
     type: 'openai',
     options: {
         model: 'gpt-4o',
-        temperature: 0.3,
+        temperature: 0.7,
         max_tokens: 4000,
     },
 } satisfies Partial<MindConfig> & { type: MindModelType }
@@ -46,4 +46,4 @@ export type OpenAIConfig = {
         max_tokens: number
     }
 }
-export type OpenAIModel = 'gpt-4o'
+export type OpenAIModel = 'gpt-4o' | 'gpt-4-turbo'

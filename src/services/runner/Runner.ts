@@ -106,9 +106,8 @@ export default class Runner {
                 result = genResult
             } else {
                 this.cycles.format++
-                Logger.warn(
-                    `Failed to format cycle, retrying...\nCaused by: ${genResult.error}`
-                )
+                Logger.retry(this.cycles.format, config.cycles.format)
+                Logger.debug(`Caused by: ${genResult.error}`)
             }
         }
 
@@ -144,7 +143,7 @@ export default class Runner {
                 error: 'No completion found',
             }
 
-        Logger.debug(`Completion: ${completion}`)
+        Logger.appendMessage(completion + '\n')
 
         return this.mind.parser.parse(completion)
     }

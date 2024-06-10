@@ -8,7 +8,7 @@ import ActionType from '@/services/runner/domain/ActionType'
 import ActionStatus from '@/services/runner/domain/ActionStatus'
 import Logger from '@/logger'
 
-const SoMUrl = 'https://unpkg.com/@brewcoua/web-som'
+const SoMUrl = 'https://unpkg.com/@brewcoua/web-som@1.1.4'
 
 export default class PageWrapper {
     constructor(private readonly page: Page) {}
@@ -121,10 +121,7 @@ export default class PageWrapper {
      * @param element - The element to perform the action on (if applicable)
      * @returns {ActionStatus} - The status of the action
      */
-    public async perform(
-        action: Action,
-        element?: ElementHandle
-    ): Promise<ActionStatus> {
+    public async perform(action: Action): Promise<ActionStatus> {
         try {
             if (action.type === ActionType.Scroll) {
                 await this.page.evaluate(
@@ -146,6 +143,9 @@ export default class PageWrapper {
                 action.type === ActionType.Click ||
                 action.type === ActionType.Type
             ) {
+                const element = await this.page.$(
+                    `[data-som="${action.arguments.label}"]`
+                )
                 if (!element) {
                     return ActionStatus.Failed
                 }
@@ -162,6 +162,7 @@ export default class PageWrapper {
 
             return ActionStatus.Success
         } catch (err) {
+            Logger.debug(err)
             return ActionStatus.Failed
         }
     }

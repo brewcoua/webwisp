@@ -5,16 +5,8 @@ const prompts: Prompts = {
         introduction:
             'You are an autonomous agent browsing a website to test a particular feature, verifying that a certain task can be completed.\n' +
             'You are given a set of possible actions to interact with the website, and you can choose to perform any of them.\n' +
-            'owever, you must only issue one action at a time, in a format consistent with the instructions provided as to allow parsing.\n' +
+            'However, you must only issue one action at a time, and alwyas issue one, in a format consistent with the instructions provided as to allow parsing.\n' +
             'Unlike a human, you may directly type into an editable element without needing to click on it first.\n' +
-            'To make your decision, you will be given everytime a screenshot of the current state of the website, the url and title of the page, and the full list of your previous actions, written by yourself in previous steps.\n' +
-            'When completing the task, make as little actions as possible, and try to avoid unnecessary actions. This means that you should only perform actions that are strictly necessary to complete the task, and avoid any other actions that do not contribute to the task completion.\n' +
-            "If you believe that you have completed the task or that it cannot be completed, regardless of success of failure, you can issue the 'done' action to finish the task, while also giving the final verdict of the task completion." +
-            "However, you must be sure that the task is completed or not, as the 'done' action is final and cannot be undone.\n" +
-            "If you believe that the previous action was wrong, you can interact with the page history to go back to the previous state with the 'back' action and try a different action.\n" +
-            'Actions such as scroll up or down, cancel each other out, and may be used instead if you want to revert the previous action.\n' +
-            'When selecting an element (for a click action for example), you need to specify the label of the element, which is the text displayed next to all interactive elements on the website.\n' +
-            'Editable elements however, have stripes on them, and are the only ones that can be typed into.\n' +
             'If you encounter a cookie consent banner, close it as soon as possible, as it may block the view of the website.\n\n' +
             'The possible actions are the following:\n' +
             '{{actions}}\n\n' +
@@ -24,14 +16,20 @@ const prompts: Prompts = {
             'For your answer, you must follow the format below, while ommiting the <template> tags:\n' +
             '<template>\n' +
             '## Current State ##\n' +
-            'Describe the current state of the website, including the screenshot, url, title, and previous actions.\n\n' +
+            'Describe the current state of the website, including the screenshot, url, title, and previous actions.' +
+            'Based on what you see, you may doubt the previous actions, and decide to go back to a previous state.\n\n' +
             '## Action ##\n' +
             'Describe the action you want to perform, including why you want to perform it, and what you expect to happen.\n\n' +
             '~~~\n' +
             '$ <single-sentence action description for what you want to do>\n' +
             '<action> [arg1] [arg2] ...\n' +
             '~~~\n' +
-            '</template>',
+            '</template>\n\n' +
+            'To make your decision, you will be given everytime a screenshot of the current state of the website, the url and title of the page, and the full list of your previous actions, written by yourself in previous steps.\n' +
+            'When trying to interact with an element, you will need to provide the label (colored number, associated with the bounding box over the element) most closely associated with it, as it is the only way to identify it. ' +
+            'However, you must make sure that the label is the correct one, as the system will not check if the label is correct or not.\n' +
+            'A successful action in the previous actions only means that it was performed, not that it did as expected. You must always check the result of the action to see if it was successful. ' +
+            'In fact, the current state of the page matters way more than the previous actions, as it is the only way to know what is happening.',
         addons: {
             examples: {
                 message:
@@ -40,43 +38,20 @@ const prompts: Prompts = {
                     {
                         screenshot: './assets/examples/1.png',
                         prompt:
-                            'Title: Amazon.fr : livres, DVD, jeux vidéo, musique, high-tech, informatique, jouets, vêtements, chaussures, sport, bricolage, maison, beauté, puériculture, épicerie et plus encore !\n' +
-                            'URL: https://www.amazon.fr/\n' +
-                            'Task: Check that we can add a PlayStation 5 to the cart and proceed to checkout.' +
+                            'Title: LaBRI - Laboratoire Bordelais de Recherche en Informatique\n' +
+                            'URL: https://www.labri.fr/en\n' +
+                            'Task: Check that Promyze is among the start-up projects carried out by the LaBRI.\n' +
                             'Previous actions:\n' +
                             'None\n' +
                             'Screenshot:',
                         completion:
                             '## Current State ##\n' +
-                            "Let's think step by step. The website is on the Amazon.fr homepage. Various categories are displayed, such as High-Tech, Cuisine et maison, Jardin, etc. The search bar is available at the top of the page.\n\n" +
+                            'Let\'s think step by step. The website is on the LaBRI homepage. A navigation bar is available at the top of the page, with a "MENU" button and a search button.\n\n' +
                             '## Action ##\n' +
-                            'We need to use the search bar to search for a PlayStation 5, with the search bar being orange with stripes and a label that says "Rechercher Amazon.fr".\n\n' +
+                            'We need to first click on the "MENU" button to access the navigation menu, then further navigate to find the start-up projects.\n\n' +
                             '~~~\n' +
-                            '$ Type "PlayStation 5" into the search bar\n' +
-                            'type 4 "PlayStation 5"\n' +
-                            '~~~',
-                    },
-                    {
-                        screenshot: './assets/examples/2.png',
-                        prompt:
-                            'Title: Reddit - Dive into anything\n' +
-                            'URL: https://www.reddit.com/\n' +
-                            'Task: Find the first post in the feed from r/technology and upvote it.\n' +
-                            'Previous actions:\n' +
-                            '- scroll down : Scroll down the page to see more posts [success]\n' +
-                            'Screenshot:',
-                        completion:
-                            '## Current State ##\n' +
-                            "Let's think step by step. The website is on the Reddit homepage. The feed is displayed, showing various posts from different subreddits." +
-                            'The first post is from r/technology and talks about the diamond industry.' +
-                            'The previous actions indicate that the page was scrolled down to see more posts.\n\n' +
-                            '## Action ##\n' +
-                            'We need to upvote the first post in the feed from r/technology.' +
-                            'The upvote button is a small arrow pointing upwards next to the post.' +
-                            'The label of the upvote button is 30, with a dark green color.\n\n' +
-                            '~~~\n' +
-                            '$ Click on the upvote button next to the first post\n' +
-                            'click 30\n' +
+                            '$ Click on the "MENU" button\n' +
+                            'click 2\n' +
                             '~~~',
                     },
                 ],

@@ -1,14 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access */
 
 import chalk from 'chalk'
+import { writeFileSync, mkdirSync } from 'fs'
 
 import Action from './services/runner/domain/Action'
 import ActionType from './services/runner/domain/ActionType'
 import TaskResult from './services/runner/domain/TaskResult'
 import WebwispError from './domain/WebwispError'
+import ActionStatus from './services/runner/domain/ActionStatus'
 
 export default class Logger {
     private static verbose = process.env.NODE_ENV === 'development'
+    private static baseTime = Date.now()
 
     static setVerbose(verbose: boolean) {
         this.verbose = verbose
@@ -40,6 +43,15 @@ export default class Logger {
             chalk.green('$'),
             chalk.whiteBright.bold(title),
             chalk.reset.cyan(value)
+        )
+    }
+
+    static retry(current: number, max: number) {
+        console.log(
+            chalk.bold.whiteBright('🔁'),
+            chalk.grey.italic(
+                `Failed to format cycle, retrying... (${current}/${max})`
+            )
         )
     }
 
@@ -84,7 +96,11 @@ export default class Logger {
         console.log(
             chalk.bold.whiteBright(`${emote}❯`),
             chalk.white(action.description),
-            chalk.bold(action.status ? chalk.green('✔') : chalk.red('✘')),
+            chalk.bold(
+                action.status === ActionStatus.Success
+                    ? chalk.green('✔')
+                    : chalk.red('✘')
+            ),
             // Duration
             duration && chalk.gray.italic(`(${duration}ms)`),
             // Usage
@@ -116,6 +132,14 @@ export default class Logger {
                 chalk.cyan(result.value)
             )
         }
+    }
+
+    static appendMessage(message: string) {
+        const path = `./dist/logs/${this.baseTime}.log`
+
+        mkdirSync('./dist/logs', { recursive: true })
+
+        writeFileSync(path, message + '\n', { flag: 'a' })
     }
 }
 
