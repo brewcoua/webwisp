@@ -19,6 +19,10 @@ const config: BrowserConfig = {
         caret: 'initial',
         scale: 'css',
     },
+    viewport: {
+        width: 1440,
+        height: 900,
+    },
 }
 
 export default config

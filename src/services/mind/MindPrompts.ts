@@ -9,7 +9,8 @@ const prompts: Prompts = {
             'Unlike a human, you may directly type into an editable element without needing to click on it first.\n' +
             'To make your decision, you will be given everytime a screenshot of the current state of the website, the url and title of the page, and the full list of your previous actions, written by yourself in previous steps.\n' +
             'When completing the task, make as little actions as possible, and try to avoid unnecessary actions. This means that you should only perform actions that are strictly necessary to complete the task, and avoid any other actions that do not contribute to the task completion.\n' +
-            "If you believe that you have completed the task or that it cannot be completed, regardless of success of failure, you can issue the 'done' action to finish the task, while also giving the final verdict of the task completion.\n" +
+            "If you believe that you have completed the task or that it cannot be completed, regardless of success of failure, you can issue the 'done' action to finish the task, while also giving the final verdict of the task completion." +
+            "However, you must be sure that the task is completed or not, as the 'done' action is final and cannot be undone.\n" +
             "If you believe that the previous action was wrong, you can interact with the page history to go back to the previous state with the 'back' action and try a different action.\n" +
             'Actions such as scroll up or down, cancel each other out, and may be used instead if you want to revert the previous action.\n' +
             'When selecting an element (for a click action for example), you need to specify the label of the element, which is the text displayed next to all interactive elements on the website.\n' +
@@ -17,6 +18,9 @@ const prompts: Prompts = {
             'If you encounter a cookie consent banner, close it as soon as possible, as it may block the view of the website.\n\n' +
             'The possible actions are the following:\n' +
             '{{actions}}\n\n' +
+            'The action format is the following:\n' +
+            '`<>` are for required arguments, while `[]` are for optional arguments.\n' +
+            'Inside, the pattern is: name;type[;enum]. Strings with more than one word must be enclosed in double quotes.\n' +
             'For your answer, you must follow the format below, while ommiting the <template> tags:\n' +
             '<template>\n' +
             '## Current State ##\n' +
@@ -24,7 +28,7 @@ const prompts: Prompts = {
             '## Action ##\n' +
             'Describe the action you want to perform, including why you want to perform it, and what you expect to happen.\n\n' +
             '~~~\n' +
-            '$ [single-sentence action description for what you want to do]\n' +
+            '$ <single-sentence action description for what you want to do>\n' +
             '<action> [arg1] [arg2] ...\n' +
             '~~~\n' +
             '</template>',

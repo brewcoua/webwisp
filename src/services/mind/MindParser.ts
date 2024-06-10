@@ -140,6 +140,10 @@ export default class MindParser {
                 }
 
                 const currentArg = action.arguments[count]
+                if (!currentArg) {
+                    break // Too many arguments, for the sake of flexibility we'll just ignore them
+                }
+
                 const parsed = this.parseArg(buf, currentArg)
                 if (!parsed.success) {
                     return {
@@ -191,16 +195,18 @@ export default class MindParser {
 
         if (buf) {
             const currentArg = action.arguments[count]
-            const parsed = this.parseArg(buf, currentArg)
-            if (!parsed.success) {
-                return {
-                    success: false,
-                    error: `Failed to parse argument:\n${parsed.error}`,
+            if (currentArg) {
+                const parsed = this.parseArg(buf, currentArg)
+                if (!parsed.success) {
+                    return {
+                        success: false,
+                        error: `Failed to parse argument:\n${parsed.error}`,
+                    }
                 }
-            }
 
-            parsedArgs[currentArg.name] = parsed.argument
-            count++
+                parsedArgs[currentArg.name] = parsed.argument
+                count++
+            }
         }
 
         // See if we're missing any required arguments

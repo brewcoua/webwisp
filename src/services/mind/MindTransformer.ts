@@ -99,7 +99,7 @@ export default class MindTransformer {
             })
             .join(' ')
 
-        return `- ${type} ${args} : ${action.description}`
+        return `- ${type} ${args} : ${action.description}\n\te.g. \`${action.example}\``
     }
 
     private makeExamplePrompts(examples: PromptExample[]): Message[] {

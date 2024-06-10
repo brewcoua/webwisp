@@ -11,6 +11,7 @@ const config: RunnerConfig = {
     actions: {
         click: {
             description: 'Click on an element on the page.',
+            example: 'click 3',
             arguments: [
                 {
                     name: 'label',
@@ -22,6 +23,7 @@ const config: RunnerConfig = {
         type: {
             description:
                 'Type text into an editable, striped, element on the page.',
+            example: 'type 3 "Hello, World!"',
             arguments: [
                 {
                     name: 'label',
@@ -38,6 +40,7 @@ const config: RunnerConfig = {
         press_enter: {
             description:
                 'Press the enter key on the keyboard. This does not type anything and may be used to submit forms.',
+            example: 'press_enter',
         },
         scroll: {
             description:
@@ -50,17 +53,21 @@ const config: RunnerConfig = {
                     required: true,
                 },
             ],
+            example: 'scroll up',
         },
         back: {
             description: 'Go back to the previous page in the browser history.',
+            example: 'back',
         },
         forward: {
             description:
                 'Go forward to the next page in the browser history. This requires going back first.',
+            example: 'forward',
         },
         done: {
             description:
                 'End the task and give the final verdict on the task completion',
+            example: 'done success "Name is found in the page"',
             arguments: [
                 {
                     name: 'status',

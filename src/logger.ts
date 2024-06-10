@@ -88,16 +88,16 @@ export default class Logger {
             // Duration
             duration && chalk.gray.italic(`(${duration}ms)`),
             // Usage
-            usage && chalk.gray.italic(`[${usage} tok]`)
+            usage ? chalk.gray.italic(`[${usage} tok]`) : ''
         )
 
         console.log(
             chalk.greenBright('$'),
             chalk.whiteBright(action.type),
             chalk.cyan(
-                Object.values(action.arguments).map((arg) =>
-                    typeof arg === 'string' ? `"${arg}"` : arg
-                )
+                Object.values(action.arguments)
+                    .map((arg) => (typeof arg === 'string' ? `"${arg}"` : arg))
+                    .join(' ')
             ),
             '\n'
         )
