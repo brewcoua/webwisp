@@ -16,6 +16,10 @@ import { bindSignals } from './cli/utils'
 async function main() {
     const cli = getConfig()
 
+    if (cli.verbose) {
+        Logger.setVerbose(true)
+    }
+
     const target = await promptTarget(cli.target)
     if (cli.target) {
         Logger.prompt('Target', target)

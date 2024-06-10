@@ -1,29 +1,35 @@
 import config from '../runner/RunnerConfig'
 import AbstractAction from '../runner/domain/AbstractAction'
 import AbstractArgument, {
-    AbstractArgumentPrimitive,
     AbstractArgumentType,
 } from '../runner/domain/AbstractArgument'
-import Action, { ActionArguments } from '../runner/domain/Action'
+import { ActionArguments } from '../runner/domain/Action'
 import ActionStatus from '../runner/domain/ActionStatus'
 import ActionType from '../runner/domain/ActionType'
-import { GenerationResult, GenerationStatus } from './domain/GenerationResult'
+import ParsedResult, {
+    ParseError,
+    ParsedAction,
+    ParsedArgument,
+    ParsedArguments,
+} from './domain/ParsedResult'
 
 const RAW_ACTION_REGEX = /~~~([^]*)~~~/
 
 export default class MindParser {
-    public parse<T>(result: string, meta?: T): GenerationResult<T> {
+    public parse(result: string): ParsedResult | ParseError {
         const rawAction = result.match(RAW_ACTION_REGEX)
         if (!rawAction) {
             return {
-                status: GenerationStatus.Invalid,
+                success: false,
+                error: 'No action found',
             }
         }
 
         const action = this.parseAction(rawAction[1].trim())
-        if (!action) {
+        if (!action.success) {
             return {
-                status: GenerationStatus.Invalid,
+                success: false,
+                error: 'Invalid action',
             }
         }
 
@@ -35,18 +41,20 @@ export default class MindParser {
             ?.trim()
 
         return {
-            status: GenerationStatus.Success,
-            action,
+            success: true,
+            action: action.action,
             reasoning,
-            meta,
         }
     }
 
-    private parseAction(action: string): Action | null {
+    private parseAction(action: string): ParsedAction | ParseError {
         const lines = action.split('\n')
 
         if (lines.length !== 2) {
-            return null
+            return {
+                success: false,
+                error: `Line count mismatch (expected 2, got ${lines.length})`,
+            }
         }
 
         const description = lines[0].trim()
@@ -55,42 +63,59 @@ export default class MindParser {
             !description.startsWith('$ ') ||
             description.length < 3
         ) {
-            return null
+            return {
+                success: false,
+                error: 'Invalid description, must start with "$ "',
+            }
         }
 
         const actionLine = lines[1].trim()
         if (!actionLine) {
-            return null
+            return {
+                success: false,
+                error: 'No action line found',
+            }
         }
 
         const actionType = actionLine.split(' ')[0] as ActionType
         const actionInfo = config.actions[actionType]
         if (!actionInfo) {
-            return null
+            return {
+                success: false,
+                error: `Unknown action type: ${actionType}`,
+            }
         }
 
         const args = actionLine.substring(actionType.length).trim()
-        const parsedArgs = this.parseArgs(args, actionType, actionInfo)
-        if (!parsedArgs) {
-            return null
+        const parsedArgs = this.parseArgs(args, actionInfo)
+        if (!parsedArgs.success) {
+            return {
+                success: false,
+                error: 'Failed to parse arguments:\n' + parsedArgs.error,
+            }
         }
 
         return {
-            status: ActionStatus.Pending,
-            type: actionType,
-            description: description.substring(2),
-            arguments: parsedArgs,
+            success: true,
+            action: {
+                status: ActionStatus.Pending,
+                type: actionType,
+                description: description.substring(2),
+                arguments: parsedArgs.arguments,
+            },
         }
     }
 
     private parseArgs(
         args: string,
-        type: ActionType,
         action: AbstractAction
-    ): ActionArguments | null {
+    ): ParsedArguments | ParseError {
         const parsedArgs = {} as ActionArguments
         if (!action.arguments) {
-            return parsedArgs
+            return {
+                success: true,
+                arguments: parsedArgs,
+            }
         }
 
         let cursor = 0,
@@ -116,11 +141,14 @@ export default class MindParser {
 
                 const currentArg = action.arguments[count]
                 const parsed = this.parseArg(buf, currentArg)
-                if (parsed === null) {
-                    return null
+                if (!parsed.success) {
+                    return {
+                        success: false,
+                        error: `Failed to parse argument:\n${parsed.error}`,
+                    }
                 }
 
-                parsedArgs[currentArg.name] = parsed
+                parsedArgs[currentArg.name] = parsed.argument
 
                 buf = ''
                 count++
@@ -148,7 +176,10 @@ export default class MindParser {
                 if (state.string.inside) {
                     buf += args[++cursor]
                 } else {
-                    return null // Invalid escape character
+                    return {
+                        success: false,
+                        error: `Invalid escape character at position ${cursor}`,
+                    }
                 }
                 cursor++
                 continue
@@ -161,11 +192,14 @@ export default class MindParser {
         if (buf) {
             const currentArg = action.arguments[count]
             const parsed = this.parseArg(buf, currentArg)
-            if (parsed === null) {
-                return null
+            if (!parsed.success) {
+                return {
+                    success: false,
+                    error: `Failed to parse argument:\n${parsed.error}`,
+                }
             }
 
-            parsedArgs[currentArg.name] = parsed
+            parsedArgs[currentArg.name] = parsed.argument
             count++
         }
 
@@ -173,39 +207,71 @@ export default class MindParser {
         const requiredArgs =
             action.arguments?.filter((arg) => arg.required) || []
         if (requiredArgs.length > count) {
-            return null // Missing required arguments
+            return {
+                success: false,
+                error: `Missing required arguments: ${requiredArgs
+                    .slice(count)
+                    .map((arg) => arg.name)
+                    .join(', ')}`,
+            }
         }
 
-        return parsedArgs
+        return {
+            success: true,
+            arguments: parsedArgs,
+        }
     }
 
     private parseArg(
         buf: string,
         argument: AbstractArgument
-    ): AbstractArgumentPrimitive | null {
+    ): ParsedArgument | ParseError {
         switch (argument.type) {
             case AbstractArgumentType.String:
                 if (argument.enum && !argument.enum.includes(buf)) {
-                    return null // Bad enum
+                    return {
+                        success: false,
+                        error: `Invalid enum value, got ${buf}, expected ${argument.enum.join(', ')}`,
+                    }
                 }
-                return buf
+                return {
+                    success: true,
+                    argument: buf,
+                }
             case AbstractArgumentType.Number: {
                 const parsedNumber = parseInt(buf)
                 if (isNaN(parsedNumber)) {
-                    return null // Bad number
+                    return {
+                        success: false,
+                        error: 'Failed to parse number',
+                    }
                 }
-                return parsedNumber
+                return {
+                    success: true,
+                    argument: parsedNumber,
+                }
             }
             case AbstractArgumentType.Boolean:
+                let val
                 if (buf === 'true' || buf === '1') {
-                    return true
+                    val = true
                 } else if (buf === 'false' || buf === '0') {
-                    return false
+                    val = false
                 } else {
-                    return null // Bad boolean
+                    return {
+                        success: false,
+                        error: 'Failed to parse boolean',
+                    }
+                }
+                return {
+                    success: true,
+                    argument: val,
                 }
             default:
-                return null // Unknown argument type
+                return {
+                    success: false,
+                    error: 'Unknown argument type',
+                }
         }
     }
 }

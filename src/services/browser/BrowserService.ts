@@ -1,5 +1,5 @@
 import Service from '@/domain/Service'
-import WebwispError from '@/domain/errors/Error'
+import WebwispError from '@/domain/WebwispError'
 
 import config from './BrowserConfig'
 

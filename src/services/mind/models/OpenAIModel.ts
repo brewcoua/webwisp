@@ -1,6 +1,6 @@
 import OpenAI from 'openai'
 
-import WebwispError from '@/domain/errors/Error'
+import WebwispError from '@/domain/WebwispError'
 
 import MindModel from './MindModel'
 import GenerationResponse from '../domain/GenerationResponse'
@@ -8,6 +8,7 @@ import Message from '../domain/Message'
 import OpenAIMapper from '../mappers/OpenAIMapper'
 
 import config from '../MindConfig'
+import { GenerationError } from '../MindErrors'
 
 export default class OpenAIModel extends MindModel<OpenAI> {
     protected readonly client: OpenAI
@@ -28,45 +29,26 @@ export default class OpenAIModel extends MindModel<OpenAI> {
         this.mapper = new OpenAIMapper()
     }
 
-    public async generate(
-        messages: Message[]
-    ): Promise<GenerationResponse<OpenAIMeta>> {
+    public async generate(messages: Message[]): Promise<string | null> {
         const modelMessages = this.mapper.message.toModels(messages)
 
-        const result = await this.client.chat.completions.create({
-            model: config.options.model,
-            messages: modelMessages,
-            temperature: config.options.temperature,
-            max_tokens: config.options.max_tokens,
-        })
+        try {
+            const result = await this.client.chat.completions.create({
+                model: config.options.model,
+                messages: modelMessages,
+                temperature: config.options.temperature,
+                max_tokens: config.options.max_tokens,
+            })
 
-        const choice = result.choices[0]
-        const value = choice.message.content
+            const choice = result.choices[0]
+            const value = choice.message.content
 
-        const usage = result.usage
-            ? {
-                  completion: result.usage.completion_tokens,
-                  prompt: result.usage.prompt_tokens,
-                  total: result.usage.total_tokens,
-              }
-            : undefined
-
-        if (!value) {
-            return {
-                success: false,
-                error: 'No completion value found in OpenAI response',
-                meta: {
-                    usage,
-                },
-            }
-        }
-
-        return {
-            success: true,
-            result: value,
-            meta: {
-                usage,
-            },
+            return value
+        } catch (err: any) {
+            // This only ever happens if the API request fails because of Bad Request or exceptional circumstances (e.g. API down)
+            throw new GenerationError(
+                'Failed to generate response'
+            ).withContext(err)
         }
     }
 }

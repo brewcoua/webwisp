@@ -5,7 +5,7 @@ import ActionType from './ActionType'
 type Action = {
     type: ActionType
     description: string
-    arguments: Record<string, string | number | boolean>
+    arguments: ActionArguments
     status: ActionStatus
 }
 

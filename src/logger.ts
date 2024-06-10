@@ -5,7 +5,7 @@ import chalk from 'chalk'
 import Action from './services/runner/domain/Action'
 import ActionType from './services/runner/domain/ActionType'
 import TaskResult from './services/runner/domain/TaskResult'
-import WebwispError from './domain/errors/Error'
+import WebwispError from './domain/WebwispError'
 
 export default class Logger {
     private static verbose = process.env.NODE_ENV === 'development'

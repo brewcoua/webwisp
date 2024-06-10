@@ -1,5 +1,4 @@
 import MindMapper from '../mappers/MindMapper'
-import GenerationResponse from '../domain/GenerationResponse'
 import type Message from '../domain/Message'
 
 export default abstract class MindModel<Client> {
@@ -12,5 +11,5 @@ export default abstract class MindModel<Client> {
      * Generate a response from a list of messages
      * @param messages Messages to generate a response from
      */
-    abstract generate(messages: Message[]): Promise<GenerationResponse<unknown>>
+    abstract generate(messages: Message[]): Promise<string | null>
 }

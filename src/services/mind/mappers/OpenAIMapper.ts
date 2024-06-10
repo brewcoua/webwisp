@@ -2,7 +2,7 @@ import OpenAI from 'openai'
 
 import MindMapper, { MindMessageMapper } from './MindMapper'
 import Message from '../domain/Message'
-import WebwispError from '@/domain/errors/Error'
+import WebwispError from '@/domain/WebwispError'
 
 export default class OpenAIMapper extends MindMapper {
     public readonly message = new OpenAIMessageMapper()

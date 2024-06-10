@@ -27,10 +27,10 @@
         "start": "(which bun && bun start:bun) || npm run start:node",
         "start:bun": "bun run build && bun ./dist/webwisp.js",
         "start:node": "npm run build && node ./dist/webwisp.js",
-        "demo": "(which bun && bun demo:bun) || npm run demo:node",
-        "demo:bun": "bun start:bun -- -t https://www.amazon.fr -k \"Check that it is possible to add a PS5 to the cart and display it\"",
-        "demo:node": "npm run start:node -- -t https://www.amazon.fr -k \"Check that it is possible to add a PS5 to the cart and display it\"",
+        "demo1": "node ./dist/webwisp.js -t \"https://cftl.fr/actualites/jftl/\" -k \"Does Xavier Blanc have a Talk at 10:40 in the morning ?\"",
+        "demo2": "node ./dist/webwisp.js -t \"https://cftl.fr/actualites/jftl/\" -k \"Is the 16th edition of the JFTL at Beffroi de Montrouge ?\"",
         "build": "npx rollup -c",
+        "build:watch": "npx rollup -c -w",
         "format": "npx prettier --write ./src/**/*.ts",
         "lint": "npx eslint ./src/**/*.ts"
     },

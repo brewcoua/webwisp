@@ -93,14 +93,28 @@ export type RunnerConfig = {
     /** Settings related to the number of cycles to run for a task */
     cycles: {
         /** Maximum number of cycles to run for a task, regardless of success. (e.g. 10, means a maximum of 10 actions for a task) */
-        max: number
+        max: IntRange<1, 100>
         /** Maximum number of failed cycles before stopping the task. (e.g. 3, means if 3 cycles fail, the task is stopped) */
-        failed: number
+        failed: IntRange<1, 10>
         /** Maximum number of retries for format errors (e.g. model not following the format, leading to parsing errors) */
-        format: number
+        format: IntRange<1, 10>
     }
     /** Definitions of actions that can be performed */
     actions: {
         [key in ActionType]: AbstractAction
     }
+}
+
+declare global {
+    type Enumerate<
+        N extends number,
+        Acc extends number[] = [],
+    > = Acc['length'] extends N
+        ? Acc[number]
+        : Enumerate<N, [...Acc, Acc['length']]>
+
+    type IntRange<F extends number, T extends number> = Exclude<
+        Enumerate<T>,
+        Enumerate<F>
+    >
 }
