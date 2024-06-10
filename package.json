@@ -27,7 +27,7 @@
         "start": "(which bun && bun start:bun) || npm run start:node",
         "start:bun": "bun run build && bun ./dist/webwisp.js",
         "start:node": "npm run build && node ./dist/webwisp.js",
-        "demo1": "node ./dist/webwisp.js -t \"https://cftl.fr/actualites/jftl/\" -k \"Does Xavier Blanc have a Talk at 10:40 in the morning ?\"",
+        "demo1": "node ./dist/webwisp.js -t \"https://cftl.fr/actualites/jftl/\" -k \"Does Xavier Blanc have a Talk at 10:40 in the morning ?\" --verbose",
         "demo2": "node ./dist/webwisp.js -t \"https://cftl.fr/actualites/jftl/\" -k \"Is the 16th edition of the JFTL at Beffroi de Montrouge ?\"",
         "build": "npx rollup -c",
         "build:watch": "npx rollup -c -w",

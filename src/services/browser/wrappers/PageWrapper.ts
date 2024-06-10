@@ -6,6 +6,7 @@ import config from '../BrowserConfig'
 import Action from '@/services/runner/domain/Action'
 import ActionType from '@/services/runner/domain/ActionType'
 import ActionStatus from '@/services/runner/domain/ActionStatus'
+import Logger from '@/logger'
 
 const SoMUrl = 'https://unpkg.com/@brewcoua/web-som'
 
@@ -62,7 +63,12 @@ export default class PageWrapper {
             ).replace('{{timestamp}}', Date.now().toString())
 
             // Make sure the directory exists
-            mkdirSync(path, { recursive: true })
+            mkdirSync(path.substring(0, path.lastIndexOf('/')), {
+                recursive: true,
+            })
+
+            // Now we call the SoM to display
+            await this.page.evaluate(`SoM.display()`)
 
             await this.page.screenshot({
                 ...config.screenshot,
@@ -75,6 +81,7 @@ export default class PageWrapper {
                 config.screenshot.type || 'png'
             };base64,${buf.toString('base64')}`
         } catch (err) {
+            Logger.debug(err)
             return null
         }
     }
