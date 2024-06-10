@@ -9,7 +9,7 @@ export default {
     input: 'src/main.ts',
     output: {
         file: 'dist/webwisp.js',
-        format: 'cjs',
+        format: 'umd',
     },
     plugins: [
         typescript({
