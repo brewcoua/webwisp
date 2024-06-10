@@ -8,7 +8,7 @@ import ActionType from '@/services/runner/domain/ActionType'
 import ActionStatus from '@/services/runner/domain/ActionStatus'
 import Logger from '@/logger'
 
-const SoMUrl = 'https://unpkg.com/@brewcoua/web-som@1.1.4'
+const SoMUrl = 'https://unpkg.com/@brewcoua/web-som@1.2.0/SoM.min.js'
 
 export default class PageWrapper {
     constructor(private readonly page: Page) {}
