@@ -32,6 +32,7 @@
     "demo3": "node ./dist/webwisp.js -t \"https://www.labri.fr/en\" -k \"Go to the MENU, then to the Awards, check that Yvonne Jansen is in the list\"",
     "build": "npx rollup -c",
     "build:watch": "npx rollup -c -w",
+    "compile": "bun build ./dist/webwisp.js --compile --outfile=./dist/webwisp -e playwright -e openai",
     "format": "npx prettier --write ./src/**/*.ts",
     "lint": "npx eslint ./src/**/*.ts"
   },
