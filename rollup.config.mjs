@@ -14,6 +14,7 @@ export default {
     plugins: [
         typescript({
             outputToFilesystem: true,
+            noEmitOnError: true,
         }),
         resolve({
             preferBuiltins: true,
@@ -25,12 +26,5 @@ export default {
     external: [
         'playwright',
         'openai',
-        '@inquirer/core',
-        '@inquirer/prompts',
-        'ora',
-        'node-audiorecorder',
-        'commander',
-        'dotenv',
-        'chalk',
     ],
 }
