@@ -3,8 +3,8 @@ import { Logger, createLogger, format, transports } from 'winston'
 import Service from '@/domain/Service'
 
 import { BrowserService, MindService, Runner } from './services'
-import TaskResult from './services/runner/domain/TaskResult'
 import { TTYFormat } from './config/logger'
+import WebwispError from './domain/WebwispError'
 
 export default class Agent extends Service {
     private mind!: MindService
@@ -53,14 +53,16 @@ export default class Agent extends Service {
         this.logger.debug('Agent destroyed')
     }
 
-    async spawn(target: string, task: string): Promise<TaskResult> {
-        this.logger.debug('Running agent')
+    async spawn(target: string, task: string): Promise<Runner> {
+        this.logger.debug(
+            `Spawning runner for task: ${task} on target: ${target}`
+        )
 
         const context = await this.browser.newContext()
         const page = await context?.makePage(target)
 
         if (!page) {
-            throw new Error('Failed to create page')
+            throw new WebwispError('Failed to create page')
         }
 
         const runner = new Runner(
@@ -73,6 +75,6 @@ export default class Agent extends Service {
 
         this.runners.push(runner)
 
-        return runner.run()
+        return runner
     }
 }

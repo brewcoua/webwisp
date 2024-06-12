@@ -50,10 +50,12 @@ async function main() {
 
     await agent.initialize()
 
+    const runner = await agent.spawn(target, task)
+
     if (process.stdout.isTTY)
         await waitPress({ message: 'Press enter to start the task' })
 
-    const result = await agent.spawn(target, task)
+    const result = await runner.run()
 
     await agent.destroy()
     agent._logger.info('Task completed', { result })
