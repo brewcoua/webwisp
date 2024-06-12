@@ -11,7 +11,12 @@ export function bindSignals(agent: Agent) {
         void terminate()
     })
     process.on('uncaughtException', (error) => {
-        agent._logger.error(`Uncaught Exception: ${error.message}`, { error })
+        agent._logger.error(`Uncaught Exception: ${error.message}`, {
+            error: {
+                message: error.message,
+                stack: error.stack,
+            },
+        })
         void terminate()
     })
     ;['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGTERM'].forEach((signal) => {

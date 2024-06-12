@@ -23,26 +23,28 @@ export const TTYFormat = format.printf((info) => {
     const level = chalk.bold(FormatLevel(info.level))
     const sep = chalk.grey(':')
 
-    return `${info.timestamp}${sep}${level}${sep}${chalk.white.bold(info.service)}${sep} ${info.message}`
+    return `${info.timestamp || new Date().toISOString()}${sep}${level}${sep}${chalk.white.bold(info.service)}${sep} ${info.message}`
 })
 
 const FormatLevel = (level: keyof typeof LevelMap) => {
-    return LevelMap[level].format(
-        (LevelMap[level].full || level)
-            .toUpperCase()
-            .padStart(
-                Object.keys(LevelMap).reduce(
-                    (acc, cur) =>
-                        Math.max(
-                            acc,
+    return (
+        LevelMap[level]?.format(
+            (LevelMap[level].full || level)
+                .toUpperCase()
+                .padStart(
+                    Object.keys(LevelMap).reduce(
+                        (acc, cur) =>
                             Math.max(
-                                LevelMap[cur].full?.length || 0,
-                                cur.length
-                            )
-                        ),
-                    0
+                                acc,
+                                Math.max(
+                                    LevelMap[cur].full?.length || 0,
+                                    cur.length
+                                )
+                            ),
+                        0
+                    )
                 )
-            )
+        ) || level.toUpperCase()
     )
 }
 const LevelMap: Record<
@@ -65,6 +67,10 @@ const LevelMap: Record<
     },
     error: {
         format: (s: string) => chalk.magenta(s),
+    },
+    warn: {
+        full: 'warning',
+        format: (s: string) => chalk.yellow(s),
     },
     warning: {
         format: (s: string) => chalk.yellow(s),

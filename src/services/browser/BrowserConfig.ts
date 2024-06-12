@@ -13,6 +13,7 @@ const config: BrowserConfig = {
         args: [
             '--disable-web-security',
             `--remote-debugging-port=${REMOTE_PORT}`,
+            `--remote-allow-origins=http://localhost:${REMOTE_PORT}`,
         ],
     },
     context: {

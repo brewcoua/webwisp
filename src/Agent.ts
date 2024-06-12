@@ -19,7 +19,7 @@ export default class Agent extends Service {
                     transports: [
                         new transports.Console({
                             format: process.stdout.isTTY
-                                ? TTYFormat
+                                ? format.combine(format.timestamp(), TTYFormat)
                                 : format.json(),
                         }),
                         new transports.File({
