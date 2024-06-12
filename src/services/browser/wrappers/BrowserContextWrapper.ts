@@ -1,4 +1,5 @@
 import { BrowserContext } from 'playwright'
+import { Logger } from 'winston'
 
 import PageWrapper from './PageWrapper'
 import config from '../BrowserConfig'
@@ -6,7 +7,10 @@ import config from '../BrowserConfig'
 export default class BrowserContextWrapper {
     private readonly pages: PageWrapper[] = []
 
-    constructor(private readonly context: BrowserContext) {}
+    constructor(
+        private readonly context: BrowserContext,
+        private readonly logger: Logger
+    ) {}
 
     public async destroy(): Promise<boolean> {
         try {
@@ -29,7 +33,13 @@ export default class BrowserContextWrapper {
 
             if (config.viewport) await page.setViewportSize(config.viewport)
 
-            const pageWrap = new PageWrapper(page)
+            const pageWrap = new PageWrapper(
+                page,
+                this.logger.child({
+                    wrapper: 'Page',
+                    id: this.pages.length + 1,
+                })
+            )
             this.pages.push(pageWrap)
 
             await pageWrap.waitToLoad()

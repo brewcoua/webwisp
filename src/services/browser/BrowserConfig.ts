@@ -4,11 +4,16 @@ import {
     PageScreenshotOptions,
 } from 'playwright'
 
+export const REMOTE_PORT = 9394
+
 const config: BrowserConfig = {
     type: 'chromium',
     options: {
         headless: false,
-        args: ['--disable-web-security'],
+        args: [
+            '--disable-web-security',
+            `--remote-debugging-port=${REMOTE_PORT}`,
+        ],
     },
     context: {
         bypassCSP: true,

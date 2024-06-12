@@ -1,4 +1,5 @@
-import Logger from '@/logger'
+import Service from '@/domain/Service'
+
 import PageWrapper from '../browser/wrappers/PageWrapper'
 import MindService from '../mind'
 import Message from '../mind/domain/Message'
@@ -11,13 +12,18 @@ import ActionType from './domain/ActionType'
 import { ErrorResult } from './domain/ErrorResult'
 import ParsedResult from '../mind/domain/ParsedResult'
 import CycleResult from './domain/CycleResult'
+import { Logger } from 'winston'
 
-export default class Runner {
+export default class Runner extends Service {
     constructor(
         private readonly page: PageWrapper,
         private readonly mind: MindService,
-        private readonly task: string
-    ) {}
+        private readonly task: string,
+        private readonly id: number,
+        logger: Logger
+    ) {
+        super('Runner', logger.child({ id }))
+    }
 
     private cycles = {
         total: 0,
@@ -27,7 +33,8 @@ export default class Runner {
     private readonly actions: Action[] = []
 
     public async run(): Promise<TaskResult> {
-        Logger.debug(`Starting task: ${this.task}`)
+        this.logger.debug(`Starting task: ${this.task}`)
+
         while (
             this.cycles.total < config.cycles.max &&
             this.cycles.failed < config.cycles.failed
@@ -36,11 +43,11 @@ export default class Runner {
 
             if (!cycleResult.success) {
                 this.cycles.failed++
-                Logger.warn(`Cycle failed: ${cycleResult.error}`)
+                this.logger.warn(`Cycle failed: ${cycleResult.error}`)
             } else {
                 this.cycles.total++
                 const action = cycleResult.action
-                Logger.debug(`Cycle ${this.cycles.total} completed`)
+                this.logger.debug(`Cycle ${this.cycles.total} completed`)
 
                 if (action.type === ActionType.Done) {
                     return {
@@ -106,8 +113,13 @@ export default class Runner {
                 result = genResult
             } else {
                 this.cycles.format++
-                Logger.retry(this.cycles.format, config.cycles.format)
-                Logger.debug(`Caused by: ${genResult.error}`)
+                this.logger.warn('Failed to format cycle, retrying...', {
+                    cycle: {
+                        current: this.cycles.format,
+                        max: config.cycles.format,
+                    },
+                    error: genResult.error,
+                })
             }
         }
 
@@ -125,7 +137,11 @@ export default class Runner {
         result.action.status = status
         this.actions.push(result.action)
 
-        Logger.action(result.action, result.reasoning, Date.now() - startedAt)
+        this.logger.info('Performed action', {
+            action: result.action,
+            reasoning: result.reasoning,
+            duration: Date.now() - startedAt,
+        })
 
         return {
             success: true,
@@ -143,7 +159,7 @@ export default class Runner {
                 error: 'No completion found',
             }
 
-        Logger.appendMessage(completion + '\n')
+        this.logger.debug('Received completion', completion)
 
         return this.mind.parser.parse(completion)
     }

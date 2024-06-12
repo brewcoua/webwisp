@@ -1,17 +1,20 @@
-import { ElementHandle, Page } from 'playwright'
+import { Page } from 'playwright'
 import { mkdirSync, readFileSync } from 'node:fs'
+import { Logger } from 'winston'
 
 import config from '../BrowserConfig'
 
 import Action from '@/services/runner/domain/Action'
 import ActionType from '@/services/runner/domain/ActionType'
 import ActionStatus from '@/services/runner/domain/ActionStatus'
-import Logger from '@/logger'
 
 const SoMUrl = 'https://unpkg.com/@brewcoua/web-som@1.2.2/SoM.min.js'
 
 export default class PageWrapper {
-    constructor(private readonly page: Page) {}
+    constructor(
+        private readonly page: Page,
+        private readonly logger: Logger
+    ) {}
 
     public async initialize(): Promise<void> {
         const SoM = await fetch(SoMUrl).then((res) => res.text())
@@ -57,33 +60,50 @@ export default class PageWrapper {
      * @returns {string | null} - The screenshot as a base64 encoded url or null if the screenshot failed
      */
     public async screenshot(): Promise<string | null> {
-        try {
-            const path = (
-                config.screenshot.path || './screenshots/{{timestamp}}.png'
-            ).replace('{{timestamp}}', Date.now().toString())
+        return new Promise<string>(async (resolve, reject) => {
+            let failCount = 0
+            let lastError = null
+            while (failCount < 3) {
+                const path = (
+                    config.screenshot.path || './screenshots/{{timestamp}}.png'
+                ).replace('{{timestamp}}', Date.now().toString())
 
-            // Make sure the directory exists
-            mkdirSync(path.substring(0, path.lastIndexOf('/')), {
-                recursive: true,
-            })
+                try {
+                    // Make sure the directory exists
+                    mkdirSync(path.substring(0, path.lastIndexOf('/')), {
+                        recursive: true,
+                    })
 
-            // Now we call the SoM to display
-            await this.page.evaluate(`SoM.display()`)
+                    // Now we call the SoM to display
+                    await this.page.evaluate(`SoM.display()`)
 
-            await this.page.screenshot({
-                ...config.screenshot,
-                path: path,
-            })
+                    await this.page.screenshot({
+                        ...config.screenshot,
+                        path: path,
+                    })
 
-            const buf = readFileSync(path)
+                    this.logger.debug(`Screenshot saved to ${path}`, {
+                        path,
+                    })
 
-            return `data:image/${
-                config.screenshot.type || 'png'
-            };base64,${buf.toString('base64')}`
-        } catch (err) {
-            Logger.debug(err)
-            return null
-        }
+                    const buf = readFileSync(path)
+
+                    return resolve(
+                        `data:image/${
+                            config.screenshot.type || 'png'
+                        };base64,${buf.toString('base64')}`
+                    )
+                } catch (err) {
+                    failCount++
+                    lastError = err
+                }
+
+                // Keep a delay between retries
+                await new Promise((resolve) => setTimeout(resolve, 500))
+            }
+
+            return reject(lastError)
+        })
     }
 
     /**
@@ -98,6 +118,7 @@ export default class PageWrapper {
             })
             return true
         } catch (err) {
+            this.logger.debug('Failed to navigate to url', { url, err })
             return false
         }
     }
@@ -162,7 +183,7 @@ export default class PageWrapper {
 
             return ActionStatus.Success
         } catch (err) {
-            Logger.debug(err)
+            this.logger.debug('Failed to perform action', { action, err })
             return ActionStatus.Failed
         }
     }

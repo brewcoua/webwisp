@@ -1,3 +1,5 @@
+import { Logger } from 'winston'
+
 import Service from '@/domain/Service'
 
 import MindModel from './models/MindModel'
@@ -11,8 +13,8 @@ export default class MindService extends Service {
     public readonly transformer = new MindTransformer()
     public readonly parser = new MindParser()
 
-    constructor() {
-        super('Mind')
+    constructor(logger: Logger) {
+        super('Mind', logger)
         this.model = MindModelFactory.makeModel(config.type)
     }
 }

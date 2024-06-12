@@ -1,5 +1,4 @@
 import Agent from '@/Agent'
-import Logger from '@/logger'
 
 export function bindSignals(agent: Agent) {
     const terminate = async (code: number = 1) => {
@@ -8,16 +7,18 @@ export function bindSignals(agent: Agent) {
     }
 
     process.on('unhandledRejection', (reason: string) => {
-        Logger.error(`Unhandled Rejection: ${reason}`)
+        agent._logger.error(`Unhandled Rejection: ${reason}`, { reason })
         void terminate()
     })
     process.on('uncaughtException', (error) => {
-        Logger.error(`Uncaught Exception: ${error.message}`)
+        agent._logger.error(`Uncaught Exception: ${error.message}`, { error })
         void terminate()
     })
     ;['SIGHUP', 'SIGINT', 'SIGQUIT', 'SIGTERM'].forEach((signal) => {
         process.on(signal, () => {
-            Logger.warn(`Received ${signal}, shutting down`)
+            agent._logger.warn(`Received signal ${signal}, terminating...`, {
+                signal,
+            })
             void terminate(0)
         })
     })

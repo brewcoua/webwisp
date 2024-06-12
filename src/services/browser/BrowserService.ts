@@ -1,3 +1,5 @@
+import { Logger } from 'winston'
+
 import Service from '@/domain/Service'
 import WebwispError from '@/domain/WebwispError'
 
@@ -9,12 +11,16 @@ import BrowserContextWrapper from './wrappers/BrowserContextWrapper'
 export default class BrowserService extends Service {
     private browser!: BrowserWrapper
 
-    constructor() {
-        super('Browser')
+    constructor(logger: Logger) {
+        super('Browser', logger)
     }
 
     public async initialize(): Promise<void> {
-        const browser = await BrowserWrapper.new(config.type, config.options)
+        const browser = await BrowserWrapper.new(
+            config.type,
+            this.logger,
+            config.options
+        )
         if (!browser) {
             throw new WebwispError('Failed to initialize browser')
         }

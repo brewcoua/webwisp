@@ -6,16 +6,26 @@ import {
     firefox,
     webkit,
 } from 'playwright'
+import { Logger } from 'winston'
+
 import { BrowserType } from '../BrowserConfig'
 import BrowserContextWrapper from './BrowserContextWrapper'
+import WebwispError from '@/domain/WebwispError'
 
 export default class BrowserWrapper {
     private readonly contexts: BrowserContextWrapper[] = []
+    private readonly logger: Logger
 
-    constructor(private readonly browser: Browser) {}
+    constructor(
+        private readonly browser: Browser,
+        logger: Logger
+    ) {
+        this.logger = logger.child({ wrapper: 'Browser' })
+    }
 
     public static async new(
         type: BrowserType,
+        logger: Logger,
         options?: LaunchOptions
     ): Promise<BrowserWrapper | null> {
         let browser: Browser
@@ -33,9 +43,9 @@ export default class BrowserWrapper {
                 default:
                     return null
             }
-            return new BrowserWrapper(browser)
-        } catch (err) {
-            return null
+            return new BrowserWrapper(browser, logger)
+        } catch (err: any) {
+            throw new WebwispError('Failed to launch browser').withContext(err)
         }
     }
 
@@ -54,7 +64,15 @@ export default class BrowserWrapper {
     ): Promise<BrowserContextWrapper | null> {
         try {
             const context = await this.browser.newContext(options)
-            this.contexts.push(new BrowserContextWrapper(context))
+            this.contexts.push(
+                new BrowserContextWrapper(
+                    context,
+                    this.logger.child({
+                        wrapper: 'Context',
+                        id: this.contexts.length + 1,
+                    })
+                )
+            )
             return this.contexts[this.contexts.length - 1]
         } catch (error) {
             return null

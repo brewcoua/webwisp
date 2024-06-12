@@ -17,14 +17,12 @@ export default {
             noEmitOnError: true,
         }),
         resolve({
+            exportConditions: ['node'],
             preferBuiltins: true,
         }),
         commonjs(),
         json(),
         terser(),
     ],
-    external: [
-        'playwright',
-        'openai',
-    ],
+    external: ['playwright', 'openai', 'winston'],
 }
