@@ -1,11 +1,11 @@
-import Service from '@/domain/Service'
+import Service from '../../domain/Service'
 
 import PageWrapper from '../browser/wrappers/PageWrapper'
 import MindService from '../mind'
 import Message from '../mind/domain/Message'
 import config from './RunnerConfig'
 
-import Action from './domain/Action'
+import Action from '../../services/runner/domain/Action'
 import ActionStatus from './domain/ActionStatus'
 import TaskResult from './domain/TaskResult'
 import ActionType from './domain/ActionType'

@@ -1,4 +1,4 @@
-import Action from '../runner/domain/Action'
+import Action from '../../services/runner/domain/Action'
 
 const prompts: Prompts = {
     system: {

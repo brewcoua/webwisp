@@ -3,7 +3,7 @@ import { readFileSync } from 'node:fs'
 import config from '../runner/RunnerConfig'
 import AbstractAction from '../runner/domain/AbstractAction'
 import ActionType from '../runner/domain/ActionType'
-import Action from '../runner/domain/Action'
+import Action from '../../services/runner/domain/Action'
 
 import prompts, {
     MindPromptPlaceholders,

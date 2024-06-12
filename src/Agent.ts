@@ -1,11 +1,15 @@
 import { Logger, createLogger, format, transports } from 'winston'
 
-import Service from '@/domain/Service'
+import Service from './domain/Service'
 
 import { BrowserService, MindService, Runner } from './services'
 import { TTYFormat } from './config/logger'
 import WebwispError from './domain/WebwispError'
 
+/**
+ * The Agent class provides a high-level interface for spawning runners and deploying tasks.
+ * @public
+ */
 export default class Agent extends Service {
     private mind!: MindService
     private browser!: BrowserService

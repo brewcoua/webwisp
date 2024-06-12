@@ -1,7 +1,7 @@
 import { Logger } from 'winston'
 
-import Service from '@/domain/Service'
-import WebwispError from '@/domain/WebwispError'
+import Service from '../../domain/Service'
+import WebwispError from '../../domain/WebwispError'
 
 import config from './BrowserConfig'
 

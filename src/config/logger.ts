@@ -1,10 +1,10 @@
 import { format } from 'winston'
 import chalk from 'chalk'
 
-import Action from '@/services/runner/domain/Action'
-import ActionType from '@/services/runner/domain/ActionType'
-import ActionStatus from '@/services/runner/domain/ActionStatus'
-import TaskResult from '@/services/runner/domain/TaskResult'
+import Action from '../services/runner/domain/Action'
+import ActionType from '../services/runner/domain/ActionType'
+import ActionStatus from '../services/runner/domain/ActionStatus'
+import TaskResult from '../services/runner/domain/TaskResult'
 
 export const TTYFormat = format.printf((info) => {
     if (info.action) {

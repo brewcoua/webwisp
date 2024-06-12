@@ -10,7 +10,7 @@ import { Logger } from 'winston'
 
 import { BrowserType } from '../BrowserConfig'
 import BrowserContextWrapper from './BrowserContextWrapper'
-import WebwispError from '@/domain/WebwispError'
+import WebwispError from '../../../domain/WebwispError'
 
 export default class BrowserWrapper {
     private readonly contexts: BrowserContextWrapper[] = []

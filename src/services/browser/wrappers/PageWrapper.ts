@@ -4,9 +4,9 @@ import { Logger } from 'winston'
 
 import config from '../BrowserConfig'
 
-import Action from '@/services/runner/domain/Action'
-import ActionType from '@/services/runner/domain/ActionType'
-import ActionStatus from '@/services/runner/domain/ActionStatus'
+import Action from '../../../services/runner/domain/Action'
+import ActionType from '../../../services/runner/domain/ActionType'
+import ActionStatus from '../../../services/runner/domain/ActionStatus'
 
 const SoMUrl = 'https://unpkg.com/@brewcoua/web-som@1.2.2/SoM.min.js'
 
@@ -56,8 +56,12 @@ export default class PageWrapper {
     }
 
     /**
-     * Take a screenshot of the current page @async
-     * @returns {string | null} - The screenshot as a base64 encoded url or null if the screenshot failed
+     * Take a screenshot of the current page
+     *
+     * @remarks
+     * This method will attempt to take a screenshot of the current page. If the screenshot fails, it will retry up to 3 times before giving up.
+     *
+     * @returns The screenshot as a base64 encoded url or null if the screenshot failed
      */
     public async screenshot(): Promise<string | null> {
         return new Promise<string>(async (resolve, reject) => {
@@ -107,9 +111,9 @@ export default class PageWrapper {
     }
 
     /**
-     * Navigate to a url @async
+     * Navigate to a url
      * @param url - The url to navigate to
-     * @returns {boolean} - True if the navigation was successful, false otherwise
+     * @returns True if the navigation was successful, false otherwise
      */
     public async goto(url: string): Promise<boolean> {
         try {
@@ -137,10 +141,10 @@ export default class PageWrapper {
     }
 
     /**
-     * Perform an action on the page @async
+     * Perform an action on the page
      * @param action - The action to perform
      * @param element - The element to perform the action on (if applicable)
-     * @returns {ActionStatus} - The status of the action
+     * @returns The status of the action
      */
     public async perform(action: Action): Promise<ActionStatus> {
         try {

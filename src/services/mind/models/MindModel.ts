@@ -9,7 +9,7 @@ export default abstract class MindModel<Client> {
 
     /**
      * Generate a response from a list of messages
-     * @param messages Messages to generate a response from
+     * @param messages - Messages to generate a response from
      */
     abstract generate(messages: Message[]): Promise<string | null>
 }

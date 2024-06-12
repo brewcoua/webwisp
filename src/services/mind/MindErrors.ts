@@ -1,4 +1,4 @@
-import WebwispError from '@/domain/WebwispError'
+import WebwispError from '../../domain/WebwispError'
 
 export class GenerationError extends WebwispError {
     constructor(message: string) {

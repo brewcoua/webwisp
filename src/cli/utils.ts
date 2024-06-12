@@ -1,4 +1,4 @@
-import Agent from '@/Agent'
+import Agent from '../Agent'
 
 export function bindSignals(agent: Agent) {
     const terminate = async (code: number = 1) => {

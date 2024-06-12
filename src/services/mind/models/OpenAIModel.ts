@@ -1,9 +1,8 @@
 import OpenAI from 'openai'
 
-import WebwispError from '@/domain/WebwispError'
+import WebwispError from '../../../domain/WebwispError'
 
 import MindModel from './MindModel'
-import GenerationResponse from '../domain/GenerationResponse'
 import Message from '../domain/Message'
 import OpenAIMapper from '../mappers/OpenAIMapper'
 

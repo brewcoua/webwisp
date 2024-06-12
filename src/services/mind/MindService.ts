@@ -1,6 +1,6 @@
 import { Logger } from 'winston'
 
-import Service from '@/domain/Service'
+import Service from '../../domain/Service'
 
 import MindModel from './models/MindModel'
 import MindModelFactory from './models/MindModelFactory'

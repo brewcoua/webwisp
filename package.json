@@ -1,10 +1,11 @@
 {
     "name": "webwisp",
     "version": "1.0.0",
-    "description": "An agent for generating end-to-end tests from a given URL",
+    "description": "A web agent for automatic end-to-end testing of websites.",
     "license": "(MIT OR Apache-2.0)",
-    "private": true,
     "type": "module",
+    "types": "./index.d.ts",
+    "main": "./index.js",
     "author": {
         "name": "Brewen Couaran",
         "email": "brewcoua@brewen.dev",
@@ -30,20 +31,23 @@
         "demo1": "node ./dist/webwisp.js -t \"https://cftl.fr/actualites/jftl/\" -k \"Ouvre le programme et vérifie que Xavier Blanc a une conférence à 10:40.\"",
         "demo2": "node ./dist/webwisp.js -t \"https://cftl.fr/actualites/jftl/\" -k \"Is the 16th edition of the JFTL at Beffroi de Montrouge ?\"",
         "demo3": "node ./dist/webwisp.js -t \"https://www.labri.fr/en\" -k \"Go to the MENU, then to the Awards, check that Yvonne Jansen is in the list\"",
-        "build": "npx rollup -c",
-        "build:watch": "npx rollup -c -w",
+        "build": "npx rollup -c rollup.cli.mjs",
+        "build:watch": "npx rollup -c rollup.cli.mjs -w",
+        "build:lib": "npx rollup -c rollup.lib.mjs && npx api-extractor run --local",
         "compile": "bun build ./dist/webwisp.js --compile --outfile=./dist/webwisp -e playwright -e openai",
         "format": "npx prettier --write ./src/**/*.ts",
         "lint": "npx eslint ./src/**/*.ts"
     },
     "devDependencies": {
         "@eslint/js": "^9.4.0",
+        "@microsoft/api-extractor": "^7.47.0",
         "@rollup/plugin-commonjs": "^26.0.1",
         "@rollup/plugin-json": "^6.1.0",
         "@rollup/plugin-node-resolve": "^15.2.3",
         "@rollup/plugin-terser": "^0.4.4",
         "@rollup/plugin-typescript": "^11.1.6",
         "@types/eslint__js": "^8.42.3",
+        "ajv": "^8.16.0",
         "eslint": "^9.4.0",
         "globals": "^15.4.0",
         "prettier": "^3.2.5",
@@ -64,8 +68,5 @@
         "ora": "^8.0.1",
         "playwright": "^1.44.0",
         "winston": "^3.13.0"
-    },
-    "bin": {
-        "webwisp": "./dist/webwisp"
     }
 }

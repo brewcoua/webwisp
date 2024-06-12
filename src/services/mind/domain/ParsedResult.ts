@@ -1,5 +1,5 @@
-import { AbstractArgumentPrimitive } from '@/services/runner/domain/AbstractArgument'
-import Action, { ActionArguments } from '@/services/runner/domain/Action'
+import type { AbstractArgumentPrimitive } from '../../../services/runner/domain/AbstractArgument'
+import Action, { ActionArguments } from '../../../services/runner/domain/Action'
 
 export type ParsedResult = {
     success: true
