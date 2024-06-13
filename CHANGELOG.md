@@ -1,3 +1,10 @@
+## [1.1.1](https://github.com/brewcoua/webwisp/compare/v1.1.0...v1.1.1) (2024-06-13)
+
+
+### Bug Fixes
+
+* only build lib for release ([94691bc](https://github.com/brewcoua/webwisp/commit/94691bc25d5b4e0b27fa13090cd603e04670c9ca))
+
 # [1.1.0](https://github.com/brewcoua/webwisp/compare/v1.0.0...v1.1.0) (2024-06-13)
 
 
