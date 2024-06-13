@@ -34,7 +34,6 @@
         "build": "npx rollup -c rollup.cli.mjs",
         "build:watch": "npx rollup -c rollup.cli.mjs -w",
         "build:lib": "npx rollup -c rollup.lib.mjs && npx api-extractor run --local",
-        "compile": "bun build ./dist/webwisp.js --compile --outfile=./dist/webwisp -e playwright -e openai",
         "format": "npx prettier --write ./src/**/*.ts",
         "lint": "npx eslint ./src/**/*.ts"
     },
