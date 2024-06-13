@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/brewcoua/webwisp/compare/v1.2.0...v1.3.0) (2024-06-13)
+
+
+### Features
+
+* **runner:** add events for actions and status ([2de33c1](https://github.com/brewcoua/webwisp/commit/2de33c16c5faf0986cb645bd377d32eff706d7ee))
+
 # [1.2.0](https://github.com/brewcoua/webwisp/compare/v1.1.1...v1.2.0) (2024-06-13)
 
 
