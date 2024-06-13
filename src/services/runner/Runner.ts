@@ -13,7 +13,13 @@ import { ErrorResult } from './domain/ErrorResult'
 import ParsedResult from '../mind/domain/ParsedResult'
 import CycleResult from './domain/CycleResult'
 import { Logger } from 'winston'
+import ActionReport from './domain/ActionReport'
+import RunnerStatus from './domain/RunnerStatus'
 
+/**
+ * The Runner class provides a high-level interface for interacting with runners.
+ * @public
+ */
 export default class Runner extends Service {
     constructor(
         public readonly page: PageWrapper,
@@ -32,8 +38,19 @@ export default class Runner extends Service {
     }
     private readonly actions: Action[] = []
 
+    private _status: RunnerStatus = RunnerStatus.Starting
+    public get status(): RunnerStatus {
+        return this._status
+    }
+    public set status(value: RunnerStatus) {
+        this._status = value
+        this.emit('status', value)
+    }
+
     public async run(): Promise<TaskResult> {
         this.logger.debug(`Starting task: ${this.task}`)
+
+        this.status = RunnerStatus.Running
 
         while (
             this.cycles.total < config.cycles.max &&
@@ -50,6 +67,11 @@ export default class Runner extends Service {
                 this.logger.debug(`Cycle ${this.cycles.total} completed`)
 
                 if (action.type === ActionType.Done) {
+                    this.status =
+                        action.arguments.status === 'success'
+                            ? RunnerStatus.Done
+                            : RunnerStatus.Failed
+
                     return {
                         success: action.arguments.status === 'success',
                         message: action.arguments.reason as string,
@@ -60,6 +82,8 @@ export default class Runner extends Service {
 
             if (config.delay) await this.sleep(config.delay)
         }
+
+        this.status = RunnerStatus.Failed
 
         if (this.cycles.failed >= config.cycles.failed) {
             return {
@@ -137,11 +161,15 @@ export default class Runner extends Service {
         result.action.status = status
         this.actions.push(result.action)
 
-        this.logger.info('Performed action', {
+        const report: ActionReport = {
             action: result.action,
             reasoning: result.reasoning,
             duration: Date.now() - startedAt,
-        })
+        }
+
+        this.logger.info('Performed action', report)
+
+        this.emit('action', report)
 
         return {
             success: true,
