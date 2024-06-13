@@ -2,7 +2,7 @@ import { Page } from 'playwright'
 import { mkdirSync, readFileSync } from 'node:fs'
 import { Logger } from 'winston'
 
-import config from '../BrowserConfig'
+import config, { REMOTE_PORT } from '../BrowserConfig'
 
 import Action from '../../../services/runner/domain/Action'
 import ActionType from '../../../services/runner/domain/ActionType'
@@ -53,6 +53,22 @@ export default class PageWrapper {
         } catch (err) {
             return null
         }
+    }
+
+    public async getRemoteDebuggingUrl(): Promise<string | null> {
+        const pages = await fetch(`http://localhost:${REMOTE_PORT}/json`)
+            .then((res) => res.json())
+            .catch(() => [])
+
+        const title = await this.title()
+        const page = pages.find(
+            (p: any) =>
+                p.type === 'page' && p.url === this.url && p.title === title
+        )
+
+        return page
+            ? `http://localhost:${REMOTE_PORT}${page.devtoolsFrontendUrl}`
+            : null
     }
 
     /**

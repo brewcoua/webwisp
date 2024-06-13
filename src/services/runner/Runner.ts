@@ -16,10 +16,10 @@ import { Logger } from 'winston'
 
 export default class Runner extends Service {
     constructor(
-        private readonly page: PageWrapper,
-        private readonly mind: MindService,
-        private readonly task: string,
-        private readonly id: number,
+        public readonly page: PageWrapper,
+        public readonly mind: MindService,
+        public readonly task: string,
+        public readonly id: number,
         logger: Logger
     ) {
         super('Runner', logger.child({ id }))

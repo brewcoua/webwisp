@@ -9,7 +9,7 @@ export const REMOTE_PORT = 9394
 const config: BrowserConfig = {
     type: 'chromium',
     options: {
-        headless: false,
+        headless: true,
         args: [
             '--disable-web-security',
             `--remote-debugging-port=${REMOTE_PORT}`,
