@@ -1,3 +1,10 @@
+# [1.2.0](https://github.com/brewcoua/webwisp/compare/v1.1.1...v1.2.0) (2024-06-13)
+
+
+### Features
+
+* **page:** add method to get remote debugging url ([665c275](https://github.com/brewcoua/webwisp/commit/665c2758f33c6c373566f112eceac09e11c00f2b))
+
 ## [1.1.1](https://github.com/brewcoua/webwisp/compare/v1.1.0...v1.1.1) (2024-06-13)
 
 
