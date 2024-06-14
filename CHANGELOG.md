@@ -1,3 +1,10 @@
+## [1.4.4](https://github.com/brewcoua/webwisp-lib/compare/v1.4.3...v1.4.4) (2024-06-14)
+
+
+### Bug Fixes
+
+* **runner:** remove unnessary args from event methods ([951b9ef](https://github.com/brewcoua/webwisp-lib/commit/951b9efbe766f086071c26236a120dbd40ae1e67))
+
 ## [1.4.3](https://github.com/brewcoua/webwisp-lib/compare/v1.4.2...v1.4.3) (2024-06-14)
 
 
