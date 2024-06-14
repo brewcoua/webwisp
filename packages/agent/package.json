@@ -3,8 +3,7 @@
     "version": "1.4.6",
     "description": "A web agent for automatic end-to-end testing of websites.",
     "license": "(MIT OR Apache-2.0)",
-    "types": "./index.d.ts",
-    "main": "./index.js",
+    "main": "./dist/main.js",
     "author": {
         "name": "Brewen Couaran",
         "email": "brewcoua@brewen.dev",
@@ -24,16 +23,18 @@
         "npm": ">=10.5.0"
     },
     "scripts": {
-        "start": "(which bun && bun start:bun) || npm run start:node",
-        "start:bun": "bun run build && bun ./dist/webwisp.js",
-        "start:node": "npm run build && node ./dist/webwisp.js",
-        "build": "npx rollup -c",
-        "build:watch": "npx rollup -c -w",
+        "start": "npx nest start",
+        "start:dev": "npx nest start --watch",
+        "start:prod": "node dist/main.js",
+        "build": "npx nest build",
         "format": "npx prettier --write ./src/**/*.ts",
         "lint": "npx eslint ./src/**/*.ts"
     },
     "devDependencies": {
         "@eslint/js": "^9.4.0",
+        "@nestjs/cli": "^10.3.2",
+        "@nestjs/schematics": "^10.1.1",
+        "@nestjs/testing": "^10.3.9",
         "@rollup/plugin-commonjs": "^26.0.1",
         "@rollup/plugin-json": "^6.1.0",
         "@rollup/plugin-node-resolve": "^15.2.3",
@@ -44,21 +45,33 @@
         "@semantic-release/git": "^10.0.1",
         "@semantic-release/npm": "^12.0.1",
         "@types/eslint__js": "^8.42.3",
+        "@types/express": "^4.17.21",
+        "@types/node": "^18.19.34",
+        "chalk": "^5.3.0",
         "conventional-changelog-conventionalcommits": "^8.0.0",
         "eslint": "^9.4.0",
         "globals": "^15.4.0",
-        "prettier": "^3.2.5",
+        "prettier": "^3.3.2",
         "rollup": "^4.18.0",
         "semantic-release": "^24.0.0",
-        "terser": "^5.31.0",
+        "terser": "^5.31.1",
         "tslib": "^2.6.3",
         "typescript": "^5.4.5",
-        "typescript-eslint": "^8.0.0-alpha.30"
+        "typescript-eslint": "8.0.0-alpha.30"
     },
     "dependencies": {
-        "openai": "^4.47.1",
-        "playwright": "^1.44.0",
-        "winston": "^3.13.0",
-        "dotenv": "^16.4.5"
+        "@nestjs/common": "^10.3.9",
+        "@nestjs/config": "^3.2.2",
+        "@nestjs/core": "^10.3.9",
+        "@nestjs/event-emitter": "^2.0.4",
+        "@nestjs/platform-express": "^10.3.9",
+        "@nestjs/swagger": "^7.3.1",
+        "@webwisp/lib": "workspace:../lib",
+        "@webwisp/types": "workspace:../types",
+        "dotenv": "^16.4.5",
+        "openai": "^4.51.0",
+        "playwright": "^1.44.1",
+        "rxjs": "^7.8.1",
+        "winston": "^3.13.0"
     }
 }

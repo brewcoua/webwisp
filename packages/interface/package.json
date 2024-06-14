@@ -23,7 +23,7 @@
   },
   "scripts": {
     "format": "prettier --write .",
-    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
+    "lint": "nx eslint:lint --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
     "typecheck:node": "npx tsc --noEmit -p tsconfig.node.json --composite false",
     "typecheck:web": "npx tsc --noEmit -p tsconfig.web.json --composite false",
     "typecheck": "npm run typecheck:node && npm run typecheck:web",
@@ -37,11 +37,11 @@
     "build:linux": "electron-vite build && electron-builder --linux"
   },
   "dependencies": {
-    "@electron-toolkit/preload": "^3.0.0",
+    "@electron-toolkit/preload": "^3.0.1",
     "@electron-toolkit/utils": "^3.0.0",
     "@webwisp/lib": "^1.4.7",
     "electron-store": "^9.0.0",
-    "electron-updater": "^6.1.7"
+    "electron-updater": "^6.2.1"
   },
   "devDependencies": {
     "@chakra-ui/react": "^2.8.2",
@@ -50,23 +50,23 @@
     "@electron-toolkit/tsconfig": "^1.0.1",
     "@preact/preset-vite": "^2.8.2",
     "@preact/signals": "^1.2.3",
-    "@types/node": "^18.19.9",
-    "@types/react": "^18.2.48",
-    "@types/react-dom": "^18.2.18",
-    "@vitejs/plugin-react": "^4.2.1",
-    "electron": "^28.2.0",
-    "electron-builder": "^24.9.1",
-    "electron-vite": "^2.0.0",
-    "eslint": "^8.56.0",
-    "eslint-plugin-react": "^7.33.2",
+    "@types/node": "^18.19.34",
+    "@types/react": "^18.3.3",
+    "@types/react-dom": "^18.3.0",
+    "@vitejs/plugin-react": "^4.3.1",
+    "electron": "^28.3.3",
+    "electron-builder": "^24.13.3",
+    "electron-vite": "^2.2.0",
+    "eslint": "^8.57.0",
+    "eslint-plugin-react": "^7.34.2",
     "preact": "^10.22.0",
     "preact-router": "^4.1.2",
-    "prettier": "^3.2.4",
-    "react": "npm:@preact/compat",
-    "react-dom": "npm:@preact/compat",
+    "prettier": "^3.3.2",
+    "react": "npm:@preact/compat@^17.1.2",
+    "react-dom": "npm:@preact/compat@^17.1.2",
     "react-icons": "^5.2.1",
-    "sass": "^1.77.4",
-    "typescript": "^5.3.3",
-    "vite": "^5.0.12"
+    "sass": "^1.77.5",
+    "typescript": "^5.4.5",
+    "vite": "^5.3.1"
   }
 }

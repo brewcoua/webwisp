@@ -10,10 +10,10 @@ const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
 export default [
     {
-        input: 'src/index.ts',
+        input: 'src/main.ts',
         output: [
             {
-                file: 'dist/index.js',
+                file: 'dist/main.js',
                 format: 'cjs',
             },
         ],
@@ -30,6 +30,8 @@ export default [
             json(),
             terser(),
         ],
-        external: Object.keys(pkg.dependencies || {}),
+        external: Object.keys(pkg.dependencies || {}).filter(
+            (x) => !x.startsWith('@webwisp')
+        ),
     },
 ]
