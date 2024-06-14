@@ -1,6 +1,6 @@
 {
-    "name": "webwisp",
-    "version": "1.3.0",
+    "name": "@webwisp/lib",
+    "version": "1.3.1",
     "description": "A web agent for automatic end-to-end testing of websites.",
     "license": "(MIT OR Apache-2.0)",
     "type": "module",
@@ -13,11 +13,11 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+ssh@github.com:brewcoua/webwisp.git"
+        "url": "git+ssh@github.com:brewcoua/webwisp-lib.git"
     },
-    "homepage": "https://github.com/brewcoua/webwisp#readme",
+    "homepage": "https://github.com/brewcoua/webwisp-lib#readme",
     "bugs": {
-        "url": "https://github.com/brewcoua/webwisp/issues",
+        "url": "https://github.com/brewcoua/webwisp-lib/issues",
         "email": "contact@brewen.dev"
     },
     "engines": {

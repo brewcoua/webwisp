@@ -1,7 +1,6 @@
-# WebWisp
+# `@webwisp/lib`
 
-This is a simple agent, made during my internship at [LaBRI](https://www.labri.fr/), that can be used to navigate through a website while also
-testing it. The agent uses OpenAI's GPT-4o model to generate the actions to take on the website.
+The full library for the WebWisp agent, which can be used to navigate websites, perform tasks, and test features.
 
 ## Installation
 
