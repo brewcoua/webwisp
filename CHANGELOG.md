@@ -1,3 +1,10 @@
+## [1.4.3](https://github.com/brewcoua/webwisp-lib/compare/v1.4.2...v1.4.3) (2024-06-14)
+
+
+### Bug Fixes
+
+* **runner:** add on_action and on_status for events ([67990a4](https://github.com/brewcoua/webwisp-lib/commit/67990a45c77fc4f229e325aa07350fa054a3e006))
+
 ## [1.4.2](https://github.com/brewcoua/webwisp-lib/compare/v1.4.1...v1.4.2) (2024-06-14)
 
 
