@@ -44,7 +44,7 @@ export default class Runner extends Service {
     }
     public set status(value: RunnerStatus) {
         this._status = value
-        this.emit('status', value)
+        super.emit('status', value)
     }
 
     public async run(): Promise<TaskResult> {
@@ -169,7 +169,7 @@ export default class Runner extends Service {
 
         this.logger.info('Performed action', report)
 
-        this.emit('action', report)
+        super.emit('action', report)
 
         return {
             success: true,
@@ -194,5 +194,30 @@ export default class Runner extends Service {
 
     private async sleep(ms: number): Promise<void> {
         return new Promise((resolve) => setTimeout(resolve, ms))
+    }
+
+    public on_action(
+        event: 'action',
+        listener: (action: ActionReport) => void
+    ): this {
+        return super.on(event, listener)
+    }
+    public on_status(
+        event: 'status',
+        listener: (status: RunnerStatus) => void
+    ): this {
+        return super.on(event, listener)
+    }
+    public off_action(
+        event: 'action',
+        listener: (action: ActionReport) => void
+    ): this {
+        return super.off(event, listener)
+    }
+    public off_status(
+        event: 'status',
+        listener: (status: RunnerStatus) => void
+    ): this {
+        return super.off(event, listener)
     }
 }
