@@ -1,6 +1,6 @@
 {
     "name": "@webwisp/lib",
-    "version": "1.4.6",
+    "version": "1.4.7",
     "description": "A web agent for automatic end-to-end testing of websites.",
     "license": "(MIT OR Apache-2.0)",
     "types": "./index.d.ts",

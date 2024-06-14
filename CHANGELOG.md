@@ -1,3 +1,10 @@
+## [1.4.7](https://github.com/brewcoua/webwisp-lib/compare/v1.4.6...v1.4.7) (2024-06-14)
+
+
+### Bug Fixes
+
+* **pkg:** remove type module to avoid es module error ([51c1b8c](https://github.com/brewcoua/webwisp-lib/commit/51c1b8c36f06ac1ee62b37d5d8b7f0eaddf5ef22))
+
 ## [1.4.6](https://github.com/brewcoua/webwisp-lib/compare/v1.4.5...v1.4.6) (2024-06-14)
 
 
