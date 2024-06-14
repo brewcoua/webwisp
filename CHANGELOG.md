@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/brewcoua/webwisp-lib/compare/v1.4.0...v1.4.1) (2024-06-14)
+
+
+### Bug Fixes
+
+* **lib:** export runner status type ([f16f235](https://github.com/brewcoua/webwisp-lib/commit/f16f2352f87c71e39dd4590588ec48b0dae47a6f))
+
 # [1.4.0](https://github.com/brewcoua/webwisp-lib/compare/v1.3.1...v1.4.0) (2024-06-14)
 
 
