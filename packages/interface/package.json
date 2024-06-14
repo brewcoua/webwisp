@@ -1,0 +1,72 @@
+{
+  "name": "webwisp",
+  "version": "1.0.0",
+  "description": "A web agent for automatic end-to-end testing of websites.",
+  "main": "./out/main/index.js",
+  "author": {
+    "name": "Brewen Couaran",
+    "email": "brewcoua@brewen.dev",
+    "url": "https://brewen.dev"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+ssh@github.com:brewcoua/webwisp.git"
+  },
+  "homepage": "https://github.com/brewcoua/webwisp#readme",
+  "bugs": {
+    "url": "https://github.com/brewcoua/webwisp/issues",
+    "email": "contact@brewen.dev"
+  },
+  "engines": {
+    "node": ">=20.14.0",
+    "npm": ">=10.5.0"
+  },
+  "scripts": {
+    "format": "prettier --write .",
+    "lint": "eslint . --ext .js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --fix",
+    "typecheck:node": "npx tsc --noEmit -p tsconfig.node.json --composite false",
+    "typecheck:web": "npx tsc --noEmit -p tsconfig.web.json --composite false",
+    "typecheck": "npm run typecheck:node && npm run typecheck:web",
+    "start": "npx electron-vite preview",
+    "dev": "npx electron-vite dev",
+    "build": "npm run typecheck && electron-vite build",
+    "postinstall": "electron-builder install-app-deps",
+    "build:unpack": "npm run build && electron-builder --dir",
+    "build:win": "npm run build && electron-builder --win",
+    "build:mac": "electron-vite build && electron-builder --mac",
+    "build:linux": "electron-vite build && electron-builder --linux"
+  },
+  "dependencies": {
+    "@electron-toolkit/preload": "^3.0.0",
+    "@electron-toolkit/utils": "^3.0.0",
+    "@webwisp/lib": "^1.4.7",
+    "electron-store": "^9.0.0",
+    "electron-updater": "^6.1.7"
+  },
+  "devDependencies": {
+    "@chakra-ui/react": "^2.8.2",
+    "@electron-toolkit/eslint-config-prettier": "^2.0.0",
+    "@electron-toolkit/eslint-config-ts": "^1.0.1",
+    "@electron-toolkit/tsconfig": "^1.0.1",
+    "@preact/preset-vite": "^2.8.2",
+    "@preact/signals": "^1.2.3",
+    "@types/node": "^18.19.9",
+    "@types/react": "^18.2.48",
+    "@types/react-dom": "^18.2.18",
+    "@vitejs/plugin-react": "^4.2.1",
+    "electron": "^28.2.0",
+    "electron-builder": "^24.9.1",
+    "electron-vite": "^2.0.0",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react": "^7.33.2",
+    "preact": "^10.22.0",
+    "preact-router": "^4.1.2",
+    "prettier": "^3.2.4",
+    "react": "npm:@preact/compat",
+    "react-dom": "npm:@preact/compat",
+    "react-icons": "^5.2.1",
+    "sass": "^1.77.4",
+    "typescript": "^5.3.3",
+    "vite": "^5.0.12"
+  }
+}

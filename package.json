@@ -1,10 +1,8 @@
 {
-    "name": "@webwisp/lib",
-    "version": "1.4.6",
+    "name": "webwisp",
+    "private": true,
     "description": "A web agent for automatic end-to-end testing of websites.",
     "license": "(MIT OR Apache-2.0)",
-    "types": "./index.d.ts",
-    "main": "./index.js",
     "author": {
         "name": "Brewen Couaran",
         "email": "brewcoua@brewen.dev",
@@ -12,65 +10,18 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+ssh@github.com:brewcoua/webwisp-lib.git"
+        "url": "git+ssh@github.com:brewcoua/webwisp.git"
     },
-    "homepage": "https://github.com/brewcoua/webwisp-lib#readme",
+    "homepage": "https://github.com/brewcoua/webwisp#readme",
     "bugs": {
-        "url": "https://github.com/brewcoua/webwisp-lib/issues",
+        "url": "https://github.com/brewcoua/webwisp/issues",
         "email": "contact@brewen.dev"
     },
     "engines": {
         "node": ">=20.14.0",
         "npm": ">=10.5.0"
     },
-    "scripts": {
-        "start": "(which bun && bun start:bun) || npm run start:node",
-        "start:bun": "bun run build && bun ./dist/webwisp.js",
-        "start:node": "npm run build && node ./dist/webwisp.js",
-        "demo1": "node ./dist/webwisp.js -t \"https://cftl.fr/actualites/jftl/\" -k \"Ouvre le programme et vérifie que Xavier Blanc a une conférence à 10:40.\"",
-        "demo2": "node ./dist/webwisp.js -t \"https://cftl.fr/actualites/jftl/\" -k \"Is the 16th edition of the JFTL at Beffroi de Montrouge ?\"",
-        "demo3": "node ./dist/webwisp.js -t \"https://www.labri.fr/en\" -k \"Go to the MENU, then to the Awards, check that Yvonne Jansen is in the list\"",
-        "build": "npx rollup -c rollup.cli.mjs",
-        "build:watch": "npx rollup -c rollup.cli.mjs -w",
-        "build:lib": "npx rollup -c rollup.lib.mjs && npx api-extractor run --local",
-        "format": "npx prettier --write ./src/**/*.ts",
-        "lint": "npx eslint ./src/**/*.ts"
-    },
-    "devDependencies": {
-        "@eslint/js": "^9.4.0",
-        "@inquirer/core": "^8.2.1",
-        "@inquirer/prompts": "^5.0.4",
-        "@microsoft/api-extractor": "^7.47.0",
-        "@rollup/plugin-commonjs": "^26.0.1",
-        "@rollup/plugin-json": "^6.1.0",
-        "@rollup/plugin-node-resolve": "^15.2.3",
-        "@rollup/plugin-terser": "^0.4.4",
-        "@rollup/plugin-typescript": "^11.1.6",
-        "@semantic-release/changelog": "^6.0.3",
-        "@semantic-release/exec": "^6.0.3",
-        "@semantic-release/git": "^10.0.1",
-        "@semantic-release/npm": "^12.0.1",
-        "@types/eslint__js": "^8.42.3",
-        "ajv": "^8.16.0",
-        "chalk": "^5.3.0",
-        "commander": "^12.1.0",
-        "conventional-changelog-conventionalcommits": "^8.0.0",
-        "dotenv": "^16.4.5",
-        "eslint": "^9.4.0",
-        "globals": "^15.4.0",
-        "node-audiorecorder": "^3.0.0",
-        "ora": "^8.0.1",
-        "prettier": "^3.2.5",
-        "rollup": "^4.18.0",
-        "semantic-release": "^24.0.0",
-        "terser": "^5.31.0",
-        "tslib": "^2.6.3",
-        "typescript": "^5.4.5",
-        "typescript-eslint": "^8.0.0-alpha.30"
-    },
-    "dependencies": {
-        "openai": "^4.47.1",
-        "playwright": "^1.44.0",
-        "winston": "^3.13.0"
-    }
+    "workspaces": [
+        "packages/*"
+    ]
 }
