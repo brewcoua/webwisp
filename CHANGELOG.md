@@ -1,3 +1,10 @@
+## [1.4.6](https://github.com/brewcoua/webwisp-lib/compare/v1.4.5...v1.4.6) (2024-06-14)
+
+
+### Bug Fixes
+
+* **build:** switch format to cjs ([06ef1c3](https://github.com/brewcoua/webwisp-lib/commit/06ef1c38cb19bd6f2d7b0cba95098634dcbf290e))
+
 ## [1.4.5](https://github.com/brewcoua/webwisp-lib/compare/v1.4.4...v1.4.5) (2024-06-14)
 
 
