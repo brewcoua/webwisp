@@ -196,28 +196,16 @@ export default class Runner extends Service {
         return new Promise((resolve) => setTimeout(resolve, ms))
     }
 
-    public on_action(
-        event: 'action',
-        listener: (action: ActionReport) => void
-    ): this {
-        return super.on(event, listener)
+    public on_action(listener: (action: ActionReport) => void): this {
+        return super.on('action', listener)
     }
-    public on_status(
-        event: 'status',
-        listener: (status: RunnerStatus) => void
-    ): this {
-        return super.on(event, listener)
+    public on_status(listener: (status: RunnerStatus) => void): this {
+        return super.on('status', listener)
     }
-    public off_action(
-        event: 'action',
-        listener: (action: ActionReport) => void
-    ): this {
-        return super.off(event, listener)
+    public off_action(listener: (action: ActionReport) => void): this {
+        return super.off('action', listener)
     }
-    public off_status(
-        event: 'status',
-        listener: (status: RunnerStatus) => void
-    ): this {
-        return super.off(event, listener)
+    public off_status(listener: (status: RunnerStatus) => void): this {
+        return super.off('status', listener)
     }
 }
