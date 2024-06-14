@@ -12,7 +12,7 @@ The full library for the WebWisp agent, which can be used to navigate websites, 
 A public library is available for the agent, for integrating it into other projects. It can be installed with the following:
 
 ```bash
-npm install webwisp
+npm install @webwisp/lib
 ```
 
 It currently only exposes the `Agent` class, which can be used to manage the services and spawn runners.
@@ -22,8 +22,8 @@ It currently only exposes the `Agent` class, which can be used to manage the ser
 First, clone the repository and install the dependencies:
 
 ```bash
-git clone git@github.com:brewcoua/webwisp.git --recursive
-cd webwisp
+git clone git@github.com:brewcoua/webwisp-lib.git
+cd webwisp-lib
 bun install # Or any other package manager
 ```
 
