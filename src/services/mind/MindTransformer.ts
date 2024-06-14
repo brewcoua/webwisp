@@ -1,4 +1,5 @@
 import { readFileSync } from 'node:fs'
+import { join as joinPath } from 'node:path'
 
 import config from '../runner/RunnerConfig'
 import AbstractAction from '../runner/domain/AbstractAction'
@@ -117,9 +118,12 @@ export default class MindTransformer {
 
     private makeExamplePrompts(examples: PromptExample[]): Message[] {
         return examples.flatMap((example) => {
-            const screenshotBuf = readFileSync(example.screenshot, {
-                encoding: 'base64',
-            })
+            const screenshotBuf = readFileSync(
+                joinPath(__dirname, example.screenshot),
+                {
+                    encoding: 'base64',
+                }
+            )
 
             return [
                 {

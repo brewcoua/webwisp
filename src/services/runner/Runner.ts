@@ -195,17 +195,4 @@ export default class Runner extends Service {
     private async sleep(ms: number): Promise<void> {
         return new Promise((resolve) => setTimeout(resolve, ms))
     }
-
-    public on_action(listener: (action: ActionReport) => void): this {
-        return super.on('action', listener)
-    }
-    public on_status(listener: (status: RunnerStatus) => void): this {
-        return super.on('status', listener)
-    }
-    public off_action(listener: (action: ActionReport) => void): this {
-        return super.off('action', listener)
-    }
-    public off_status(listener: (status: RunnerStatus) => void): this {
-        return super.off('status', listener)
-    }
 }
