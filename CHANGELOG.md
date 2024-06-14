@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/brewcoua/webwisp-lib/compare/v1.4.1...v1.4.2) (2024-06-14)
+
+
+### Bug Fixes
+
+* **runner:** replace enum runner status with basic string type ([f0b735f](https://github.com/brewcoua/webwisp-lib/commit/f0b735fe43b401dfc7d212068d838076cf1e9c44))
+
 ## [1.4.1](https://github.com/brewcoua/webwisp-lib/compare/v1.4.0...v1.4.1) (2024-06-14)
 
 
