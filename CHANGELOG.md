@@ -1,3 +1,10 @@
+# [1.4.0](https://github.com/brewcoua/webwisp-lib/compare/v1.3.1...v1.4.0) (2024-06-14)
+
+
+### Features
+
+* **package:** rename webwisp to @webwisp/lib ([21b20f7](https://github.com/brewcoua/webwisp-lib/commit/21b20f79126a74b20e6244b81298f1b515a8e853))
+
 # [1.3.0](https://github.com/brewcoua/webwisp/compare/v1.2.0...v1.3.0) (2024-06-13)
 
 
