@@ -1,3 +1,10 @@
+## [1.4.5](https://github.com/brewcoua/webwisp-lib/compare/v1.4.4...v1.4.5) (2024-06-14)
+
+
+### Bug Fixes
+
+* **prompts:** use relative path for example screenshots and pack assets ([3fd5c61](https://github.com/brewcoua/webwisp-lib/commit/3fd5c61b66a9be9cfb4bf2ae4d4bebd414ae08bd))
+
 ## [1.4.4](https://github.com/brewcoua/webwisp-lib/compare/v1.4.3...v1.4.4) (2024-06-14)
 
 
