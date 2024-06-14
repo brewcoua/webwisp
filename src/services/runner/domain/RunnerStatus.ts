@@ -1,7 +1,2 @@
-export enum RunnerStatus {
-    Starting = 'Starting',
-    Running = 'Running',
-    Done = 'Done',
-    Failed = 'Failed',
-}
+export type RunnerStatus = 'starting' | 'running' | 'done' | 'failed'
 export default RunnerStatus

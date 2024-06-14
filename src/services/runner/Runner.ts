@@ -38,7 +38,7 @@ export default class Runner extends Service {
     }
     private readonly actions: Action[] = []
 
-    private _status: RunnerStatus = RunnerStatus.Starting
+    private _status: RunnerStatus = 'starting'
     public get status(): RunnerStatus {
         return this._status
     }
@@ -50,7 +50,7 @@ export default class Runner extends Service {
     public async run(): Promise<TaskResult> {
         this.logger.debug(`Starting task: ${this.task}`)
 
-        this.status = RunnerStatus.Running
+        this.status = 'running'
 
         while (
             this.cycles.total < config.cycles.max &&
@@ -69,8 +69,8 @@ export default class Runner extends Service {
                 if (action.type === ActionType.Done) {
                     this.status =
                         action.arguments.status === 'success'
-                            ? RunnerStatus.Done
-                            : RunnerStatus.Failed
+                            ? 'done'
+                            : 'failed'
 
                     return {
                         success: action.arguments.status === 'success',
@@ -83,7 +83,7 @@ export default class Runner extends Service {
             if (config.delay) await this.sleep(config.delay)
         }
 
-        this.status = RunnerStatus.Failed
+        this.status = 'failed'
 
         if (this.cycles.failed >= config.cycles.failed) {
             return {
