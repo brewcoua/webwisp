@@ -1,7 +1,7 @@
 import ActionStatus from './ActionStatus'
 import ActionType from './ActionType'
 
-type Action = {
+export type Action = {
     type: ActionType
     description: string
     arguments: ActionArguments

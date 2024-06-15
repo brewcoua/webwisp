@@ -1,5 +1,5 @@
 export enum RunnerStatus {
-    STARTING = 'starting',
+    PENDING = 'pending',
     RUNNING = 'running',
     PAUSED = 'paused',
     COMPLETED = 'completed',

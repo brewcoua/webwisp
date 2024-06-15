@@ -1,8 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
-import { RunEvents, Runner, RunnerStatus } from '@webwisp/types'
+import { RunEvents } from '@webwisp/types'
 
 import AgentService from '../agent/agent.service'
+import Runner from '../../services/runner/runner.service'
+import RunnerEntity from './entities/runner.entity'
 
 @Injectable()
 export default class RunsService {
@@ -11,27 +13,31 @@ export default class RunsService {
         private agentService: AgentService
     ) {}
 
+    getRuns() {
+        return this.agentService
+            .getRunners()
+            .map((runner) => new RunnerEntity(runner))
+    }
+
+    getRun(id: number) {
+        const runner = this.agentService.getRunner(id)
+        return runner ? new RunnerEntity(runner) : undefined
+    }
+
     async createRun(target: string, prompt: string): Promise<Runner> {
-        Logger.log(`Creating run for target: ${target}`, 'RunsService')
-        const runner = await this.agentService.spawnRunner(target, prompt)
+        const runner = await this.agentService.spawn(target, prompt)
 
-        const runnerObj: Runner = {
-            id: runner.id,
-            name: "temp",
-            status: RunnerStatus.STARTING,
-            createdAt: new Date(),
-            config: {
-                target: target,
-                prompt: prompt,
-            },
-            actions: [],
-        }
-
-        this.eventEmitter.emit(`run.${runner.id}`, {
-            type: RunEvents.RUNNER_CREATED,
-            runner: runnerObj,
+        Object.values(RunEvents).forEach((event) => {
+            runner.on(event, (data) => {
+                this.eventEmitter.emit(`run.${runner.id}`, {
+                    type: event,
+                    data,
+                })
+            })
         })
 
-        return runnerObj
+        void runner.run()
+
+        return runner
     }
 }
