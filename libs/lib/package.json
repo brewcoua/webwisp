@@ -1,0 +1,26 @@
+{
+    "name": "@webwisp/lib",
+    "version": "1.4.7",
+    "description": "The library for the WebWisp agent.",
+    "license": "(MIT OR Apache-2.0)",
+    "main": "./src/index.ts",
+    "private": true,
+    "author": {
+        "name": "Brewen Couaran",
+        "email": "brewcoua@brewen.dev",
+        "url": "https://brewen.dev"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+ssh@github.com:brewcoua/webwisp.git"
+    },
+    "homepage": "https://github.com/brewcoua/webwisp/tree/master/packages/agent-lib#readme",
+    "bugs": {
+        "url": "https://github.com/brewcoua/webwisp/issues",
+        "email": "contact@brewen.dev"
+    },
+    "engines": {
+        "node": ">=20.14.0",
+        "npm": ">=10.5.0"
+    }
+}
