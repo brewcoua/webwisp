@@ -6,6 +6,7 @@ import winston from 'winston'
 
 import RunsModule from './modules/runs/runs.module'
 import AgentModule from './modules/agent/agent.module'
+import PreviewModule from './modules/preview/preview.module'
 
 @Module({
     imports: [
@@ -48,6 +49,7 @@ import AgentModule from './modules/agent/agent.module'
 
         AgentModule,
         RunsModule,
+        PreviewModule,
     ],
     controllers: [],
     providers: [],
