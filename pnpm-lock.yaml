@@ -37,7 +37,7 @@ importers:
         specifier: 8.0.0-alpha.30
         version: 8.0.0-alpha.30(eslint@9.5.0)(typescript@5.4.5)
 
-  apps/agent:
+  apps/server:
     dependencies:
       '@nestjs/common':
         specifier: ^10.3.9
