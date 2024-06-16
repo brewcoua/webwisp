@@ -1,4 +1,4 @@
-FROM node:lts-iron AS base
+FROM node:iron-slim AS base
 ENV PNPM_HOME="/pnpm"
 ENV PATH="$PNPM_HOME:$PATH"
 RUN corepack enable
