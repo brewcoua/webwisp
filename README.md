@@ -1,83 +1,49 @@
-# `@webwisp/lib`
+# `webwisp`
 
-The full library for the WebWisp agent, which can be used to navigate websites, perform tasks, and test features.
+A web agent for automatic end-to-end testing of websites.
+This agent was made during my internship at [LaBRI](https://www.labri.fr/), a computer science laboratory in Bordeaux, France.
+It is made in 2 parts:
+
+-   The server, which is a REST API made with NestJS, that handles the whole agent part, with the creation of runners, the execution of tasks on target websites, and the storage of the results.
+-   The client, which is an Electron app made with Preact, that allows connecting to any ongoing server, and to create, edit, and run tasks on target websites.
 
 ## Installation
 
 > [!NOTE]
-> The repository mainly uses [Bun](https://bun.sh) to manage the project, but any other package manager can be used.
+> The repository uses [pnpm](https://pnpm.io/) as the package manager, and [lerna](https://lerna.js.org/) for managing the monorepo.
 
-### Library
+### Server
 
-A public library is available for the agent, for integrating it into other projects. It can be installed with the following:
+1. Clone the repository
+2. Install the dependencies with `pnpm install` and go to the `apps/server` folder
+3. Create a `.env` file at the root of the server folder, and fill it with the following content:
 
-```bash
-npm install @webwisp/lib
+```
+LOG_LEVEL=info # The log level of the server, default is info
+
+OPENAI_API_KEY=sk-XXXXXXXXXXXXXXXXXXXXXXXX # Your OpenAI API key
+OPENAI_ORG=org-XXXXXXXXXXXXXXXXXXXXXXXX # Your OpenAI organization
+OPENAI_PROJECT=proj-XXXXXXXXXXXXXXXXXXXXXXXX # Your OpenAI project
 ```
 
-It currently only exposes the `Agent` class, which can be used to manage the services and spawn runners.
+These environment variables can also be set in the environment.
 
-### CLI
+4. Start the server with `pnpm start`
 
-First, clone the repository and install the dependencies:
+For easily deploying the server in production, a Dockerfile is provided at the root of the server folder.
 
-```bash
-git clone git@github.com:brewcoua/webwisp-lib.git
-cd webwisp-lib
-bun install # Or any other package manager
-```
+### Client
 
-Then, you can run WebWisp with the following command, depending on your runtime:
+1. Clone the repository
+2. Install the dependencies with `pnpm install` and go to the `apps/client` folder
+3. Start the client with `pnpm start` or `pnpm dev` for development
 
-```bash
-npm run start:node
-bun run start:bun
-```
+Currently, the client is not ready for a release, but it will be available soon as prebuilt in the releases.
 
-This will prioritize running with `bun`, but if it is not installed, it will default to `npm` and `node`.
+## Usage
 
-It can also be built by itself using:
-
-```bash
-bun run build
-```
-
-and found at `./dist/webwisp.js`. Since `playwright`, `openai` and `winston` are kept external, they need to be accessible when running the agent.
-
-> [!IMPORTANT]
-> Make sure to install browsers for Playwright to use. This can be done with the following:
->
-> ```bash
-> npx playwright install # Or 'bunx playwright install'
-> ```
-
-> [!WARNING]
-> The voice flag requires `sox` to be installed on your system. You can install it with the following:
->
-> ```bash
-> sudo apt-get install sox libsox-fmt-all # For Linux // Derive it from your package manager
-> brew install sox # For MacOS
-> ```
->
-> If you are using Windows, you can download the binaries [here](http://sourceforge.net/projects/sox/files/latest/download).
-
-## Configuration
-
-The agent can be configured through environment variables.
-The following environment variables can be set:
-
--   `OPENAI_API_KEY`: The OpenAI API key to use for the agent. **_Required_**
--   `OPENAI_ORG` : The OpenAI organization to use for the agent.
--   `OPENAI_PROJECT`: The OpenAI project to use for the agent.
-
-It also has flags that can be set when using the CLI:
-
--   `--target, -t`: The target website to navigate. Will otherwise be prompted.
--   `--task, -k`: The task to perform on the website. Will otherwise be prompted.
--   `--voice, -v`: Use voice recognition to get the task to perform. Off by default and overriden by target and task flags.
--   `--help`: Display the help message.
--   `--version, -V`: Display the version of the agent.
--   `--verbose`: Display more information about the agent's actions.
+The client can be used to connect to any server running the agent, and to create, edit, and run tasks on target websites.
+As this is currently work in progress, servers do not require authentication, and the client can connect to any server running the agent.
 
 ## License
 

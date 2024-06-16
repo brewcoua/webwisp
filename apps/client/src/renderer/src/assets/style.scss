@@ -1,0 +1,14 @@
+// Style the scrollbar to make it fit the chakra-ui theme
+// This is a workaround for the scrollbar not being styled by chakra-ui
+
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--chakra-colors-gray-800);
+}
+::-webkit-scrollbar-thumb {
+  background-color: var(--chakra-colors-gray-500);
+  border-radius: 6px;
+}

@@ -1,0 +1,27 @@
+{
+  "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
+  "include": [
+    "src/**/*",
+    "src/preload/*.d.ts",
+    "src/common/**/*.ts",
+  ],
+  "compilerOptions": {
+    "composite": true,
+    "skipLibCheck": true,
+    "baseUrl": ".",
+
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
+    
+    "paths": {
+      "@renderer/*": [
+        "src/renderer/src/*"
+      ],
+      "@common/*": [
+        "src/common/*"
+      ],
+      "react": ["./node_modules/preact/compat/"],
+      "react-dom": ["./node_modules/preact/compat/"],
+    }
+  }
+}
