@@ -27,7 +27,7 @@ export default class AgentService {
 
     async spawn(target: string, prompt: string): Promise<Runner> {
         Logger.log(
-            `Spawning runner for task: ${prompt} on target: ${target}`,
+            `Spawning runner on target: ${target}\n\tPrompt: ${prompt}`,
             Contexts.AgentService
         )
 
