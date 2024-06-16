@@ -1,32 +1,10 @@
-# `@webwisp/agent`
+# `@webwisp/server`
 
 The backend server for the WebWisp automated agent. It uses Playwright to interact with websites and OpenAI to generate tasks.
 
 ## Installation
 
-> [!NOTE]
-> The repository uses [pnpm](https://pnpm.io/) as the package manager, and [lerna](https://lerna.js.org/) for managing the monorepo.
-
-To install the dependencies, run the following:
-
-```bash
-pnpm install
-```
-
-## Usage
-
-The agent can be started with the following command:
-
-```bash
-pnpm start
-```
-
-> [!IMPORTANT]
-> Make sure to install browsers for Playwright to use. This can be done with the following:
->
-> ```bash
-> pnpm exec playwright install
-> ```
+For instructions, see the [README.md](../../README.md) in the root of the repository.
 
 ## Configuration
 

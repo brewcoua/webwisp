@@ -15,7 +15,10 @@ import PreviewModule from './modules/preview/preview.module'
             useFactory: (configService: ConfigService) => ({
                 transports: [
                     new winston.transports.Console({
-                        level: configService.get('LOG_LEVEL') || 'info',
+                        level:
+                            configService.get('LOG_LEVEL') ||
+                            process.env.LOG_LEVEL ||
+                            'info',
                         format: winston.format.combine(
                             winston.format.timestamp(),
                             winston.format.colorize(),

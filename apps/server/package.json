@@ -1,5 +1,5 @@
 {
-    "name": "@webwisp/agent",
+    "name": "@webwisp/server",
     "version": "1.4.6",
     "description": "A web agent for automatic end-to-end testing of websites.",
     "license": "(MIT OR Apache-2.0)",
@@ -11,17 +11,18 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+ssh@github.com:brewcoua/webwisp-lib.git"
+        "url": "git+ssh@github.com:brewcoua/webwisp.git"
     },
-    "homepage": "https://github.com/brewcoua/webwisp-lib#readme",
+    "homepage": "https://github.com/brewcoua/webwisp/tree/master/apps/server#readme",
     "bugs": {
-        "url": "https://github.com/brewcoua/webwisp-lib/issues",
+        "url": "https://github.com/brewcoua/webwisp/issues",
         "email": "contact@brewen.dev"
     },
     "engines": {
         "node": ">=20.14.0",
         "npm": ">=10.5.0"
     },
+    "packageManager": "pnpm@9.3.0",
     "scripts": {
         "start": "pnpm build && pnpm start:prod",
         "start:prod": "node dist/main.js",

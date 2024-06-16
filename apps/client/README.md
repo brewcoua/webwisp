@@ -1,34 +1,17 @@
-# webwisp-ui
+# `@webwisp/client`
 
-An Electron application with React and TypeScript
+The client for the WebWisp automated agent. Made in Electron, along with Preact, it provides a GUI for connecting to any ongoing agent and managing tasks.
 
-## Recommended IDE Setup
+## Installation
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+For instructions, see the [README.md](../../README.md) in the root of the repository.
 
-## Project Setup
+## License
 
-### Install
+This project is licensed under either of the following, at your option:
 
-```bash
-$ npm install
-```
+- Apache License, Version 2.0, ([LICENSE-APACHE](LICENSE-APACHE) or http://www.apache.org/licenses/LICENSE-2.0)
+- MIT License ([LICENSE-MIT](LICENSE-MIT) or http://opensource.org/licenses/MIT)
 
-### Development
-
-```bash
-$ npm run dev
-```
-
-### Build
-
-```bash
-# For windows
-$ npm run build:win
-
-# For macOS
-$ npm run build:mac
-
-# For Linux
-$ npm run build:linux
-```
+Unless you explicitly state otherwise, any contribution intentionally submitted for inclusion in the work by you,
+as defined in the Apache-2.0 license, shall be dual licensed as above, without any additional terms or conditions.
