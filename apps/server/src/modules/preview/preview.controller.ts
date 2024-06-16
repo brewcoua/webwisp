@@ -15,10 +15,15 @@ const proxy = createProxyMiddleware({
         proxyReq: (proxyReq, req) => {
             proxyReq.setHeader('Host', `localhost:${REMOTE_PORT}`)
             proxyReq.setHeader('Origin', `http://localhost:${REMOTE_PORT}`)
+            proxyReq.protocol = 'http'
         },
         proxyReqWs: (proxyReq, req) => {
             proxyReq.setHeader('Host', `localhost:${REMOTE_PORT}`)
             proxyReq.setHeader('Origin', `http://localhost:${REMOTE_PORT}`)
+
+            if (proxyReq.getHeader('Sec-WebSocket-Protocol')) {
+                proxyReq.setHeader('Sec-WebSocket-Protocol', 'ws')
+            }
         },
     },
 })

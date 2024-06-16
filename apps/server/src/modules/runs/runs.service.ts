@@ -3,7 +3,6 @@ import { EventEmitter2 } from '@nestjs/event-emitter'
 import { RunEvents } from '@webwisp/types'
 
 import AgentService from '../agent/agent.service'
-import Runner from '../../services/runner/runner.service'
 import RunnerEntity from './entities/runner.entity'
 
 @Injectable()
@@ -24,7 +23,7 @@ export default class RunsService {
         return runner ? new RunnerEntity(runner) : undefined
     }
 
-    async createRun(target: string, prompt: string): Promise<Runner> {
+    async createRun(target: string, prompt: string): Promise<RunnerEntity> {
         const runner = await this.agentService.spawn(target, prompt)
 
         Object.values(RunEvents).forEach((event) => {
@@ -38,6 +37,6 @@ export default class RunsService {
 
         //void runner.run()
 
-        return runner
+        return new RunnerEntity(runner)
     }
 }

@@ -37,14 +37,7 @@ export default class AgentService {
             `Spawning runner for task: ${prompt} on target: ${target}`
         )
 
-        const context = await this.browserService.detach()
-        const page = await context?.detach(target)
-
-        if (!page) {
-            this.logger.error('Failed to create page for runner')
-            throw new Error('Failed to create page for runner')
-        }
-
+        const page = await this.browserService.detach(target)
         const runner = new Runner(
             this.runners.length + 1,
             nanoid(),

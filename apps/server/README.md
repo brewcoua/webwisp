@@ -15,6 +15,9 @@ The following environment variables can be set:
 -   `OPENAI_ORG` : The OpenAI organization to use for the agent.
 -   `OPENAI_PROJECT`: The OpenAI project to use for the agent.
 
+Make sure that the server has enough memory to run the agent. If the server hangs when spawning a runner, it might be running out of memory.
+Usually, at least 1GB of memory is required to run the agent.
+
 ## License
 
 This project is licensed under either of the following, at your option:
