@@ -50,6 +50,7 @@
         "@nestjs/event-emitter": "^2.0.4",
         "@nestjs/platform-express": "^10.3.9",
         "@nestjs/swagger": "^7.3.1",
+        "chalk": "^5.3.0",
         "class-transformer": "^0.5.1",
         "class-validator": "^0.14.1",
         "http-proxy-middleware": "^3.0.0",

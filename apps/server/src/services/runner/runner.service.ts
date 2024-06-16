@@ -6,7 +6,7 @@ import {
     ActionType,
     ActionStatus,
 } from '@webwisp/types'
-import { Logger } from 'winston'
+import { Logger } from '@nestjs/common'
 import EventEmitter from 'node:events'
 
 import PageWrapper from '../browser/wrappers/page.wrapper'
@@ -18,13 +18,13 @@ import TaskResult from './domain/TaskResult'
 import { ErrorResult } from './domain/ErrorResult'
 import ParsedResult from '../mind/domain/ParsedResult'
 import CycleResult from './domain/CycleResult'
+import { Contexts } from '../../constants'
 
 /**
  * The Runner class provides a high-level interface for interacting with runners.
  * @public
  */
 export default class Runner extends EventEmitter implements IRunner {
-    private readonly logger: Logger
     public status = RunnerStatus.PENDING
     public createdAt = new Date()
     public readonly actions: ActionReport[] = []
@@ -37,15 +37,9 @@ export default class Runner extends EventEmitter implements IRunner {
             prompt: string
         },
         private readonly page: PageWrapper,
-        private readonly mind: MindService,
-
-        logger: Logger
+        private readonly mind: MindService
     ) {
         super()
-        this.logger = logger.child({
-            context: 'Runner',
-            id,
-        })
     }
 
     private cycles = {
@@ -72,7 +66,7 @@ export default class Runner extends EventEmitter implements IRunner {
     }
 
     public async run(): Promise<TaskResult> {
-        this.logger.debug(`Starting task`, this.config)
+        Logger.debug(`Starting task`, Contexts.Runner(this.id), this.config)
 
         this.setStatus(RunnerStatus.RUNNING)
 
@@ -84,11 +78,17 @@ export default class Runner extends EventEmitter implements IRunner {
 
             if (!cycleResult.success) {
                 this.cycles.failed++
-                this.logger.warn(`Cycle failed: ${cycleResult.error}`)
+                Logger.warn(
+                    `Cycle failed: ${cycleResult.error}`,
+                    Contexts.Runner(this.id)
+                )
             } else {
                 this.cycles.total++
                 const action = cycleResult.action
-                this.logger.debug(`Cycle ${this.cycles.total} completed`)
+                Logger.debug(
+                    `Cycle ${this.cycles.total} completed`,
+                    Contexts.Runner(this.id)
+                )
 
                 if (action.type === ActionType.Done) {
                     this.setStatus(
@@ -173,13 +173,10 @@ export default class Runner extends EventEmitter implements IRunner {
                 result = genResult
             } else {
                 this.cycles.format++
-                this.logger.warn('Failed to format cycle, retrying...', {
-                    cycle: {
-                        current: this.cycles.format,
-                        max: config.cycles.format,
-                    },
-                    error: genResult.error,
-                })
+                Logger.warn(
+                    `Failed to format cycle, retrying... (${this.cycles.format}/${config.cycles.format})`,
+                    Contexts.Runner(this.id)
+                )
             }
         }
 
@@ -204,7 +201,22 @@ export default class Runner extends EventEmitter implements IRunner {
 
         this.actions.push(report)
 
-        this.logger.info('Performed action', report)
+        Logger.debug(
+            `Performed action: ${result.action.type}${
+                result.action.arguments
+                    ? ' ' +
+                      Object.keys(result.action.arguments)
+                          .map((key) => {
+                              const value = result.action.arguments[key]
+                              return typeof value === 'string'
+                                  ? `"${value}"`
+                                  : value.toString()
+                          })
+                          .join(' ')
+                    : ''
+            } (${status})`,
+            Contexts.Runner(this.id)
+        )
 
         this.emit(RunEvents.CYCLE_COMPLETED, { report })
 
@@ -224,7 +236,10 @@ export default class Runner extends EventEmitter implements IRunner {
                 error: 'No completion found',
             }
 
-        this.logger.debug('Received completion', completion)
+        Logger.debug(
+            `Received completion (${completion.length} chars)`,
+            Contexts.Runner(this.id)
+        )
 
         return this.mind.parser.parse(completion)
     }

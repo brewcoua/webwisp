@@ -1,16 +1,14 @@
 import { BrowserContext } from 'playwright'
-import { Logger } from 'winston'
+import { Logger } from '@nestjs/common'
 
 import PageWrapper from './page.wrapper'
 import config from '../browser.config'
+import { Contexts } from 'apps/server/src/constants'
 
 export default class ContextWrapper {
     private readonly pages: PageWrapper[] = []
 
-    constructor(
-        private readonly context: BrowserContext,
-        private readonly logger: Logger
-    ) {}
+    constructor(private readonly context: BrowserContext) {}
 
     public async destroy(): Promise<void> {
         try {
@@ -18,72 +16,61 @@ export default class ContextWrapper {
             await this.context?.close()
             return
         } catch (error: any) {
-            this.logger.warn(`Failed to gracefully close context`, {
-                error: {
-                    message: error.message,
-                    stack: error.stack,
-                },
-            })
+            Logger.error(
+                `Failed to gracefully close context`,
+                error.stack,
+                Contexts.ContextWrapper
+            )
             return
         }
     }
 
     public async detach(url?: string): Promise<PageWrapper> {
         try {
-            this.logger.debug(`Creating new page`, {
-                id: this.pages.length,
-            })
             const page = await this.context.newPage()
-            this.logger.debug(`Created new page`, {
-                id: this.pages.length,
-            })
+            const id = this.pages.length
+
+            Logger.debug(
+                `Created new page with id ${id}${url ? ` and url ${url}` : ''}`,
+                Contexts.ContextWrapper
+            )
 
             if (url) {
                 await page.goto(url, {
                     waitUntil: 'load',
                 })
-                this.logger.debug(`Navigated to url`, {
-                    url,
-                    id: this.pages.length,
-                })
+                Logger.verbose(
+                    `Navigated to url: ${url}`,
+                    `${Contexts.ContextWrapper}/${Contexts.PageWrapper(id)}`
+                )
             }
 
             if (config.viewport) {
                 await page.setViewportSize(config.viewport)
-                this.logger.debug(`Set viewport size`, {
-                    size: config.viewport,
-                    id: this.pages.length,
-                })
+                Logger.verbose(
+                    `Set viewport size to ${config.viewport.width}x${config.viewport.height}`,
+                    `${Contexts.ContextWrapper}/${Contexts.PageWrapper(id)}`
+                )
             }
 
-            const pageWrap = new PageWrapper(
-                page,
-                this.logger.child({
-                    wrapper: 'Page',
-                    page: this.pages.length,
-                })
-            )
+            const pageWrap = new PageWrapper(this.pages.length, page)
             this.pages.push(pageWrap)
-
-            this.logger.debug(`Initializing page wrapper`, {
-                id: this.pages.length,
-            })
 
             await pageWrap.waitToLoad()
             await pageWrap.initialize()
 
-            this.logger.debug(`Page wrapper initialized`, {
-                id: this.pages.length,
-            })
+            Logger.verbose(
+                `Page wrapper initialized`,
+                `${Contexts.ContextWrapper}/${Contexts.PageWrapper(id)}`
+            )
 
             return pageWrap
         } catch (error: any) {
-            this.logger.error(`Failed to create page`, {
-                error: {
-                    message: error.message,
-                    stack: error.stack,
-                },
-            })
+            Logger.error(
+                `Failed to create page wrapper`,
+                error.stack,
+                Contexts.ContextWrapper
+            )
             throw new Error('Failed to create page: ' + error)
         }
     }

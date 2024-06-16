@@ -8,7 +8,7 @@ import copy from 'rollup-plugin-copy'
 import { readFileSync } from 'node:fs'
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
-const internals = ['nanoid']
+const internals = ['nanoid', 'chalk']
 
 export default [
     {

@@ -1,16 +1,17 @@
 import { Page } from 'playwright'
 import { mkdirSync, readFileSync } from 'node:fs'
-import { Logger } from 'winston'
+import { Logger } from '@nestjs/common'
 import { Action, ActionStatus, ActionType } from '@webwisp/types'
 
 import config, { REMOTE_PORT } from '../browser.config'
+import { Contexts } from 'apps/server/src/constants'
 
 const SoMUrl = 'https://unpkg.com/@brewcoua/web-som@1.2.2/SoM.min.js'
 
 export default class PageWrapper {
     constructor(
-        private readonly page: Page,
-        private readonly logger: Logger
+        private readonly id: number,
+        private readonly page: Page
     ) {}
 
     public async initialize(): Promise<void> {
@@ -97,9 +98,10 @@ export default class PageWrapper {
                         path: path,
                     })
 
-                    this.logger.debug(`Screenshot saved to ${path}`, {
-                        path,
-                    })
+                    Logger.debug(
+                        `Screenshot saved to ${path}`,
+                        Contexts.PageWrapper(this.id)
+                    )
 
                     const buf = readFileSync(path)
 
@@ -132,8 +134,12 @@ export default class PageWrapper {
                 waitUntil: 'domcontentloaded',
             })
             return true
-        } catch (err) {
-            this.logger.debug('Failed to navigate to url', { url, err })
+        } catch (err: any) {
+            Logger.error(
+                "Failed to navigate to url '" + url,
+                err.stack,
+                Contexts.PageWrapper(this.id)
+            )
             return false
         }
     }
@@ -197,8 +203,11 @@ export default class PageWrapper {
             }
 
             return ActionStatus.Success
-        } catch (err) {
-            this.logger.debug('Failed to perform action', { action, err })
+        } catch (err: any) {
+            Logger.debug(
+                'Failed to perform action: ' + err.message,
+                Contexts.PageWrapper(this.id)
+            )
             return ActionStatus.Failed
         }
     }

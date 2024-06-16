@@ -1,27 +1,20 @@
-import { Inject, Injectable } from '@nestjs/common'
-import { WINSTON_MODULE_PROVIDER } from 'nest-winston'
-import { Logger } from 'winston'
+import { Injectable, Logger } from '@nestjs/common'
 import { nanoid } from 'nanoid'
 import { Runner as IRunner } from '@webwisp/types'
 
 import { BrowserService } from '../../services/browser'
 import { MindService } from '../../services/mind'
 import Runner from '../../services/runner'
+import { Contexts } from '../../constants'
 
 @Injectable()
 export default class AgentService {
-    private readonly logger: Logger
     private readonly runners: Runner[] = []
 
     constructor(
-        @Inject(WINSTON_MODULE_PROVIDER) logger: Logger,
         private readonly browserService: BrowserService,
         private readonly mindService: MindService
-    ) {
-        this.logger = logger.child({
-            context: 'AgentService',
-        })
-    }
+    ) {}
 
     getRunners(): Readonly<IRunner>[] {
         return this.runners.map<Readonly<IRunner>>(Object.freeze)
@@ -33,8 +26,9 @@ export default class AgentService {
     }
 
     async spawn(target: string, prompt: string): Promise<Runner> {
-        this.logger.info(
-            `Spawning runner for task: ${prompt} on target: ${target}`
+        Logger.log(
+            `Spawning runner for task: ${prompt} on target: ${target}`,
+            Contexts.AgentService
         )
 
         const page = await this.browserService.detach(target)
@@ -46,8 +40,7 @@ export default class AgentService {
                 prompt,
             },
             page,
-            this.mindService,
-            this.logger
+            this.mindService
         )
 
         this.runners.push(runner)

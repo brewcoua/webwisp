@@ -6,6 +6,7 @@ import OpenAIMapper from '../mappers/openai.mapper'
 
 import config from '../mind.config'
 import { GenerationError } from '../mind.errors'
+import ModelStatus from '../domain/ModelStatus'
 
 export default class OpenAIModel extends MindModel<OpenAI> {
     protected readonly client: OpenAI
@@ -24,6 +25,24 @@ export default class OpenAIModel extends MindModel<OpenAI> {
             project: process.env.OPENAI_PROJECT,
         })
         this.mapper = new OpenAIMapper()
+    }
+
+    public async verify(): Promise<ModelStatus> {
+        try {
+            const list = await this.client.models.list()
+
+            const isModelAvailable = list.data.some(
+                (model) => model.id === config.options.model
+            )
+
+            if (!isModelAvailable) {
+                return ModelStatus.MISSING_MODEL
+            }
+            return ModelStatus.READY
+        } catch (err: any) {
+            // This only ever happens if the API request fails because of Bad Request or exceptional circumstances (e.g. API down)
+            return ModelStatus.UNAUTHORIZED(err)
+        }
     }
 
     public async generate(messages: Message[]): Promise<string | null> {
