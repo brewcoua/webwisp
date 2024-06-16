@@ -38,7 +38,9 @@ export default class PreviewController {
     ) {
         const host = req.headers.host
         return res.redirect(
-            `/view/-/devtools/inspector.html?ws=${host}/view/-/devtools/page/${id}`
+            `/view/-/devtools/inspector.html?ws${
+                req.secure ? 's' : ''
+            }=${host}/view/-/devtools/page/${id}`
         )
     }
 
