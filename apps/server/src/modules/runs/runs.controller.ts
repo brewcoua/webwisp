@@ -13,6 +13,7 @@ import RunsService from './runs.service'
 import GetRunnerParams from './dtos/get-runner.params'
 import CreateRunnerDto from './dtos/create-runner.dto'
 import RunnerEntity from './entities/runner.entity'
+import PartialRunnerEntity from './entities/partial-runner.entity'
 
 @Controller('runs')
 export default class RunsController {
@@ -20,8 +21,8 @@ export default class RunsController {
 
     @Get()
     @ApiResponse({ status: 200, description: 'Returns all runs' })
-    getAll(): RunnerEntity[] {
-        return this.runsService.getRuns()
+    getAll(): PartialRunnerEntity[] {
+        return this.runsService.getAll()
     }
 
     @Get(':id')
@@ -32,7 +33,7 @@ export default class RunsController {
     })
     @ApiResponse({ status: 404, description: 'Run not found' })
     getRun(@Param() params: GetRunnerParams): RunnerEntity {
-        const run = this.runsService.getRun(params.id)
+        const run = this.runsService.get(params.id)
         if (!run) {
             throw new NotFoundException(`Run with ID ${params.id} not found`)
         }
@@ -53,7 +54,7 @@ export default class RunsController {
     async createRun(
         @Body() createRunnerDto: CreateRunnerDto
     ): Promise<RunnerEntity> {
-        return this.runsService.createRun(
+        return this.runsService.spawn(
             createRunnerDto.target,
             createRunnerDto.prompt
         )

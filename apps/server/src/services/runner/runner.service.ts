@@ -25,13 +25,14 @@ import { Contexts } from '../../constants'
  * @public
  */
 export default class Runner extends EventEmitter implements IRunner {
-    public status = RunnerStatus.PENDING
+    public status = RunnerStatus.NOT_STARTED
     public createdAt = new Date()
     public readonly actions: ActionReport[] = []
+    public result?: TaskResult
 
     constructor(
-        public readonly id: number,
-        public readonly name: string,
+        public readonly id: string,
+        public readonly pageId: string,
         public readonly config: {
             target: string
             prompt: string
@@ -40,6 +41,12 @@ export default class Runner extends EventEmitter implements IRunner {
         private readonly mind: MindService
     ) {
         super()
+        this.on(RunEvents.TASK_COMPLETED, (result: TaskResult) => {
+            this.result = result
+            this.setStatus(
+                result.success ? RunnerStatus.COMPLETED : RunnerStatus.FAILED
+            )
+        })
     }
 
     private cycles = {
@@ -55,18 +62,11 @@ export default class Runner extends EventEmitter implements IRunner {
         })
     }
 
-    private isPaused = false
-    public pause(): void {
-        this.isPaused = true
-        this.emit('runner.paused')
-    }
-    public resume(): void {
-        this.isPaused = false
-        this.emit('runner.resumed')
-    }
-
-    public async run(): Promise<TaskResult> {
-        Logger.debug(`Starting task`, Contexts.Runner(this.id), this.config)
+    public async run(): Promise<void> {
+        Logger.debug(
+            `[${this.config.target}]: Starting task: "${this.config.prompt}"`,
+            Contexts.Runner(this.id)
+        )
 
         this.setStatus(RunnerStatus.RUNNING)
 
@@ -91,17 +91,12 @@ export default class Runner extends EventEmitter implements IRunner {
                 )
 
                 if (action.type === ActionType.Done) {
-                    this.setStatus(
-                        action.arguments.status === 'success'
-                            ? RunnerStatus.COMPLETED
-                            : RunnerStatus.FAILED
-                    )
-
-                    return {
+                    this.emit(RunEvents.TASK_COMPLETED, {
                         success: action.arguments.status === 'success',
                         message: action.arguments.reason as string,
                         value: action.arguments.value as string | undefined,
-                    }
+                    })
+                    return
                 }
             }
 
@@ -116,22 +111,26 @@ export default class Runner extends EventEmitter implements IRunner {
                     this.setStatus(RunnerStatus.RUNNING)
             }
 
+            if (this.isCancelled) {
+                this.setStatus(RunnerStatus.CANCELLED)
+                return
+            }
+
             if (config.delay) await this.sleep(config.delay)
         }
 
         this.setStatus(RunnerStatus.FAILED)
 
+        let message
         if (this.cycles.failed >= config.cycles.failed) {
-            return {
-                success: false,
-                message: 'Failed too many times',
-            }
+            message = 'Failed too many times'
         } else {
-            return {
-                success: false,
-                message: 'Reached maximum cycles',
-            }
+            message = 'Reached maximum cycles'
         }
+        this.emit(RunEvents.TASK_COMPLETED, {
+            success: false,
+            message,
+        })
     }
 
     private async cycle(): Promise<CycleResult | ErrorResult> {
@@ -246,5 +245,21 @@ export default class Runner extends EventEmitter implements IRunner {
 
     private async sleep(ms: number): Promise<void> {
         return new Promise((resolve) => setTimeout(resolve, ms))
+    }
+
+    private isPaused = false
+    public pause(): void {
+        this.isPaused = true
+        this.emit('runner.paused')
+    }
+    public resume(): void {
+        this.isPaused = false
+        this.emit('runner.resumed')
+    }
+
+    private isCancelled = false
+    public cancel(): void {
+        this.isCancelled = true
+        this.emit('runner.cancelled')
     }
 }

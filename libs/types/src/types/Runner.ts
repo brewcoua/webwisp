@@ -1,10 +1,11 @@
 import ActionReport from '../types/ActionReport'
 import RunnerStatus from '../types/RunnerStatus'
+import TaskResult from './TaskResult'
 
 export default interface Runner {
-    id: number
-    name: string
+    id: string
     status: RunnerStatus
+    pageId: string
 
     createdAt: Date
 
@@ -14,4 +15,5 @@ export default interface Runner {
     }
 
     actions: ActionReport[]
+    result?: TaskResult
 }

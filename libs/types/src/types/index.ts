@@ -5,3 +5,4 @@ export { default as ActionType } from './ActionType'
 
 export { default as Runner } from './Runner'
 export { default as RunnerStatus } from './RunnerStatus'
+export { default as TaskResult } from './TaskResult'

@@ -1,10 +1,11 @@
-import { ActionReport, Runner, RunnerStatus } from '../types'
+import { ActionReport, Runner, RunnerStatus, TaskResult } from '../types'
 
 export const RunEvents = {
     RUNNER_CREATED: 'runner.created',
     RUNNER_DESTROYED: 'runner.destroyed',
     STATUS_CHANGED: 'runner.status_changed',
     CYCLE_COMPLETED: 'runner.cycle_completed',
+    TASK_COMPLETED: 'runner.task_completed',
 }
 
 export default RunEvents
@@ -36,5 +37,11 @@ export type CycleCompletedEvent = {
     data: {
         cycle: number
         action: ActionReport
+    }
+}
+export type TaskCompletedEvent = {
+    type: typeof RunEvents.TASK_COMPLETED
+    data: {
+        result: TaskResult
     }
 }

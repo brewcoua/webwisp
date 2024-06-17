@@ -3,7 +3,6 @@ import { ConfigModule } from '@nestjs/config'
 import { EventEmitterModule } from '@nestjs/event-emitter'
 
 import RunsModule from './modules/runs/runs.module'
-import AgentModule from './modules/agent/agent.module'
 import PreviewModule from './modules/preview/preview.module'
 
 @Module({
@@ -14,7 +13,6 @@ import PreviewModule from './modules/preview/preview.module'
         }),
         EventEmitterModule.forRoot(),
 
-        AgentModule,
         RunsModule,
         PreviewModule,
     ],

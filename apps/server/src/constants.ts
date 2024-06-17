@@ -1,9 +1,9 @@
 export const Contexts = {
-    AgentService: 'AgentService',
+    RunsService: 'RunsService',
     RunsGateway: 'RunsGateway',
     BrowserService: 'BrowserService',
     ContextWrapper: 'ContextWrapper',
     PageWrapper: (id: number) => `Page#${id}`,
-    Runner: (id: number) => `Runner#${id}`,
+    Runner: (id: string) => `Runner#${id}`,
     MindModule: 'MindModule',
 }

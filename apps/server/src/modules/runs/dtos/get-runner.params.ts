@@ -1,16 +1,17 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNumberString } from 'class-validator';
+import { ApiProperty } from '@nestjs/swagger'
+import { IsString, Matches } from 'class-validator'
 
 export default class GetRunnerParams {
-    @IsNumberString()
+    @IsString()
+    @Matches(/^[A-Za-z0-9_-]{21}$/)
     @ApiProperty({
-        type: 'number',
+        type: 'string',
         description: 'The ID of the runner.',
-        example: 1
+        example: 'V1StGXR8_Z5jdHi6B-myT',
     })
-    id: number
+    id: string
 
-    constructor(id: number) {
+    constructor(id: string) {
         this.id = id
     }
 }
