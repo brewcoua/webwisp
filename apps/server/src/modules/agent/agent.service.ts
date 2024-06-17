@@ -17,12 +17,11 @@ export default class AgentService {
     ) {}
 
     getRunners(): Readonly<IRunner>[] {
-        return this.runners.map<Readonly<IRunner>>(Object.freeze)
+        return this.runners
     }
 
     getRunner(id: number): Readonly<IRunner> | undefined {
-        const runner = this.runners.find((runner) => runner.id === id)
-        return runner ? Object.freeze(runner) : undefined
+        return this.runners.find((runner) => runner.id === id)
     }
 
     async spawn(target: string, prompt: string): Promise<Runner> {
@@ -46,5 +45,14 @@ export default class AgentService {
         this.runners.push(runner)
 
         return runner
+    }
+
+    async start(id: number): Promise<void> {
+        Logger.log(`Starting runner ${id}`, Contexts.AgentService)
+
+        const runner = this.runners.find((runner) => runner.id === id)
+        if (runner) {
+            await runner.run()
+        }
     }
 }

@@ -35,8 +35,10 @@ export default class RunsService {
             })
         })
 
-        //void runner.run()
-
         return new RunnerEntity(runner)
+    }
+
+    async startRun(id: number) {
+        return this.agentService.start(id)
     }
 }

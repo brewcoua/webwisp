@@ -28,7 +28,7 @@ export default class ContextWrapper {
     public async detach(url?: string): Promise<PageWrapper> {
         try {
             const page = await this.context.newPage()
-            const id = this.pages.length
+            const id = this.pages.length + 1
 
             Logger.debug(
                 `Created new page with id ${id}${url ? ` and url ${url}` : ''}`,
@@ -53,7 +53,7 @@ export default class ContextWrapper {
                 )
             }
 
-            const pageWrap = new PageWrapper(this.pages.length, page)
+            const pageWrap = new PageWrapper(id, page)
             this.pages.push(pageWrap)
 
             await pageWrap.waitToLoad()

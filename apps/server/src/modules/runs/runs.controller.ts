@@ -6,12 +6,8 @@ import {
     NotFoundException,
     Param,
     Post,
-    Sse,
 } from '@nestjs/common'
-import { EventEmitter2 } from '@nestjs/event-emitter'
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
-import { RunEvent, RunnerStatus } from '@webwisp/types'
-import { Observable, fromEvent, map } from 'rxjs'
 
 import RunsService from './runs.service'
 import GetRunnerParams from './dtos/get-runner.params'
@@ -20,10 +16,7 @@ import RunnerEntity from './entities/runner.entity'
 
 @Controller('runs')
 export default class RunsController {
-    constructor(
-        private eventEmitter: EventEmitter2,
-        private runsService: RunsService
-    ) {}
+    constructor(private runsService: RunsService) {}
 
     @Get()
     @ApiResponse({ status: 200, description: 'Returns all runs' })
@@ -44,20 +37,6 @@ export default class RunsController {
             throw new NotFoundException(`Run with ID ${params.id} not found`)
         }
         return run
-    }
-
-    @Sse(':id/events')
-    @ApiResponse({
-        status: 200,
-        description: 'Returns events for a run. Will not close the connection.',
-    })
-    getRunEvents(@Param() params: GetRunnerParams): Observable<MessageEvent> {
-        return fromEvent(this.eventEmitter, `run.${params.id}`).pipe(
-            map((data) => {
-                const event = data as RunEvent
-                return new MessageEvent(event.type, { data: event.data })
-            })
-        )
     }
 
     @Post()
