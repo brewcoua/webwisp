@@ -24,8 +24,7 @@
         "baseUrl": ".",
 
         "paths": {
-            "@webwisp/lib": ["libs/lib/src/index.ts"],
-            "@webwisp/types": ["libs/types/src/index.ts"]
+            "@webwisp/types/*": ["types/*"]
         }
     },
     "exclude": ["node_modules", "dist"]

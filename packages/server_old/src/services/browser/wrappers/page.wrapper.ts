@@ -4,7 +4,7 @@ import { Logger } from '@nestjs/common'
 import { Action, ActionStatus, ActionType } from '@webwisp/types'
 
 import config, { REMOTE_PORT } from '../browser.config'
-import { Contexts } from 'apps/server/src/constants'
+import { Contexts } from 'packages/server_old/src/constants'
 
 const SoMUrl = 'https://unpkg.com/@brewcoua/web-som@1.2.2/SoM.min.js'
 

@@ -3,7 +3,7 @@ import { Logger } from '@nestjs/common'
 
 import PageWrapper from './page.wrapper'
 import config from '../browser.config'
-import { Contexts } from 'apps/server/src/constants'
+import { Contexts } from 'packages/server_old/src/constants'
 
 export default class ContextWrapper {
     private readonly pages: PageWrapper[] = []

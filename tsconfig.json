@@ -1,4 +1,4 @@
 {
     "files": [],
-    "references": [{ "path": "apps/server" }]
+    "references": [{ "path": "packages/orchestrator" }]
 }

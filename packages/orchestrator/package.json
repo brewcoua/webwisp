@@ -1,0 +1,53 @@
+{
+    "name": "@webwisp/orchestrator",
+    "version": "1.0.0",
+    "description": "A task orchestrator for the WebWisp autonomous agent.",
+    "license": "(MIT OR Apache-2.0)",
+    "main": "./dist/main.js",
+    "author": {
+        "name": "Brewen Couaran",
+        "email": "brewcoua@brewen.dev",
+        "url": "https://brewen.dev"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+ssh@github.com:brewcoua/webwisp.git"
+    },
+    "homepage": "https://github.com/brewcoua/webwisp/tree/master/packages/orchestrator#readme",
+    "bugs": {
+        "url": "https://github.com/brewcoua/webwisp/issues",
+        "email": "contact@brewen.dev"
+    },
+    "engines": {
+        "node": ">=20.14.0",
+        "npm": ">=10.5.0"
+    },
+    "packageManager": "pnpm@9.4.0",
+    "scripts": {
+        "start": "pnpm build && pnpm start:prod",
+        "start:prod": "node dist/main.js",
+        "build": "pnpm exec rollup -c",
+        "build:watch": "pnpm exec rollup -c -w",
+        "format": "pnpm exec prettier --write ./src/**/*.ts"
+    },
+    "devDependencies": {
+        "@nestjs/testing": "^10.3.9",
+        "@types/express": "^4.17.21"
+    },
+    "dependencies": {
+        "@nestjs/common": "^10.3.9",
+        "@nestjs/config": "^3.2.2",
+        "@nestjs/core": "^10.3.9",
+        "@nestjs/cqrs": "^10.2.7",
+        "@nestjs/platform-express": "^10.3.9",
+        "@nestjs/swagger": "^7.3.1",
+        "chalk": "^5.3.0",
+        "class-transformer": "^0.5.1",
+        "class-validator": "^0.14.1",
+        "http-proxy-middleware": "^3.0.0",
+        "nanoid": "^5.0.7",
+        "nest-winston": "^1.10.0",
+        "rxjs": "^7.8.1",
+        "winston": "^3.13.0"
+    }
+}
