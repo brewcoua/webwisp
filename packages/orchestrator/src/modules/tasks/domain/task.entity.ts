@@ -10,6 +10,13 @@ export default class TaskEntity implements Task {
     id: string
 
     @ApiProperty({
+        description: 'Date and time the task was created',
+        example: '2021-07-25T00:00:00.000Z',
+        type: 'string',
+    })
+    createdAt: Date
+
+    @ApiProperty({
         description: 'The URL of the target to run the task on',
         example: 'https://example.com',
     })
@@ -23,8 +30,9 @@ export default class TaskEntity implements Task {
     })
     prompt: string
 
-    constructor(id: string, target: string, prompt: string) {
+    constructor(id: string, date: Date, target: string, prompt: string) {
         this.id = id
+        this.createdAt = date
         this.target = target
         this.prompt = prompt
     }

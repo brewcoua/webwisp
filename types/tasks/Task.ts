@@ -5,4 +5,5 @@ export interface PartialTask {
 
 export interface Task extends PartialTask {
     id: string
+    createdAt: Date
 }

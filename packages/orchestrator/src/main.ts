@@ -16,6 +16,7 @@ async function bootstrap() {
         }),
     })
     app.useGlobalPipes(new ValidationPipe())
+    app.getHttpAdapter().getInstance().disable('x-powered-by')
 
     const document = SwaggerModule.createDocument(app, makeSwaggerConfig())
     SwaggerModule.setup('docs', app, document)

@@ -19,6 +19,7 @@ export class CreateTaskHandler implements ICommandHandler<CreateTaskCommand> {
         this.queueService.push({
             ...command.task,
             id,
+            createdAt: new Date(),
         })
 
         Logger.verbose(`Created task with id: ${id}`, 'CreateTaskHandler')
