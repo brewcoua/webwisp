@@ -1,7 +1,7 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { Runner as IRunner, RunnerStatus } from '@webwisp/types'
+import { Runner as IRunner, RunnerStatus, PartialRunner } from '@webwisp/types'
 
-export default class PartialRunnerEntity {
+export default class PartialRunnerEntity implements PartialRunner {
     @ApiProperty({
         type: 'string',
         description: 'The ID of the runner. (nanoid)',
@@ -26,6 +26,13 @@ export default class PartialRunnerEntity {
     createdAt: Date
 
     @ApiProperty({
+        type: 'string',
+        description: 'The ID of the page.',
+        example: 'D054E459E2C5D7749A57E3A2E3E28FCC',
+    })
+    pageId: string
+
+    @ApiProperty({
         type: 'object',
         description: 'The configuration of the runner.',
         example: { target: 'https://example.com', prompt: 'Run prompt' },
@@ -39,6 +46,7 @@ export default class PartialRunnerEntity {
         this.id = runner.id
         this.status = runner.status
         this.createdAt = runner.createdAt
+        this.pageId = runner.pageId
         this.config = runner.config
     }
 }
