@@ -2,7 +2,7 @@ services:
     orchestrator:
         build:
             context: .
-            dockerfile: ./build/Dockerfile.orchestrator
+            dockerfile: ./packages/orchestrator/Dockerfile
         container_name: ww-orchestrator
         ports:
             - '3000:3000'
