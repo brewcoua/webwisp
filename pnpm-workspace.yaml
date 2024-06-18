@@ -2,3 +2,4 @@ packages:
     - 'packages/*'
     - '!packages/client'
     - '!packages/server_old'
+    - 'types'

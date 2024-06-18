@@ -1,0 +1,11 @@
+services:
+    orchestrator:
+        build:
+            context: .
+            dockerfile: ./build/Dockerfile.orchestrator
+        container_name: ww-orchestrator
+        ports:
+            - '3000:3000'
+        environment:
+            - FORCE_COLOR=1
+            - LOG_LEVEL=debug

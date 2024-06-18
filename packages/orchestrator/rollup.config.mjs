@@ -7,8 +7,6 @@ import terser from '@rollup/plugin-terser'
 import { readFileSync } from 'node:fs'
 const pkg = JSON.parse(readFileSync('./package.json', 'utf-8'))
 
-const internals = ['nanoid', 'chalk']
-
 export default [
     {
         input: 'src/main.ts',
@@ -33,8 +31,6 @@ export default [
                 mangle: false,
             }),
         ],
-        external: Object.keys(pkg.dependencies || {}).filter(
-            (key) => !internals.some((i) => key.startsWith(i))
-        ),
+        external: Object.keys(pkg.dependencies || {}),
     },
 ]
