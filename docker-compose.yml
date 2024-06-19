@@ -57,6 +57,7 @@ services:
             - FORCE_COLOR=1
             - LOG_LEVEL=debug
             - RABBITMQ_HOST=rabbitmq
+        restart: on-failure
 
 networks:
     webwisp:

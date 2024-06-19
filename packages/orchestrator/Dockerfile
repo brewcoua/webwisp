@@ -15,7 +15,7 @@ RUN npm install
 
 FROM base AS build
 COPY ./packages/${PACKAGE} /cwd/packages/${PACKAGE}
-COPY ./package.json ./tsconfig.base.json /cwd/
+COPY ./package.json /cwd/
 COPY --from=dev-deps /cwd/node_modules /cwd/node_modules
 WORKDIR /cwd
 

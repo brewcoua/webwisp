@@ -1,8 +1,34 @@
 {
-    "extends": "../../tsconfig.base.json",
+    "compileOnSave": false,
     "compilerOptions": {
-        "outDir": "./dist"
+        "target": "ES2022",
+        "module": "ESNext",
+        "moduleResolution": "Node",
+
+        "strict": true,
+        "declaration": false,
+
+        "skipLibCheck": true,
+        "skipDefaultLibCheck": true,
+        "removeComments": true,
+        "emitDecoratorMetadata": true,
+        "experimentalDecorators": true,
+        "allowSyntheticDefaultImports": true,
+        "useDefineForClassFields": true,
+        "forceConsistentCasingInFileNames": true,
+        "resolveJsonModule": true,
+
+        "lib": ["ES2022", "DOM"],
+
+        "rootDir": ".",
+        "baseUrl": ".",
+
+        "paths": {
+            "@services/*": ["src/services/*"],
+            "@configs/*": ["src/configs/*"],
+            "@domain/*": ["src/domain/*"],
+        }
     },
-    "include": ["./src/**/*.ts"],
-    "exlude": ["./node_modules", "./dist"]
+    "include": ["src/**/*"],
+    "exclude": ["node_modules", "dist"]
 }
