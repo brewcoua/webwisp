@@ -6,9 +6,9 @@ import QueueService from './services/queue'
 
 import { RabbitMQModule } from './repositories/rabbitmq'
 
-import { CancelTaskHandler, CreateTaskHandler } from './commands'
+import { CreateTaskHandler } from './commands'
 
-const commandHandlers = [CreateTaskHandler, CancelTaskHandler]
+const commandHandlers = [CreateTaskHandler]
 
 @Module({
     imports: [RabbitMQModule],

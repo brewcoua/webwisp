@@ -1,5 +1,5 @@
 import { Injectable } from '@nestjs/common'
-import { Task } from '@webwisp/types/tasks'
+import { Task } from '../../domain'
 import Queue from './queue.entity'
 
 @Injectable()

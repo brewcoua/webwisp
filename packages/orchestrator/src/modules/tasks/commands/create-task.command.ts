@@ -1,7 +1,7 @@
 import { CommandHandler, ICommand, ICommandHandler } from '@nestjs/cqrs'
 import { Logger } from '@nestjs/common'
 import { nanoid } from 'nanoid'
-import { PartialTask } from '@webwisp/types/tasks'
+import { PartialTask } from '../domain'
 
 import TasksService from '../tasks.service'
 

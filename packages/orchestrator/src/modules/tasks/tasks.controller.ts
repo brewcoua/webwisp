@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, HttpCode } from '@nestjs/common'
+import { Controller, Post, Body, HttpCode } from '@nestjs/common'
 import { CommandBus, QueryBus } from '@nestjs/cqrs'
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
 

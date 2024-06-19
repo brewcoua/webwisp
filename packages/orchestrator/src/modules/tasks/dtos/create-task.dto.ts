@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { PartialTask } from '@webwisp/types/tasks'
+import { PartialTask } from '../domain'
 import { IsUrl, MinLength, MaxLength } from 'class-validator'
 
 export default class CreateTaskDto implements PartialTask {
