@@ -2,15 +2,24 @@ FROM node:iron-slim AS base
 
 ENV PACKAGE=worker
 
-FROM base AS build-base
-COPY . /cwd
+FROM base AS deps
+COPY ./packages/${PACKAGE}/package.json /cwd/packages/${PACKAGE}/package.json
+COPY ./package.json ./package-lock.json /cwd/
 WORKDIR /cwd
 
-FROM build-base AS prod-deps
+FROM deps AS prod-deps
 RUN npm install -w @webwisp/${PACKAGE} --omit=dev --omit=optional
 
-FROM build-base AS build
+FROM deps AS dev-deps
 RUN npm install
+RUN npx playwright install chromium --with-deps
+
+FROM base AS build
+COPY ./packages/${PACKAGE} /cwd/packages/${PACKAGE}
+COPY ./package.json ./tsconfig.base.json /cwd/
+COPY --from=dev-deps /cwd/node_modules /cwd/node_modules
+WORKDIR /cwd
+
 RUN npm run build -w @webwisp/${PACKAGE}
 
 FROM base AS runtime

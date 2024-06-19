@@ -1,7 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { Task } from '@webwisp/types/tasks'
 
-export default class TaskEntity implements Task {
+export class TaskEntity implements Task {
     @ApiProperty({
         description: 'The ID of the task',
         example: 'SRjCIwzTLvAjKMMY59MY5',
@@ -36,4 +35,14 @@ export default class TaskEntity implements Task {
         this.target = target
         this.prompt = prompt
     }
+}
+
+export interface Task extends PartialTask {
+    id: string
+    createdAt: Date
+}
+
+export interface PartialTask {
+    target: string
+    prompt: string
 }

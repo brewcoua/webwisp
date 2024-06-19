@@ -1,16 +1,18 @@
 import { Module } from '@nestjs/common'
 
 import TasksController from './tasks.controller'
+import TasksService from './tasks.service'
 import QueueService from './services/queue'
 
+import { RabbitMQModule } from './repositories/rabbitmq'
+
 import { CancelTaskHandler, CreateTaskHandler } from './commands'
-import { GetTasksHandler } from './queries'
 
 const commandHandlers = [CreateTaskHandler, CancelTaskHandler]
-const queryHandlers = [GetTasksHandler]
 
 @Module({
+    imports: [RabbitMQModule],
     controllers: [TasksController],
-    providers: [QueueService, ...commandHandlers, ...queryHandlers],
+    providers: [TasksService, QueueService, ...commandHandlers],
 })
 export default class TasksModule {}

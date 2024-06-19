@@ -1,0 +1,1 @@
+export { RabbitMQRepository } from './rabbitmq'

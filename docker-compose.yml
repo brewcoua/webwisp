@@ -1,35 +1,43 @@
 services:
     orchestrator:
+        container_name: orchestrator
         build:
             context: .
             dockerfile: ./packages/orchestrator/Dockerfile
         ports:
             - '3000:3000'
-        environment:
-            - FORCE_COLOR=1
-            - LOG_LEVEL=debug
-        container_name: orchestrator
+        networks:
+            - webwisp
         depends_on:
-            - rabbitmq
+            rabbitmq:
+                condition: service_healthy
         healthcheck:
             test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
             interval: 1m30s
             timeout: 30s
             retries: 5
             start_period: 30s
+        environment:
+            - FORCE_COLOR=1
+            - LOG_LEVEL=debug
+            - RABBITMQ_HOST=rabbitmq
+            - RABBITMQ_USER=guest
+            - RABBITMQ_PASS=guest
 
     rabbitmq:
         image: rabbitmq:3-management
         ports:
             - '5672:5672'
             - '15672:15672'
+        networks:
+            - webwisp
         environment:
             - RABBITMQ_DEFAULT_USER=guest
             - RABBITMQ_DEFAULT_PASS=guest
         container_name: rabbitmq
         healthcheck:
             test: ['CMD', 'rabbitmqctl', 'status']
-            interval: 30s
+            interval: 10s
             timeout: 10s
             retries: 3
 
@@ -37,12 +45,19 @@ services:
         build:
             context: .
             dockerfile: ./packages/worker/Dockerfile
-        environment:
-            - FORCE_COLOR=1
-            - LOG_LEVEL=debug
         deploy:
             mode: replicated
             replicas: 2
+        networks:
+            - webwisp
         depends_on:
-            - rabbitmq
-            - orchestrator
+            rabbitmq:
+                condition: service_healthy
+        environment:
+            - FORCE_COLOR=1
+            - LOG_LEVEL=debug
+            - RABBITMQ_HOST=rabbitmq
+
+networks:
+    webwisp:
+        driver: bridge
