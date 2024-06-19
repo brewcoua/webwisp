@@ -11,6 +11,12 @@ services:
         container_name: orchestrator
         depends_on:
             - rabbitmq
+        healthcheck:
+            test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
+            interval: 1m30s
+            timeout: 30s
+            retries: 5
+            start_period: 30s
 
     rabbitmq:
         image: rabbitmq:3-management

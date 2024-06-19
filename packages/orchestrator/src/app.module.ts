@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config'
 import { CqrsModule } from '@nestjs/cqrs'
 
 import TasksModule from './modules/tasks'
+import HealthModule from './modules/health'
 
 @Module({
     imports: [
@@ -12,6 +13,7 @@ import TasksModule from './modules/tasks'
         }),
         CqrsModule.forRoot(),
 
+        HealthModule,
         TasksModule,
     ],
     controllers: [],

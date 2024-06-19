@@ -1,7 +1,4 @@
 FROM node:iron-slim AS base
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
-RUN corepack enable
 
 ENV PACKAGE=worker
 
@@ -10,12 +7,11 @@ COPY . /cwd
 WORKDIR /cwd
 
 FROM build-base AS prod-deps
-RUN pnpm config set node-linker hoisted --location=project
-RUN pnpm install --frozen-lockfile --prod --filter @webwisp/${PACKAGE}
+RUN npm install -w @webwisp/${PACKAGE} --omit=dev --omit=optional
 
 FROM build-base AS build
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --filter @webwisp/${PACKAGE}
-RUN pnpm exec lerna run build --scope @webwisp/${PACKAGE}
+RUN npm install
+RUN npm run build -w @webwisp/${PACKAGE}
 
 FROM base AS runtime
 ENV NODE_ENV=production

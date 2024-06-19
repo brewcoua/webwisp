@@ -2,43 +2,49 @@
 
 A web agent for automatic end-to-end testing of websites.
 This agent was made during my internship at [LaBRI](https://www.labri.fr/), a computer science laboratory in Bordeaux, France.
-It is made in 2 parts:
+It is made of 3 docker images:
 
--   The server, which is a REST API made with NestJS, that handles the whole agent part, with the creation of runners, the execution of tasks on target websites, and the storage of the results.
--   The client, which is an Electron app made with Preact, that allows connecting to any ongoing server, and to create, edit, and run tasks on target websites.
+-   An orchestrator, which manages the tasks dispatched to a pool of workers, and allows viewing the results of the tasks and workers through http endpoints.
+-   Workers, which run the tasks dispatched by the orchestrator. (replicated for scalability)
+-   A RabbitMQ server, which is used as a message broker between the orchestrator and the workers.
 
 ## Installation
 
-> [!NOTE]
-> The repository uses [pnpm](https://pnpm.io/) as the package manager, and [lerna](https://lerna.js.org/) for managing the monorepo.
+First of all, depending on if you want to run the agent in development or production, you will need to install the following dependencies:
 
-### Server
+### Development
 
-1. Clone the repository
-2. Install the dependencies with `pnpm install` and go to the `apps/server` folder
-3. Create a `.env` file at the root of the server folder, and fill it with the following content:
+1. Install [Node.js](https://nodejs.org/en/download/), along with [RabbitMQ](https://www.rabbitmq.com/docs/download).
+2. Install npm dependencies with the following command:
 
-```
-LOG_LEVEL=info # The log level of the server, default is info
-
-OPENAI_API_KEY=sk-XXXXXXXXXXXXXXXXXXXXXXXX # Your OpenAI API key
-OPENAI_ORG=org-XXXXXXXXXXXXXXXXXXXXXXXX # Your OpenAI organization
-OPENAI_PROJECT=proj-XXXXXXXXXXXXXXXXXXXXXXXX # Your OpenAI project
+```sh
+npm install
 ```
 
-These environment variables can also be set in the environment.
+3. Use the following command to start a few workers at once:
 
-4. Start the server with `pnpm start`
+```sh
+npm run start:bulk -w @webwisp/worker
+```
 
-For easily deploying the server in production, a Dockerfile is provided at the root of the server folder.
+4. Use the following command to start the orchestrator:
 
-### Client
+```sh
+npm run start -w @webwisp/orchestrator
+```
 
-1. Clone the repository
-2. Install the dependencies with `pnpm install` and go to the `apps/client` folder
-3. Start the client with `pnpm start` or `pnpm dev` for development
+5. Done! If your RabbitMQ is properly running, you should be able to access the orchestrator at `http://localhost:3000` and the api docs at `http://localhost:3000/docs`.
 
-Currently, the client is not ready for a release, but it will be available soon as prebuilt in the releases.
+### Production
+
+1. Install [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/).
+2. A `docker-compose.yml` file is provided at the root of the repository. You can use it to start the agent with the following command:
+
+```sh
+docker-compose up --build -d
+```
+
+3. Done! Everything is handled by Docker, and you should be able to access the orchestrator at `http://localhost:3000` and the api docs at `http://localhost:3000/docs`.
 
 ## Usage
 
