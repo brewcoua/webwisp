@@ -8,12 +8,8 @@ For instructions, see the [README.md](../../README.md) in the root of the reposi
 
 ## Configuration
 
-The agent can be configured through environment variables.
-The following environment variables can be set:
-
--   `OPENAI_API_KEY`: The OpenAI API key to use for the agent. **_Required_**
--   `OPENAI_ORG` : The OpenAI organization to use for the agent.
--   `OPENAI_PROJECT`: The OpenAI project to use for the agent.
+Nothing is required to configure the worker. It will automatically connect to the RabbitMQ server and start listening for tasks.
+Make sure to set up the OpenAI config through docker secrets, as described in the root README.
 
 Make sure that the server has enough memory to run the worker. If the worker hangs, it may be due to a lack of memory.
 Usually, somewhere around 500-600MB of memory is enough for a single worker, without counting the orchestrator and RabbitMQ.
