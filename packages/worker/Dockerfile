@@ -29,9 +29,6 @@ ENV NODE_ENV=production
 
 COPY ./LICENSE-MIT ./LICENSE-APACHE ./packages/${PACKAGE}/README.md ./packages/${PACKAGE}/package.json /app/
 
-# If a .env is present, copy it to the app directory
-COPY ./packages/${PACKAGE}/.env /app/.env
-
 COPY --from=prod-deps /cwd/node_modules /app/node_modules
 COPY --from=build /cwd/packages/${PACKAGE}/dist /app/dist
 

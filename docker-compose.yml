@@ -21,8 +21,6 @@ services:
             - FORCE_COLOR=1
             - LOG_LEVEL=debug
             - RABBITMQ_HOST=rabbitmq
-            - RABBITMQ_USER=guest
-            - RABBITMQ_PASS=guest
 
     rabbitmq:
         image: rabbitmq:3-management
@@ -53,12 +51,19 @@ services:
         depends_on:
             rabbitmq:
                 condition: service_healthy
+        restart: on-failure
         environment:
             - FORCE_COLOR=1
             - LOG_LEVEL=debug
             - RABBITMQ_HOST=rabbitmq
-        restart: on-failure
+            - OPENAI_CONFIG_FILE=/run/secrets/openai-config
+        secrets:
+            - openai-config
 
 networks:
     webwisp:
         driver: bridge
+
+secrets:
+    openai-config:
+        file: ./.secrets/openai.json

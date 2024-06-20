@@ -4,14 +4,7 @@ dist/
 coverage/
 videos/
 *.log
-
-.env*
 *.tsbuildinfo
 
-
-
-
-
-
-.nx/cache
-.nx/workspace-data
+.env*
+.secrets/

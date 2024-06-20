@@ -1,4 +1,5 @@
 import OpenAI from 'openai'
+import { readFileSync, existsSync } from 'fs'
 
 import MindModel from './mind.model'
 import Message from '../domain/Message'
@@ -15,14 +16,22 @@ export default class OpenAIModel extends MindModel<OpenAI> {
     constructor() {
         super('OpenAI')
 
-        if (!process.env.OPENAI_API_KEY) {
-            throw new Error('OPENAI_API_KEY is not set')
+        if (!process.env.OPENAI_CONFIG_FILE) {
+            throw new Error('OPENAI_CONFIG_FILE is not set')
         }
 
+        if (!existsSync(process.env.OPENAI_CONFIG_FILE)) {
+            throw new Error('OPENAI_CONFIG_FILE does not exist')
+        }
+
+        const config = JSON.parse(
+            readFileSync(process.env.OPENAI_CONFIG_FILE, 'utf-8')
+        )
+
         this.client = new OpenAI({
-            apiKey: process.env.OPENAI_API_KEY,
-            organization: process.env.OPENAI_ORG,
-            project: process.env.OPENAI_PROJECT,
+            apiKey: config.key,
+            organization: config.org,
+            project: config.project,
         })
         this.mapper = new OpenAIMapper()
     }

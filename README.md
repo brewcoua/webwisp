@@ -11,13 +11,25 @@ It is made of 3 docker images:
 ## Installation
 
 1. Install [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/).
-2. A `docker-compose.yml` file is provided at the root of the repository. You can use it to start the agent with the following command:
+2. Setup the OpenAI API config following this format as a file in `.secrets/openai.json`:
+
+```json
+{
+    "key": "your-openai-api-key",
+    "org": "optional-organization-id",
+    "project": "optional-project-id"
+}
+```
+
+A missing, wrong or not sufficiently privileged OpenAI API key will result in an error at startup. (i.e. it requires access to the `gpt-4o` model)
+
+3. A `docker-compose.yml` file is provided at the root of the repository. You can use it to start the agent with the following command:
 
 ```sh
 docker-compose up --build -d
 ```
 
-3. Done! Everything is handled by Docker, and you should be able to access the orchestrator at `http://localhost:3000` and the api docs at `http://localhost:3000/docs`.
+4. Done! Everything is handled by Docker, and you should be able to access the orchestrator at `http://localhost:3000` and the api docs at `http://localhost:3000/docs`.
 
 > [!NOTE]
 > You can tweak the number of workers by changing the `replicas` field in the `docker-compose.yml` file.
