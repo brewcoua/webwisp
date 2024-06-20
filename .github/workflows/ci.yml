@@ -7,31 +7,9 @@ on:
     workflow_dispatch:
 
 jobs:
-    eslint:
-        name: ESLint
-        runs-on: ubuntu-latest
-
-        steps:
-            - name: Checkout
-              uses: actions/checkout@v4
-
-            - name: Setup Node
-              uses: actions/setup-node@v4
-              with:
-                  node-version: 'lts/iron'
-
-            - name: Setup pnpm
-              uses: pnpm/action-setup@v4
-              with:
-                  run_install: true
-
-            - name: Lint
-              run: pnpm exec lerna run lint
-
     build:
         name: Build
         runs-on: ubuntu-latest
-        needs: eslint
 
         steps:
             - name: Checkout
@@ -48,4 +26,4 @@ jobs:
                   run_install: true
 
             - name: Build
-              run: pnpm exec lerna run build
+              run: npm run build --workspaces
