@@ -20,10 +20,8 @@ jobs:
               with:
                   node-version: 'lts/iron'
 
-            - name: Setup pnpm
-              uses: pnpm/action-setup@v4
-              with:
-                  run_install: true
+            - name: Install Dependencies
+              run: npm ci
 
             - name: Build
               run: npm run build --workspaces
