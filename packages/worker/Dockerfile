@@ -1,4 +1,5 @@
 FROM node:iron-slim AS base
+LABEL org.opencontainers.image.source="https://github.com/brewcoua/webwisp"
 
 ENV PACKAGE=worker
 
