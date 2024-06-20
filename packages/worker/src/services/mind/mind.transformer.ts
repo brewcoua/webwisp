@@ -1,7 +1,7 @@
 import { readFileSync } from 'node:fs'
 import { join as joinPath } from 'node:path'
 
-import config from 'src/worker.config'
+import config from '@services/exec/execution.config'
 import prompts, {
     MindPromptPlaceholders,
     MindPromptUserPlaceholders,

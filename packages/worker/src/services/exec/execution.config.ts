@@ -4,9 +4,12 @@ import ActionType from '@domain/ActionType'
 
 const config: RunnerConfig = {
     cycles: {
-        max: 10,
-        failed: 3,
-        format: 3,
+        total: 10,
+        failed: {
+            total: 5,
+            action: 3,
+            format: 3,
+        },
     },
     actions: {
         click: {
@@ -100,11 +103,15 @@ export type RunnerConfig = {
     /** Settings related to the number of cycles to run for a task */
     cycles: {
         /** Maximum number of cycles to run for a task, regardless of success. (e.g. 10, means a maximum of 10 actions for a task) */
-        max: IntRange<1, 100>
-        /** Maximum number of failed cycles before stopping the task. (e.g. 3, means if 3 cycles fail, the task is stopped) */
-        failed: IntRange<1, 10>
-        /** Maximum number of retries for format errors (e.g. model not following the format, leading to parsing errors) */
-        format: IntRange<1, 10>
+        total: IntRange<1, 100>
+        failed: {
+            /** Maximum number of failed cycles before the task is considered failed */
+            total: IntRange<1, 100>
+            /** Maximum number of failed actions before the task is considered failed */
+            action: IntRange<1, 10>
+            /** Maximum number of failed formats before the task is considered failed */
+            format: IntRange<1, 10>
+        }
     }
     /** Definitions of actions that can be performed */
     actions: {

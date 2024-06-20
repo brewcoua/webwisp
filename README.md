@@ -10,33 +10,6 @@ It is made of 3 docker images:
 
 ## Installation
 
-First of all, depending on if you want to run the agent in development or production, you will need to install the following dependencies:
-
-### Development
-
-1. Install [Node.js](https://nodejs.org/en/download/), along with [RabbitMQ](https://www.rabbitmq.com/docs/download).
-2. Install npm dependencies with the following command:
-
-```sh
-npm install
-```
-
-3. Use the following command to start a few workers at once:
-
-```sh
-npm run start:bulk -w @webwisp/worker
-```
-
-4. Use the following command to start the orchestrator:
-
-```sh
-npm run start -w @webwisp/orchestrator
-```
-
-5. Done! If your RabbitMQ is properly running, you should be able to access the orchestrator at `http://localhost:3000` and the api docs at `http://localhost:3000/docs`.
-
-### Production
-
 1. Install [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/).
 2. A `docker-compose.yml` file is provided at the root of the repository. You can use it to start the agent with the following command:
 
@@ -46,10 +19,8 @@ docker-compose up --build -d
 
 3. Done! Everything is handled by Docker, and you should be able to access the orchestrator at `http://localhost:3000` and the api docs at `http://localhost:3000/docs`.
 
-## Usage
-
-The client can be used to connect to any server running the agent, and to create, edit, and run tasks on target websites.
-As this is currently work in progress, servers do not require authentication, and the client can connect to any server running the agent.
+> [!NOTE]
+> You can tweak the number of workers by changing the `replicas` field in the `docker-compose.yml` file.
 
 ## License
 

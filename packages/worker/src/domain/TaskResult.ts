@@ -1,3 +1,4 @@
+import ActionReport from './ActionReport'
 import TaskStatus from './TaskStatus'
 
 export default interface TaskResult {
@@ -5,4 +6,5 @@ export default interface TaskResult {
     status: TaskStatus
     message: string
     value?: string
+    actions: ActionReport[]
 }

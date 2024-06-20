@@ -32,7 +32,7 @@ export default class BrowserService {
                 `Browser initialized, CDP listening on http://localhost:${REMOTE_PORT}`
             )
         } catch (err: any) {
-            this.logger.crit('Failed to launch browser', {
+            this.logger.error('Failed to launch browser', {
                 stack: err.stack,
             })
             throw new Error('Failed to launch browser: ' + err)

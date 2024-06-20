@@ -35,7 +35,7 @@ const prompts: Prompts = {
                 message:
                     'To help you with the task, here are some examples of input/output pairs:',
                 list: [
-                    {
+                    /*{
                         screenshot: './assets/examples/1.png',
                         prompt:
                             'Title: LaBRI - Laboratoire Bordelais de Recherche en Informatique\n' +
@@ -53,7 +53,7 @@ const prompts: Prompts = {
                             '$ Click on the "MENU" button\n' +
                             'click 2\n' +
                             '~~~',
-                    },
+                    },*/
                 ],
             },
         },

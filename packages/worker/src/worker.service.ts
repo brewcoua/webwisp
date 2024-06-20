@@ -2,8 +2,11 @@ import makeLogger from '@configs/logger'
 import { Logger } from 'winston'
 import amqp from 'amqplib'
 
-import { ResultsRepository, TasksRepository } from './repositories'
+import BrowserService from '@services/browser'
+import MindService from '@services/mind'
 import RabbitMQService from '@services/rabbitmq'
+import ExecutionService from '@services/exec'
+
 import Task from '@domain/Task'
 
 export default class WorkerService {
@@ -11,32 +14,26 @@ export default class WorkerService {
         context: 'WorkerService',
     })
 
-    private rabbitMQService: RabbitMQService | null = null
-
-    private tasksRepository: TasksRepository | null = null
-    private resultsRepository: ResultsRepository | null = null
+    private execution: ExecutionService | null = null
+    public rabbitmq: RabbitMQService | null = null
+    public browser: BrowserService | null = null
+    public mind: MindService | null = null
 
     async initialize() {
         this.logger.info('Initializing WorkerService')
 
-        this.rabbitMQService = new RabbitMQService()
-        await this.rabbitMQService.initialize()
+        this.rabbitmq = new RabbitMQService(this.logger)
+        this.browser = new BrowserService(this.logger)
+        this.mind = new MindService(this.logger)
 
-        this.tasksRepository = new TasksRepository(this.rabbitMQService)
-        await this.tasksRepository.initialize()
+        await Promise.all([
+            this.rabbitmq.initialize(),
+            this.browser.initialize(),
+            this.mind.initialize(),
+        ])
 
-        this.tasksRepository.bind((msg) => {
-            const task: Task = JSON.parse(msg.content.toString())
-            this.handleTask(msg, task)
-        })
-
-        this.resultsRepository = new ResultsRepository(this.rabbitMQService)
-        await this.resultsRepository.initialize()
+        this.execution = new ExecutionService(this, this.logger)
 
         this.logger.info('WorkerService initialized')
-    }
-
-    async handleTask(msg: amqp.ConsumeMessage, task: Task) {
-        this.logger.info('Handling task', { task })
     }
 }

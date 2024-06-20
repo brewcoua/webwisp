@@ -13,7 +13,7 @@ export default class RabbitMQRepository {
             `amqp://${process.env.RABBITMQ_HOST || 'localhost'}`
         )
         this.channel = await this.connection.createChannel()
-        await this.channel.assertQueue('tasks_queue', { durable: true })
+        await this.channel.assertQueue('tasks', { durable: true })
     }
 
     publish(message: string): boolean {
@@ -21,7 +21,7 @@ export default class RabbitMQRepository {
             throw new Error('Channel not initialized')
         }
 
-        return this.channel.sendToQueue('tasks_queue', Buffer.from(message))
+        return this.channel.sendToQueue('tasks', Buffer.from(message))
     }
 
     async close() {
