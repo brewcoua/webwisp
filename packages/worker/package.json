@@ -13,7 +13,7 @@
         "type": "git",
         "url": "git+ssh@github.com:brewcoua/webwisp.git"
     },
-    "homepage": "https://github.com/brewcoua/webwisp/tree/master/packages/orchestrator#readme",
+    "homepage": "https://github.com/brewcoua/webwisp/tree/master/packages/worker#readme",
     "bugs": {
         "url": "https://github.com/brewcoua/webwisp/issues",
         "email": "contact@brewen.dev"

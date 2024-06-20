@@ -66,10 +66,10 @@ export const prettyFormat = format.combine(
 
         return `${chalk.gray(timestamp || new Date().toISOString())}${sep}${levelStr}${
             context ? sep + chalk.cyan(context.padStart(PADDINGS.context)) : ''
-        }${sep} ${
-            isError ? chalk.red(message) : message
-        }${Object.keys(rest).length ? '\n' + JSON.stringify(rest, null, 2) : ''}${
-            stack ? '\n' + chalk.gray.italic(stack) : ''
-        }`
+        }${sep} ${isError ? chalk.red(message) : message}${
+            Object.keys(rest).length
+                ? '\n' + chalk.gray(JSON.stringify(rest, null, 2))
+                : ''
+        }${stack ? '\n' + chalk.gray.italic(stack) : ''}`
     })
 )

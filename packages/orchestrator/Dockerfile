@@ -22,12 +22,21 @@ WORKDIR /cwd
 
 RUN npm run build -w @webwisp/${PACKAGE}
 
+FROM base AS build-client
+COPY ./packages/client /cwd/packages/client
+COPY ./package.json ./package-lock.json /cwd/
+WORKDIR /cwd
+
+RUN npm install
+RUN npm run build -w @webwisp/client
+
 FROM base AS runtime
 ENV NODE_ENV=production
 
 COPY ./LICENSE-MIT ./LICENSE-APACHE ./packages/${PACKAGE}/README.md ./packages/${PACKAGE}/package.json /app/
 COPY --from=prod-deps /cwd/node_modules /app/node_modules
 COPY --from=build /cwd/packages/${PACKAGE}/dist /app/dist
+COPY --from=build-client /cwd/packages/client/dist /app/public
 
 WORKDIR /app
 

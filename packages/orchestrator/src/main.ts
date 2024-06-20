@@ -2,6 +2,8 @@ import { NestFactory } from '@nestjs/core'
 import { ValidationPipe } from '@nestjs/common'
 import { SwaggerModule } from '@nestjs/swagger'
 import { WinstonModule } from 'nest-winston'
+import { NextFunction, Request, Response } from 'express'
+import { join } from 'path'
 
 import { AppModule } from './app.module'
 import makeSwaggerConfig from './configs/swagger'
@@ -15,11 +17,24 @@ async function bootstrap() {
             instance: logger,
         }),
     })
+
+    app.setGlobalPrefix('api')
     app.useGlobalPipes(new ValidationPipe())
     app.getHttpAdapter().getInstance().disable('x-powered-by')
 
     const document = SwaggerModule.createDocument(app, makeSwaggerConfig())
-    SwaggerModule.setup('docs', app, document)
+    SwaggerModule.setup('/api/docs', app, document)
+
+    app.use((req: Request, res: Response, next: NextFunction) => {
+        if (
+            !req.originalUrl.startsWith('/api') &&
+            !req.originalUrl.startsWith('/assets')
+        ) {
+            res.sendFile(join(__dirname, '..', 'public', 'index.html'))
+        } else {
+            next()
+        }
+    })
 
     let port = parseInt(process.env.PORT || '')
     if (!port || isNaN(port) || port > 65535 || port < 1) {

@@ -35,6 +35,7 @@
     },
     "workspaces": [
         "packages/orchestrator",
-        "packages/worker"
+        "packages/worker",
+        "packages/client"
     ]
 }
