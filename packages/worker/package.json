@@ -25,7 +25,7 @@
     "scripts": {
         "start": "npm run build && npm run start:prod",
         "start:prod": "node dist/main.js",
-        "build": "npx rollup -c",
+        "build": "npx rollup -c && cp -r ./assets ./dist/assets",
         "build:watch": "npx rollup -c -w",
         "format": "npx prettier --write ./src/**/*.ts"
     },
