@@ -41,8 +41,7 @@ export default class WorkersController {
     subscribe(): Observable<MessageEvent> {
         return fromEvent(this.eventEmitter, 'worker').pipe(
             map((event) => {
-                const { type, ...data } = event as WorkerEvent
-                return new MessageEvent(type, { data })
+                return new MessageEvent('message', { data: event })
             })
         )
     }

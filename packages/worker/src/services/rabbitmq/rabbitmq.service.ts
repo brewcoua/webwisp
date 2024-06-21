@@ -80,6 +80,14 @@ export default class RabbitMQService {
         return this.tasksQueue
     }
 
+    ackTask(msg: amqp.ConsumeMessage) {
+        if (!this.tasksQueue) {
+            throw new Error('Tasks queue is not initialized')
+        }
+
+        this.tasksQueue.ack(msg)
+    }
+
     emitEvent(event: WorkerEvent): boolean {
         if (!this.eventsQueue) {
             throw new Error('Events queue is not initialized')

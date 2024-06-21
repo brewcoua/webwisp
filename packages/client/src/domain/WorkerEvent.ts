@@ -1,5 +1,5 @@
-import { Task } from '@modules/tasks/domain'
 import ActionReport from './ActionReport'
+import { Task } from './Task'
 import TaskResult from './TaskResult'
 import Worker from './Worker'
 
@@ -21,7 +21,7 @@ export type WorkerEvent = (
 
 export type StartedWorkerEvent = {
     type: WorkerEventType.STARTED
-    worker?: Worker
+    worker: Worker
 }
 export type TaskStartedWorkerEvent = {
     type: WorkerEventType.TASK_STARTED

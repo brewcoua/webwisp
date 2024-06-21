@@ -40,7 +40,8 @@ export default class ExecutionService {
             result,
         })
         if (status) {
-            this.logger.info('Published result', { status })
+            this.logger.info('Published result for task', { id: task.id })
+            this.worker.rabbitmq?.ackTask(msg)
         } else {
             this.logger.error('Failed to publish result')
         }
@@ -88,9 +89,10 @@ export default class ExecutionService {
                     if (action.type === ActionType.Done) {
                         return {
                             id: task.id,
-                            status: action.arguments.success
-                                ? TaskStatus.COMPLETED
-                                : TaskStatus.FAILED,
+                            status:
+                                action.arguments.status === 'success'
+                                    ? TaskStatus.COMPLETED
+                                    : TaskStatus.FAILED,
                             message: action.arguments.reason.toString(),
                             value: action.arguments.value as string | undefined,
                             actions,

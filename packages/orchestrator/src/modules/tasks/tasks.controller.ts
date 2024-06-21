@@ -22,7 +22,7 @@ export default class TasksController {
         private readonly workersService: WorkersService
     ) {}
 
-    @Post('create')
+    @Post()
     @HttpCode(201)
     @ApiOperation({
         summary: 'Create a new task',

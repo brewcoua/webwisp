@@ -79,19 +79,22 @@ export default class WorkersService {
                         msg.content.toString()
                     )
                     switch (event.type) {
-                        case WorkerEventType.STARTED:
-                            this.workers.append({
+                        case WorkerEventType.STARTED: {
+                            const worker = {
                                 id: event.id,
                                 tag: msg.fields.consumerTag,
                                 status: WorkerStatus.READY,
                                 createdAt: new Date(),
                                 updatedAt: new Date(),
-                            })
+                            }
+                            this.workers.append(worker)
                             Logger.log(
                                 `Worker ${event.id} connected`,
                                 'WorkersService'
                             )
+                            event.worker = worker
                             break
+                        }
                         case WorkerEventType.TASK_STARTED: {
                             const worker = this.workers.findById(event.id)
                             if (worker) {
