@@ -13,6 +13,7 @@ import ActionType from '@domain/ActionType'
 import TaskStatus from '@domain/TaskStatus'
 import { PageWrapper } from '@services/browser/wrappers'
 import ActionStatus from '@domain/ActionStatus'
+import { WorkerEventType } from '@domain/WorkerEvent'
 
 export default class ExecutionService {
     private readonly logger: Logger
@@ -34,7 +35,10 @@ export default class ExecutionService {
         const result = await this.execute(task)
         this.logger.info('Task executed', { result })
 
-        const status = this.worker.rabbitmq?.publishResult(result)
+        const status = this.worker.rabbitmq?.emitEvent({
+            type: WorkerEventType.TASK_COMPLETED,
+            result,
+        })
         if (status) {
             this.logger.info('Published result', { status })
         } else {
@@ -44,6 +48,10 @@ export default class ExecutionService {
 
     async execute(task: Task): Promise<TaskResult> {
         this.logger.verbose('Executing task', { id: task.id })
+        this.worker.rabbitmq?.emitEvent({
+            type: WorkerEventType.TASK_STARTED,
+            task,
+        })
 
         const actions: ActionReport[] = []
         const cycles = {
@@ -92,6 +100,10 @@ export default class ExecutionService {
                         id: task.id,
                         cycle: cycles.total,
                         action: action,
+                    })
+                    this.worker.rabbitmq?.emitEvent({
+                        type: WorkerEventType.CYCLE_COMPLETED,
+                        report: cycleResult.report,
                     })
                     break
                 }

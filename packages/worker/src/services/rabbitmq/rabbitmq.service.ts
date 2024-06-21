@@ -1,4 +1,4 @@
-import TaskResult from '@domain/TaskResult'
+import { WorkerEvent, WorkerEventType } from '@domain/WorkerEvent'
 import amqp from 'amqplib'
 import { Logger } from 'winston'
 
@@ -6,11 +6,14 @@ export default class RabbitMQService {
     private connection: amqp.Connection | null = null
 
     public tasksQueue: amqp.Channel | null = null
-    public resultsQueue: amqp.Channel | null = null
+    public eventsQueue: amqp.Channel | null = null
 
     private readonly logger: Logger
 
-    constructor(logger: Logger) {
+    constructor(
+        private readonly id: string,
+        logger: Logger
+    ) {
         this.logger = logger.child({
             context: 'RabbitMQService',
         })
@@ -24,10 +27,31 @@ export default class RabbitMQService {
         this.tasksQueue = await this.createChannel()
         await this.createQueue(this.tasksQueue, 'tasks')
 
-        this.resultsQueue = await this.createChannel()
-        await this.createQueue(this.resultsQueue, 'results')
+        this.eventsQueue = await this.createChannel()
+        await this.createQueue(this.eventsQueue, 'events')
 
         this.logger.info('RabbitMQService initialized')
+        this.emitEvent({
+            type: WorkerEventType.STARTED,
+        })
+    }
+
+    async close() {
+        if (this.tasksQueue) {
+            await this.tasksQueue.close()
+        }
+        if (this.eventsQueue) {
+            this.emitEvent({
+                type: WorkerEventType.DISCONNECT,
+            })
+            await this.eventsQueue.close()
+        }
+
+        if (this.connection) {
+            await this.connection.close()
+        }
+
+        this.logger.info('RabbitMQService closed')
     }
 
     private async createChannel() {
@@ -56,14 +80,19 @@ export default class RabbitMQService {
         return this.tasksQueue
     }
 
-    publishResult(result: TaskResult): boolean {
-        if (!this.resultsQueue) {
-            throw new Error('Results queue is not initialized')
+    emitEvent(event: WorkerEvent): boolean {
+        if (!this.eventsQueue) {
+            throw new Error('Events queue is not initialized')
         }
 
-        return this.resultsQueue.sendToQueue(
-            'results',
-            Buffer.from(JSON.stringify(result))
+        return this.eventsQueue.sendToQueue(
+            'events',
+            Buffer.from(
+                JSON.stringify({
+                    ...event,
+                    id: this.id,
+                })
+            )
         )
     }
 }

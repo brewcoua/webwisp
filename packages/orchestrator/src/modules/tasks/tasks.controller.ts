@@ -1,15 +1,25 @@
-import { Controller, Post, Body, HttpCode } from '@nestjs/common'
-import { CommandBus, QueryBus } from '@nestjs/cqrs'
+import {
+    Controller,
+    Post,
+    Body,
+    HttpCode,
+    Get,
+    InternalServerErrorException,
+} from '@nestjs/common'
 import { ApiOperation, ApiResponse } from '@nestjs/swagger'
+import { nanoid } from 'nanoid'
+import { EventEmitter2 } from '@nestjs/event-emitter'
 
 import { CreateTaskDto, TaskIdDto } from './dtos'
-import { CreateTaskCommand } from './commands'
+
+import { WorkersService } from '@modules/workers'
+import { TaskResultEntity } from '@modules/workers/domain/TaskResult'
 
 @Controller('tasks')
 export default class TasksController {
     constructor(
-        private readonly commandBus: CommandBus,
-        private readonly queryBus: QueryBus
+        private readonly eventEmitter: EventEmitter2,
+        private readonly workersService: WorkersService
     ) {}
 
     @Post('create')
@@ -23,11 +33,35 @@ export default class TasksController {
         description: 'Task created',
         type: TaskIdDto,
     })
-    async create(@Body() createTaskDto: CreateTaskDto) {
-        const id: string = await this.commandBus.execute(
-            new CreateTaskCommand(createTaskDto)
-        )
+    create(@Body() createTaskDto: CreateTaskDto) {
+        const id = nanoid()
+        const result = this.workersService.publishTask({
+            id,
+            createdAt: new Date(),
+            target: createTaskDto.target,
+            prompt: createTaskDto.prompt,
+        })
 
-        return { id }
+        if (result) {
+            return { id }
+        }
+        throw new InternalServerErrorException(
+            'Failed to create task due to an internal error'
+        )
+    }
+
+    @Get('results')
+    @ApiOperation({
+        summary: 'Get all task results',
+        description: 'Returns a list of all task results',
+    })
+    @ApiResponse({
+        status: 200,
+        description: 'List of task results',
+        type: TaskResultEntity,
+        isArray: true,
+    })
+    getResults() {
+        return this.workersService.getResults()
     }
 }

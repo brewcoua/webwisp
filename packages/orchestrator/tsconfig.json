@@ -24,8 +24,10 @@
         "baseUrl": ".",
 
         "paths": {
+            "@domain/*": ["src/domain/*"],
             "@configs/*": ["src/configs/*"],
             "@modules/*": ["src/modules/*"],
+            "@services/*": ["src/services/*"],
         }
     },
     "include": ["src/**/*"],

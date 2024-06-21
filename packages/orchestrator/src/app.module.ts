@@ -1,11 +1,12 @@
 import { Logger, Module } from '@nestjs/common'
 import { ConfigModule } from '@nestjs/config'
-import { CqrsModule } from '@nestjs/cqrs'
 import { ServeStaticModule } from '@nestjs/serve-static'
+import { EventEmitterModule } from '@nestjs/event-emitter'
 import { join } from 'path'
 
 import TasksModule from './modules/tasks'
 import HealthModule from './modules/health'
+import { WorkersModule } from '@modules/workers'
 
 @Module({
     imports: [
@@ -13,12 +14,13 @@ import HealthModule from './modules/health'
             envFilePath: '.env',
             isGlobal: true,
         }),
-        CqrsModule.forRoot(),
+        EventEmitterModule.forRoot(),
         ServeStaticModule.forRoot({
             rootPath: join(__dirname, '..', 'public'),
             exclude: ['/api*'],
         }),
 
+        WorkersModule,
         HealthModule,
         TasksModule,
     ],

@@ -1,5 +1,15 @@
 import { ApiProperty } from '@nestjs/swagger'
 
+export interface Task extends PartialTask {
+    id: string
+    createdAt: Date
+}
+
+export interface PartialTask {
+    target: string
+    prompt: string
+}
+
 export class TaskEntity implements Task {
     @ApiProperty({
         description: 'The ID of the task',
@@ -35,14 +45,4 @@ export class TaskEntity implements Task {
         this.target = target
         this.prompt = prompt
     }
-}
-
-export interface Task extends PartialTask {
-    id: string
-    createdAt: Date
-}
-
-export interface PartialTask {
-    target: string
-    prompt: string
 }

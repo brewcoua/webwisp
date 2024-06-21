@@ -1,18 +1,18 @@
 import makeLogger from '@configs/logger'
 import { Logger } from 'winston'
-import amqp from 'amqplib'
+import { nanoid } from 'nanoid'
 
 import BrowserService from '@services/browser'
 import MindService from '@services/mind'
 import RabbitMQService from '@services/rabbitmq'
 import ExecutionService from '@services/exec'
 
-import Task from '@domain/Task'
-
 export default class WorkerService {
     private readonly logger: Logger = makeLogger().child({
         context: 'WorkerService',
     })
+
+    public readonly id = nanoid()
 
     private execution: ExecutionService | null = null
     public rabbitmq: RabbitMQService | null = null
@@ -22,7 +22,7 @@ export default class WorkerService {
     async initialize() {
         this.logger.info('Initializing WorkerService')
 
-        this.rabbitmq = new RabbitMQService(this.logger)
+        this.rabbitmq = new RabbitMQService(this.id, this.logger)
         this.browser = new BrowserService(this.logger)
         this.mind = new MindService(this.logger)
 
@@ -35,5 +35,13 @@ export default class WorkerService {
         this.execution = new ExecutionService(this, this.logger)
 
         this.logger.info('WorkerService initialized')
+    }
+
+    async close() {
+        this.logger.info('Closing WorkerService')
+
+        await Promise.all([this.rabbitmq?.close(), this.browser?.destroy()])
+
+        this.logger.info('WorkerService closed')
     }
 }
