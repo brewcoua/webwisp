@@ -1,4 +1,4 @@
-import { Controller, Get, Sse } from '@nestjs/common'
+import { Controller, Get, Query, Sse } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import {
     ApiBearerAuth,
@@ -44,7 +44,9 @@ export default class WorkersController {
         status: 200,
         description: 'Worker events',
     })
-    subscribe(): Observable<MessageEvent> {
+    subscribe(
+        @Query('access_token') accessToken: string
+    ): Observable<MessageEvent> {
         return fromEvent(this.eventEmitter, 'worker').pipe(
             map((event) => {
                 return new MessageEvent('message', { data: event })
