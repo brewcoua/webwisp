@@ -12,7 +12,7 @@ services:
             rabbitmq:
                 condition: service_healthy
         healthcheck:
-            test: ['CMD', 'curl', '-f', 'http://localhost:3000/health']
+            test: ['CMD', 'curl', '-f', 'http://localhost:3000/api/health']
             interval: 1m30s
             timeout: 30s
             retries: 5
@@ -21,6 +21,9 @@ services:
             - FORCE_COLOR=1
             - LOG_LEVEL=debug
             - RABBITMQ_HOST=rabbitmq
+            - CONFIG_FILE=/run/secrets/config
+        secrets:
+            - config
 
     rabbitmq:
         image: rabbitmq:3-management
@@ -67,3 +70,5 @@ networks:
 secrets:
     openai-config:
         file: ./.secrets/openai.json
+    config:
+        file: ./.secrets/config.json

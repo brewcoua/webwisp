@@ -1,12 +1,18 @@
 import { Controller, Get, Sse } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
-import { ApiOperation, ApiResponse } from '@nestjs/swagger'
+import {
+    ApiBearerAuth,
+    ApiOperation,
+    ApiResponse,
+    ApiTags,
+} from '@nestjs/swagger'
 import { Observable, fromEvent, map } from 'rxjs'
 
 import WorkersService from './workers.service'
 import { WorkerEntity } from './domain/Worker'
-import { WorkerEvent } from './domain/WorkerEvent'
 
+@ApiTags('workers')
+@ApiBearerAuth()
 @Controller('workers')
 export default class WorkersController {
     constructor(

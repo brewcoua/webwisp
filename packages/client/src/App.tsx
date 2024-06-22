@@ -1,5 +1,6 @@
 import { Flex } from '@chakra-ui/react'
 import { Switch, Route } from 'wouter'
+
 import { Dashboard } from './pages'
 
 export default function App() {
