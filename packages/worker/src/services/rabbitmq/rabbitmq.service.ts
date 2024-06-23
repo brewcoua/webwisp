@@ -1,3 +1,4 @@
+import { useEnv } from '@configs/env'
 import { WorkerEvent, WorkerEventType } from '@domain/WorkerEvent'
 import amqp from 'amqplib'
 import { Logger } from 'winston'
@@ -20,9 +21,15 @@ export default class RabbitMQService {
     }
 
     async initialize() {
-        this.connection = await amqp.connect(
-            `amqp://${process.env.RABBITMQ_HOST || 'localhost'}`
-        )
+        const username = useEnv('RABBITMQ_DEFAULT_USER'),
+            password = useEnv('RABBITMQ_DEFAULT_PASS')
+        if (username && password) {
+            this.connection = await amqp.connect(
+                `amqp://${username}:${encodeURIComponent(password)}@rabbitmq`
+            )
+        } else {
+            this.connection = await amqp.connect(`amqp://rabbitmq`)
+        }
 
         this.tasksQueue = await this.createChannel()
         await this.createQueue(this.tasksQueue, 'tasks')

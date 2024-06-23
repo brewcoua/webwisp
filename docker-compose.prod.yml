@@ -1,10 +1,7 @@
 services:
     orchestrator:
+        image: ghcr.io/brewcoua/webwisp-orchestrator:master
         container_name: orchestrator
-
-        build:
-            context: .
-            dockerfile: ./packages/orchestrator/Dockerfile
 
         ports:
             - '3000:3000'
@@ -30,9 +27,7 @@ services:
               required: true
 
     worker:
-        build:
-            context: .
-            dockerfile: ./packages/worker/Dockerfile
+        image: ghcr.io/brewcoua/webwisp-worker:master
 
         deploy:
             mode: replicated

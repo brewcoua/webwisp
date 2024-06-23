@@ -1,5 +1,4 @@
-import { useConfig } from '@configs/env'
-
+import { useEnv } from '@configs/env'
 import { Injectable } from '@nestjs/common'
 import { PassportStrategy } from '@nestjs/passport'
 import { Request } from 'express'
@@ -17,7 +16,7 @@ export default class JwtStrategy extends PassportStrategy(Strategy) {
                 return ExtractJwt.fromAuthHeaderAsBearerToken()(req)
             },
             ignoreExpiration: false,
-            secretOrKey: useConfig().jwt.secret,
+            secretOrKey: useEnv('JWT_SECRET'),
         })
     }
 

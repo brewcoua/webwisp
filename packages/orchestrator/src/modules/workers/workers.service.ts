@@ -9,6 +9,7 @@ import { WorkerEvent, WorkerEventType } from './domain/WorkerEvent'
 import TaskResult from './domain/TaskResult'
 import Worker from './domain/Worker'
 import WorkerStatus from './domain/WorkerStatus'
+import { useEnv } from '@configs/env'
 
 @Injectable()
 export default class WorkersService {
@@ -23,9 +24,15 @@ export default class WorkersService {
     private readonly results: LinkedList<TaskResult> = new LinkedList()
 
     async initialize() {
-        this.connection = await amqp.connect(
-            `amqp://${process.env.RABBITMQ_HOST || 'localhost'}`
-        )
+        const username = useEnv('RABBITMQ_DEFAULT_USER'),
+            password = useEnv('RABBITMQ_DEFAULT_PASS')
+        if (username && password) {
+            this.connection = await amqp.connect(
+                `amqp://${username}:${encodeURIComponent(password)}@rabbitmq`
+            )
+        } else {
+            this.connection = await amqp.connect(`amqp://rabbitmq`)
+        }
 
         this.tasksChannel = await this.connection.createChannel()
         await this.tasksChannel.assertQueue('tasks')

@@ -1,13 +1,15 @@
 import { EnvVar, EnvVarType, TypedEnv } from './env.d'
 
 export const EnvVars = [
-    'JWT_SECRET',
-    'JWT_EXPIRES_IN',
-
-    'MONGODB_USER',
-    'MONGODB_PASSWORD',
-    'MONGODB_CLUSTER',
-    'MONGODB_DATABASE',
+    'OPENAI_API_KEY',
+    {
+        name: 'OPENAI_ORGANIZATION',
+        required: false,
+    },
+    {
+        name: 'OPENAI_PROJECT',
+        required: false,
+    },
 
     {
         name: 'RABBITMQ_DEFAULT_USER',
