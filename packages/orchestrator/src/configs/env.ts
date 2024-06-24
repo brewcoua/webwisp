@@ -4,10 +4,19 @@ export const EnvVars = [
     'JWT_SECRET',
     'JWT_EXPIRES_IN',
 
-    'MONGODB_USER',
+    'MONGODB_USERNAME',
     'MONGODB_PASSWORD',
     'MONGODB_CLUSTER',
     'MONGODB_DATABASE',
+
+    {
+        name: 'DEFAULT_USER',
+        required: false,
+    },
+    {
+        name: 'DEFAULT_PASSWORD',
+        required: false,
+    },
 
     {
         name: 'RABBITMQ_DEFAULT_USER',
