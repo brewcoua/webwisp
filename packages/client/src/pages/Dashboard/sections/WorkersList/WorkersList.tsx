@@ -6,6 +6,8 @@ import { $workers } from '@store/workers'
 import BentoBox from '../../BentoBox'
 import { WorkerItem } from './WorkerItem'
 
+import styles from './WorkersList.module.scss'
+
 export default function WorkersList(): JSX.Element {
     const workers = useStore($workers)
 
@@ -19,6 +21,7 @@ export default function WorkersList(): JSX.Element {
                     bottom="0"
                     right="0"
                     overflowY="auto"
+                    className={styles.workersList}
                     allowToggle
                     p={3}
                 >
