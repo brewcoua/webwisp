@@ -11,18 +11,7 @@ It is made of 3 docker images:
 ## Installation
 
 1. Install [Docker](https://docs.docker.com/get-docker/) and [Docker Compose](https://docs.docker.com/compose/install/).
-2. Setup the OpenAI API config following this format as a file in `.secrets/openai.json`:
-
-```json
-{
-    "key": "your-openai-api-key",
-    "org": "optional-organization-id",
-    "project": "optional-project-id"
-}
-```
-
-A missing, wrong or not sufficiently privileged OpenAI API key will result in an error at startup. (i.e. it requires access to the `gpt-4o` model)
-
+2. Follow the instructions in the [Configuration](#configuration) section to set up the required environment variables.
 3. A `docker-compose.yml` file is provided at the root of the repository. You can use it to start the agent with the following command:
 
 ```sh
@@ -33,6 +22,50 @@ docker-compose up --build -d
 
 > [!NOTE]
 > You can tweak the number of workers by changing the `replicas` field in the `docker-compose.yml` file.
+
+## Configuration
+
+To use the agent, a few configurations are required through .env files in the same folder as the `docker-compose.yml` file.
+
+-   `.env`:
+
+```env
+NODE_ENV=development # or production
+LOG_LEVEL=info # or debug
+
+# Optional authentication for RabbitMQ (replacing the default guest:guest)
+RABBITMQ_DEFAULT_USER="your-rabbitmq-username" # Username for the RabbitMQ account, if you want to override the default configuration
+RABBITMQ_DEFAULT_PASS="your-rabbitmq-password" # Password for the RabbitMQ account
+```
+
+-   `.env.orchestrator`:
+
+```env
+JWT_SECRET="your-secret-key" # Generate a secret key using a password generator
+JWT_EXPIRES_IN=5m # Set the expiration time for the JWT token
+
+MONGODB_USERNAME="your-mongodb-username" # Username for the MongoDB account
+MONGODB_PASSWORD="your-mongodb-password" # Password for the MongoDB account
+MONGODB_CLUSTER="your-mongodb-cluster" # MongoDB cluster URL, e.g. webwisp.d5e9b.mongodb.net
+MONGODB_DATABASE="your-mongodb-database" # Name of the MongoDB database, recommended to use something different from the production database
+
+DEFAULT_USER="your-default-username" # Default username for the first user, will not be used if the database is already populated
+DEFAULT_PASSWORD="your-default-password" # Default password for the first user
+```
+
+-   `.env.worker`:
+
+```env
+OPENAI_API_KEY="your-openai-api-key"
+OPENAI_ORGANIZATION="your-openai-organization-id" # Optional, used for grouping usage
+OPENAI_PROJECT="your-openai-project-id" # Optional, used for grouping usage
+```
+
+-   `.env.rabbitmq`: **_Optional_**
+
+```env
+# Set anything here if you want to override the default RabbitMQ configuration
+```
 
 ## License
 

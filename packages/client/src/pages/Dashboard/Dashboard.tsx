@@ -1,10 +1,15 @@
 import { Flex } from '@chakra-ui/react'
+import { useStore } from '@nanostores/preact'
 
 import LaunchTask from './sections/LaunchTask'
 import LaunchBenchmark from './sections/LaunchBenchmark'
 import WorkersList from './sections/WorkersList'
 
+import { $user } from '@store/user'
+
 export default function Dashboard(): JSX.Element {
+    const user = useStore($user)
+
     return (
         <Flex
             p={{

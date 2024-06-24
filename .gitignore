@@ -8,3 +8,5 @@ videos/
 
 .env*
 .secrets/
+
+!.env*.example

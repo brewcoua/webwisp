@@ -1,12 +1,18 @@
-import { Controller, Get, Sse } from '@nestjs/common'
+import { Controller, Get, Query, Sse } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
-import { ApiOperation, ApiResponse } from '@nestjs/swagger'
+import {
+    ApiBearerAuth,
+    ApiOperation,
+    ApiResponse,
+    ApiTags,
+} from '@nestjs/swagger'
 import { Observable, fromEvent, map } from 'rxjs'
 
 import WorkersService from './workers.service'
 import { WorkerEntity } from './domain/Worker'
-import { WorkerEvent } from './domain/WorkerEvent'
 
+@ApiTags('workers')
+@ApiBearerAuth()
 @Controller('workers')
 export default class WorkersController {
     constructor(
@@ -38,7 +44,9 @@ export default class WorkersController {
         status: 200,
         description: 'Worker events',
     })
-    subscribe(): Observable<MessageEvent> {
+    subscribe(
+        @Query('access_token') accessToken: string
+    ): Observable<MessageEvent> {
         return fromEvent(this.eventEmitter, 'worker').pipe(
             map((event) => {
                 return new MessageEvent('message', { data: event })

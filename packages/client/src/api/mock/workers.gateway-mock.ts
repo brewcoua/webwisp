@@ -1,9 +1,11 @@
 import ActionStatus from '@domain/ActionStatus'
 import ActionType from '@domain/ActionType'
+import IWorkersGateway from '@domain/gateways/workers.gateway'
+
 import Worker from '@domain/Worker'
 import WorkerStatus from '@domain/WorkerStatus'
 
-export default class WorkersGateway {
+export default class WorkersGatewayMock implements IWorkersGateway {
     async getWorkers(): Promise<Worker[]> {
         return repeat(
             [

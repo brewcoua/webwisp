@@ -1,9 +1,11 @@
+import { fetchAuthed } from '@api/client'
+import ITasksGateway from '@domain/gateways/tasks.gateway'
 import { PartialTask } from '@domain/Task'
 import TaskResult from '@domain/TaskResult'
 
-export default class TasksGateway {
+export default class TasksGateway implements ITasksGateway {
     async createTask(task: PartialTask): Promise<{ id: string }> {
-        const response = await fetch('/api/tasks', {
+        const response = await fetchAuthed('/api/tasks', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -11,7 +13,7 @@ export default class TasksGateway {
             body: JSON.stringify(task),
         })
 
-        if (!response.ok) {
+        if (!response?.ok) {
             throw new Error('Failed to create task')
         }
 
@@ -19,9 +21,9 @@ export default class TasksGateway {
     }
 
     async getResults(): Promise<TaskResult[]> {
-        const response = await fetch('/api/tasks/results')
+        const response = await fetchAuthed('/api/tasks/results')
 
-        if (!response.ok) {
+        if (!response?.ok) {
             throw new Error('Failed to fetch results')
         }
 

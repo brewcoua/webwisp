@@ -5,7 +5,11 @@ import {
     DiskHealthIndicator,
     MemoryHealthIndicator,
 } from '@nestjs/terminus'
+import { ApiTags } from '@nestjs/swagger'
 
+import { Public } from '@modules/auth/guards/public.guard'
+
+@ApiTags('health')
 @Controller('health')
 export class HealthController {
     constructor(
@@ -14,6 +18,7 @@ export class HealthController {
         private readonly memory: MemoryHealthIndicator
     ) {}
 
+    @Public()
     @Get()
     @HealthCheck()
     check() {

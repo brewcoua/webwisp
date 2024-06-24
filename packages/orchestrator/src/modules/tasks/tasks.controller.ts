@@ -6,7 +6,12 @@ import {
     Get,
     InternalServerErrorException,
 } from '@nestjs/common'
-import { ApiOperation, ApiResponse } from '@nestjs/swagger'
+import {
+    ApiBearerAuth,
+    ApiOperation,
+    ApiResponse,
+    ApiTags,
+} from '@nestjs/swagger'
 import { nanoid } from 'nanoid'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 
@@ -15,6 +20,8 @@ import { CreateTaskDto, TaskIdDto } from './dtos'
 import { WorkersService } from '@modules/workers'
 import { TaskResultEntity } from '@modules/workers/domain/TaskResult'
 
+@ApiTags('tasks')
+@ApiBearerAuth()
 @Controller('tasks')
 export default class TasksController {
     constructor(
