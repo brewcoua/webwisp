@@ -47,6 +47,8 @@ export function useEnv<T extends keyof TypedEnv>(key: T): TypedEnv[T] {
         ) {
             throw new Error(`Missing required environment variable: ${key}`)
         }
+
+        return undefined as unknown as TypedEnv[T]
     }
 
     switch (typeof EnvTypes[key]) {
