@@ -1,2 +1,2 @@
-export { default as Dashboard } from './Dashboard'
-export { default as Login } from './Login'
+export { default as ProtectedPages } from './protected'
+export { default as PublicPages } from './public'

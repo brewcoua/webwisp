@@ -35,6 +35,12 @@ export const LimitOptions: ILimitOptions = {
     },
 }
 
+export enum MessageQueues {
+    Tasks = 'tasks',
+    WorkerEvents = 'worker_events',
+    TaskEvents = 'task_events',
+}
+
 // Type definitions
 
 const ValidationKeys = ['displayName', 'username', 'email', 'password']

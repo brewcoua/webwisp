@@ -10,7 +10,6 @@ import {
 import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { Request } from 'express'
 
-import UserResponseDto from '../../dtos/user.response.dto'
 import { LocalAuthGuard } from './login.guard'
 import { LoginRequestDto } from './login.request.dto'
 import UserEntity from '../../domain/user.entity'
@@ -23,20 +22,11 @@ import { Public } from '../../guards/public.guard'
 export class LoginHttpController {
     constructor(private readonly authService: AuthService) {}
 
-    @ApiOperation({ summary: 'Login with local strategy (email & password)' })
+    @ApiOperation({ summary: 'Login with username & password' })
     @ApiResponse({
         status: HttpStatus.OK,
         description: 'User logged in successfully',
-        type: UserResponseDto,
-        headers: {
-            'Set-Cookie': {
-                description:
-                    'Cookie with session id (connect.sid) that expires in 7 days',
-                schema: {
-                    type: 'string',
-                },
-            },
-        },
+        type: LoginResponseDto,
     })
     @ApiResponse({
         status: HttpStatus.UNAUTHORIZED,

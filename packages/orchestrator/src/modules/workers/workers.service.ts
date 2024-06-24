@@ -2,75 +2,35 @@ import { Injectable, Logger } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import amqp from 'amqplib'
 
+import { MessageQueues } from '@configs/app.const'
 import LinkedList from '@domain/LinkedList'
-import { Task } from '@modules/tasks/domain'
+import { RabbitMQService } from '@services/rabbitmq'
 
 import { WorkerEvent, WorkerEventType } from './domain/WorkerEvent'
-import TaskResult from './domain/TaskResult'
 import Worker from './domain/Worker'
 import WorkerStatus from './domain/WorkerStatus'
-import { useEnv } from '@configs/env'
 
 @Injectable()
 export default class WorkersService {
-    constructor(private readonly eventEmitter: EventEmitter2) {}
+    constructor(
+        private readonly rabbitMQService: RabbitMQService,
+        private readonly eventEmitter: EventEmitter2
+    ) {}
 
-    private connection: amqp.Connection | null = null
-
-    private tasksChannel: amqp.Channel | null = null
     private eventsChannel: amqp.Channel | null = null
 
     private readonly workers: LinkedList<Worker> = new LinkedList()
-    private readonly results: LinkedList<TaskResult> = new LinkedList()
 
     async initialize() {
-        const username = useEnv('RABBITMQ_DEFAULT_USER'),
-            password = useEnv('RABBITMQ_DEFAULT_PASS')
-        if (username && password) {
-            this.connection = await amqp.connect(
-                `amqp://${username}:${encodeURIComponent(password)}@rabbitmq`
-            )
-        } else {
-            this.connection = await amqp.connect(`amqp://rabbitmq`)
-        }
-
-        this.tasksChannel = await this.connection.createChannel()
-        await this.tasksChannel.assertQueue('tasks')
-
-        this.eventsChannel = await this.connection.createChannel()
-        await this.eventsChannel.assertQueue('events')
-        this.bindEvents()
-    }
-
-    publishTask(task: Task): boolean {
-        if (!this.tasksChannel) {
-            throw new Error('Channel not initialized')
-        }
-
-        return this.tasksChannel.sendToQueue(
-            'tasks',
-            Buffer.from(JSON.stringify(task))
+        this.eventsChannel = await this.rabbitMQService.getQueue(
+            MessageQueues.WorkerEvents
         )
+
+        this.bindEvents()
     }
 
     getWorkers(): Worker[] {
         return this.workers.toArray()
-    }
-    getResults(): TaskResult[] {
-        return this.results.toArray()
-    }
-    getResult(id: string): TaskResult | null {
-        return this.results.findById(id)?.value || null
-    }
-
-    async close() {
-        if (this.tasksChannel) {
-            await this.tasksChannel.close()
-        }
-
-        if (this.connection) {
-            await this.connection.close()
-        }
     }
 
     private bindEvents(): void {
@@ -79,7 +39,7 @@ export default class WorkersService {
         }
 
         this.eventsChannel.consume(
-            'events',
+            MessageQueues.WorkerEvents,
             (msg) => {
                 if (msg) {
                     const event: WorkerEvent = JSON.parse(
@@ -102,31 +62,15 @@ export default class WorkersService {
                             event.worker = worker
                             break
                         }
-                        case WorkerEventType.TASK_STARTED: {
+                        case WorkerEventType.STATUS_CHANGED: {
                             const worker = this.workers.findById(event.id)
                             if (worker) {
-                                worker.value.status = WorkerStatus.BUSY
+                                worker.value.status = event.status
                                 worker.value.updatedAt = new Date()
-                                worker.value.task = event.task
+                                if (event.status === WorkerStatus.BUSY) {
+                                    worker.value.task_id = event.task_id
+                                }
                             }
-                            Logger.log(
-                                `Worker ${event.id} started task ${event.task.id}`,
-                                'WorkersService'
-                            )
-                            break
-                        }
-                        case WorkerEventType.TASK_COMPLETED: {
-                            const worker = this.workers.findById(event.id)
-                            if (worker) {
-                                worker.value.status = WorkerStatus.READY
-                                worker.value.updatedAt = new Date()
-                                worker.value.task = undefined
-                            }
-                            this.results.append(event.result)
-                            Logger.log(
-                                `Worker ${event.id} completed task ${event.result.id}`,
-                                'WorkersService'
-                            )
                             break
                         }
                         case WorkerEventType.DISCONNECT:

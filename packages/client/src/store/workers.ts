@@ -108,12 +108,6 @@ onMount($workers, () => {
         }
     }
 
-    client.workers.getWorkers().then((workers) => {
-        workers.forEach((worker) => {
-            addWorker(worker)
-        })
-    })
-
     return () => {
         source.close()
     }

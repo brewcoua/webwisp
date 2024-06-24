@@ -11,7 +11,7 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { CommandBus } from '@nestjs/cqrs'
 
 import { useEnv } from '@configs/env'
-import { CreateUserCommand } from './commands/create-user/create-user.command'
+import { SignUpCommand } from './commands/signup/signup.command'
 import { User, UserSchema } from './database/models/user.model'
 import AuthService from './auth.service'
 import AuthController from './auth.controller'
@@ -22,17 +22,18 @@ import { UserRepositoryPort } from './database/repositories/user.repository.port
 import { Repositories } from './database/repositories'
 
 import { LoginHttpController } from './queries/login/login.http.controller'
+import { SignUpHttpController } from './commands/signup/signup.http.controller'
 
 import { LocalStrategy } from './queries/login/login.strategy'
 import { JwtStrategy } from './guards/jwt'
 
-import { CreateUserService } from './commands/create-user/create-user.service'
+import { SignUpService } from './commands/signup/signup.service'
 
 import { LoginQueryHandler } from './queries/login/login.query-handler'
 
-const HttpControllers = [LoginHttpController]
+const HttpControllers = [LoginHttpController, SignUpHttpController]
 
-const CommandHandlers: Provider[] = [CreateUserService]
+const CommandHandlers: Provider[] = [SignUpService]
 const QueryHandlers: Provider[] = [LoginQueryHandler]
 
 const Mappers: Provider[] = [AuthMapper]
@@ -79,7 +80,7 @@ export default class AuthModule implements OnApplicationBootstrap {
                 await this.userRepository.findOneByUsername(defaultUser)
             if (!user) {
                 this.commandBus.execute(
-                    new CreateUserCommand({
+                    new SignUpCommand({
                         username: defaultUser,
                         password: defaultPassword,
                     })

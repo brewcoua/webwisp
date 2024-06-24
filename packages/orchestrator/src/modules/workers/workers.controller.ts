@@ -1,4 +1,4 @@
-import { Controller, Get, Query, Sse } from '@nestjs/common'
+import { Controller, Get, Query, Sse, UseGuards } from '@nestjs/common'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 import {
     ApiBearerAuth,
@@ -7,6 +7,9 @@ import {
     ApiTags,
 } from '@nestjs/swagger'
 import { Observable, fromEvent, map } from 'rxjs'
+
+import { ScopedJwtAuthGuard } from '@modules/auth'
+import { UserScopes } from '@modules/auth/domain/user.types'
 
 import WorkersService from './workers.service'
 import { WorkerEntity } from './domain/Worker'
@@ -31,6 +34,7 @@ export default class WorkersController {
         type: WorkerEntity,
         isArray: true,
     })
+    @UseGuards(ScopedJwtAuthGuard(UserScopes.VIEW))
     getAll() {
         return this.workersService.getWorkers()
     }
@@ -44,6 +48,7 @@ export default class WorkersController {
         status: 200,
         description: 'Worker events',
     })
+    @UseGuards(ScopedJwtAuthGuard(UserScopes.VIEW))
     subscribe(
         @Query('access_token') accessToken: string
     ): Observable<MessageEvent> {

@@ -4,8 +4,6 @@ import { AggregateID } from '@domain/ddd/entity.base'
 import { Encrypt } from '@domain/utils/encrypt'
 
 export default class UserEntity extends Entity<UserProps> {
-    protected readonly _id!: AggregateID
-
     static create(create: CreateUserProps) {
         const id = AggregateID.create()
         const props: UserProps = {

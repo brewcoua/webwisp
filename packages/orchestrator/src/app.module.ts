@@ -12,8 +12,9 @@ import { useEnv } from '@configs/env'
 import TasksModule from '@modules/tasks'
 import HealthModule from '@modules/health'
 import { WorkersModule } from '@modules/workers'
-import AuthModule from '@modules/auth'
-import { JwtAuthGuard } from '@modules/auth/guards/jwt'
+import AuthModule, { JwtAuthGuard } from '@modules/auth'
+
+import { RabbitMQModule } from '@services/rabbitmq'
 
 @Module({
     imports: [
@@ -38,6 +39,8 @@ import { JwtAuthGuard } from '@modules/auth/guards/jwt'
                 appName: 'orchestrator',
             }
         ),
+
+        RabbitMQModule,
 
         WorkersModule,
         HealthModule,

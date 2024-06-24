@@ -1,21 +1,15 @@
-import { Task } from '@modules/tasks/domain'
-import ActionReport from './ActionReport'
-import TaskResult from './TaskResult'
 import Worker from './Worker'
+import WorkerStatus from './WorkerStatus'
 
 export enum WorkerEventType {
     STARTED = 'started',
-    TASK_STARTED = 'task-started',
-    CYCLE_COMPLETED = 'cycle-completed',
-    TASK_COMPLETED = 'task-completed',
+    STATUS_CHANGED = 'status-changed',
     DISCONNECT = 'disconnect',
 }
 
 export type WorkerEvent = (
     | StartedWorkerEvent
-    | TaskStartedWorkerEvent
-    | CycleCompletedWorkerEvent
-    | TaskCompletedWorkerEvent
+    | StatusChangedWorkerEvent
     | DisconnectWorkerEvent
 ) & { id: string }
 
@@ -23,18 +17,21 @@ export type StartedWorkerEvent = {
     type: WorkerEventType.STARTED
     worker?: Worker
 }
-export type TaskStartedWorkerEvent = {
-    type: WorkerEventType.TASK_STARTED
-    task: Task
-}
-export type CycleCompletedWorkerEvent = {
-    type: WorkerEventType.CYCLE_COMPLETED
-    report: ActionReport
-}
-export type TaskCompletedWorkerEvent = {
-    type: WorkerEventType.TASK_COMPLETED
-    result: TaskResult
-}
+
 export type DisconnectWorkerEvent = {
     type: WorkerEventType.DISCONNECT
+}
+
+export type StatusChangedWorkerEvent =
+    | StatusChangedReadyWorkerEvent
+    | StatusChangedBusyWorkerEvent
+
+export type StatusChangedReadyWorkerEvent = {
+    type: WorkerEventType.STATUS_CHANGED
+    status: WorkerStatus.READY
+}
+export type StatusChangedBusyWorkerEvent = {
+    type: WorkerEventType.STATUS_CHANGED
+    status: WorkerStatus.BUSY
+    task_id: string
 }

@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
 
-import { Task, TaskEntity } from '@modules/tasks/domain/Task'
 import WorkerStatus from './WorkerStatus'
 
 export interface Worker {
@@ -9,7 +8,7 @@ export interface Worker {
     createdAt: Date
     updatedAt: Date
     status: WorkerStatus
-    task?: Task
+    task_id?: string
 }
 export default Worker
 
@@ -47,10 +46,10 @@ export class WorkerEntity implements Worker {
     status: WorkerStatus
 
     @ApiProperty({
-        type: TaskEntity,
-        description: 'Task assigned to the worker',
+        type: String,
+        description: 'ID of the task being executed by the worker',
     })
-    task?: Task
+    task_id?: string
 
     constructor(worker: Worker) {
         this.id = worker.id
@@ -58,6 +57,6 @@ export class WorkerEntity implements Worker {
         this.createdAt = worker.createdAt
         this.updatedAt = worker.updatedAt
         this.status = worker.status
-        this.task = worker.task
+        this.task_id = worker.task_id
     }
 }

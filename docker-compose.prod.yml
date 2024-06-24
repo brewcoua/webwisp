@@ -9,6 +9,9 @@ services:
         networks:
             - webwisp
 
+        volumes:
+            - task_data:/data
+
         depends_on:
             rabbitmq:
                 condition: service_healthy
@@ -35,6 +38,9 @@ services:
 
         networks:
             - webwisp
+
+        volumes:
+            - task_data:/data
 
         depends_on:
             rabbitmq:
@@ -74,3 +80,7 @@ services:
 networks:
     webwisp:
         driver: bridge
+
+volumes:
+    task_data:
+        driver: local

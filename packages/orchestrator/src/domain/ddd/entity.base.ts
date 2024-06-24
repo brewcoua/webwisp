@@ -24,7 +24,7 @@ export interface CreateEntityProps<T> {
 }
 
 export default abstract class Entity<EntityProps> {
-    protected abstract _id: AggregateID
+    protected readonly _id: AggregateID
     private readonly _createdAt: Date
     private readonly _updatedAt: Date
     protected readonly props: EntityProps
@@ -35,17 +35,13 @@ export default abstract class Entity<EntityProps> {
         updatedAt,
         props,
     }: CreateEntityProps<EntityProps>) {
-        this.setId(id)
+        this._id = id
         this.validateProps(props)
         const now = new Date()
         this._createdAt = createdAt || now
         this._updatedAt = updatedAt || now
         this.props = props
         this.validate()
-    }
-
-    private setId(id: AggregateID): void {
-        this._id = id
     }
 
     get id(): AggregateID {

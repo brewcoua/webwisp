@@ -1,10 +1,4 @@
-import {
-    Global,
-    Logger,
-    Module,
-    OnApplicationBootstrap,
-    OnApplicationShutdown,
-} from '@nestjs/common'
+import { Global, Logger, Module, OnApplicationBootstrap } from '@nestjs/common'
 import WorkersService from './workers.service'
 import WorkersController from './workers.controller'
 
@@ -14,18 +8,11 @@ import WorkersController from './workers.controller'
     controllers: [WorkersController],
     exports: [WorkersService],
 })
-export default class WorkersModule
-    implements OnApplicationBootstrap, OnApplicationShutdown
-{
+export default class WorkersModule implements OnApplicationBootstrap {
     constructor(private readonly workersService: WorkersService) {}
 
     async onApplicationBootstrap() {
         await this.workersService.initialize()
         Logger.log('WorkersService initialized', 'WorkersModule')
-    }
-
-    async onApplicationShutdown() {
-        await this.workersService.close()
-        Logger.log('WorkersService closed', 'WorkersModule')
     }
 }
