@@ -5,7 +5,7 @@ import NotFound from './pages/NotFound'
 
 export default function App() {
     return (
-        <Flex h="100vh" w="100vw">
+        <Flex h="100vh" w="100%">
             <Switch>
                 <Route path="/signup" component={PublicPages} />
                 <Route path="/login" component={PublicPages} />

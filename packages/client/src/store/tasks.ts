@@ -1,10 +1,18 @@
 import { useClient } from '@api/client'
-import { TaskProps } from '@domain/task.types'
-import { atom } from 'nanostores'
+import { TaskEvent, TaskEventType } from '@domain/task.events'
+import { CycleReport, TaskProps, TaskStatus } from '@domain/task.types'
+import { atom, onMount } from 'nanostores'
 
 export const $tasks = atom<TaskProps[]>([])
 
 export function addTask(task: TaskProps) {
+    // Check if it doesn't exist already
+    if ($tasks.get().find((t) => t.id === task.id)) {
+        // If it does, replace it
+        $tasks.set($tasks.get().map((t) => (t.id === task.id ? task : t)))
+        return
+    }
+
     $tasks.set([...$tasks.get(), task])
 }
 
@@ -21,3 +29,67 @@ export async function getTask(id: string): Promise<TaskProps | null> {
     }
     return response
 }
+
+export function addTaskCycle(id: string, cycle: CycleReport) {
+    $tasks.set(
+        $tasks.get().map((task) => {
+            if (task.id === id) {
+                return { ...task, cycles: [...task.cycles, cycle] }
+            }
+
+            return task
+        })
+    )
+}
+
+export function clearTaskCycles(id: string) {
+    $tasks.set(
+        $tasks.get().map((task) => {
+            if (task.id === id) {
+                return { ...task, cycles: [] }
+            }
+
+            return task
+        })
+    )
+}
+
+export function setTaskStatus(id: string, status: TaskStatus) {
+    $tasks.set(
+        $tasks.get().map((task) => {
+            if (task.id === id) {
+                return { ...task, status }
+            }
+
+            return task
+        })
+    )
+}
+
+onMount($tasks, () => {
+    const sub = useClient().tasks.subscribe()
+    const source = sub.subscribe()
+
+    source.onmessage = (event) => {
+        const taskEvent: TaskEvent = JSON.parse(event.data)
+        switch (taskEvent.type) {
+            case TaskEventType.STARTED:
+                addTask(taskEvent.task)
+                break
+            case TaskEventType.CYCLE_COMPLETED:
+                addTaskCycle(taskEvent.id, taskEvent.report)
+                break
+            case TaskEventType.COMPLETED:
+                addTask(taskEvent.task)
+                break
+            case TaskEventType.REQUEUED:
+                clearTaskCycles(taskEvent.id)
+                setTaskStatus(taskEvent.id, TaskStatus.PENDING)
+                break
+        }
+    }
+
+    return () => {
+        source.close()
+    }
+})
