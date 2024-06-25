@@ -6,26 +6,49 @@ import {
     Flex,
     Icon,
     Link,
+    Spinner,
     useColorModeValue,
 } from '@chakra-ui/react'
+import { TaskProps } from '@domain/task.types'
+import { getTask } from '@store/tasks'
+import { useEffect, useState } from 'preact/hooks'
 import { FaExternalLinkAlt } from 'react-icons/fa'
 
-import PopulatedTask from '@domain/PopulatedTask'
-
-export interface TaskDescriptionProps extends AccordionPanelProps {
-    task: PopulatedTask
+export interface TaskDisplayProps extends AccordionPanelProps {
+    task: string
 }
-
-export default function TaskDescription({
+export default function TaskDisplay({
     task,
-    ...props
-}: TaskDescriptionProps): JSX.Element {
+    ...rest
+}: TaskDisplayProps): JSX.Element {
+    const [isLoading, setIsLoading] = useState(true)
+    const [props, setProps] = useState<TaskProps | null>(null)
+
+    useEffect(() => {
+        getTask(task).then((task) => {
+            setProps(task)
+            setIsLoading(false)
+        })
+    }, [])
+
+    if (isLoading) {
+        return (
+            <Flex h="5rem" w="100%" justify="center" align="center">
+                <Spinner size="lg" />
+            </Flex>
+        )
+    }
+
+    if (!props) {
+        return <Box {...rest}>Task not found</Box>
+    }
+
     return (
-        <AccordionPanel display="flex" flexDir="column" gap={2} {...props}>
+        <AccordionPanel {...rest}>
             <TextDisplay icon={FaExternalLinkAlt} isLink>
-                {task.target}
+                {props.target}
             </TextDisplay>
-            <TextDisplay minH="5rem">{task.prompt}</TextDisplay>
+            <TextDisplay minH="5rem">{props.prompt}</TextDisplay>
         </AccordionPanel>
     )
 }

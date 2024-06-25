@@ -1,17 +1,12 @@
 import { atom, onMount } from 'nanostores'
 
-import { WorkerEvent, WorkerEventType } from '@domain/WorkerEvent'
-import Worker from '@domain/Worker'
-import PopulatedTask from '@domain/PopulatedTask'
-import ActionReport from '@domain/ActionReport'
-import WorkerStatus from '@domain/WorkerStatus'
-
+import { WorkerProps, WorkerStatus } from '@domain/worker.types'
 import { useClient } from '@api/client'
-import { addResult } from './results'
+import { WorkerEvent, WorkerEventType } from '@domain/worker.events'
 
-export const $workers = atom<Worker[]>([])
+export const $workers = atom<WorkerProps[]>([])
 
-export function addWorker(worker: Worker) {
+export function addWorker(worker: WorkerProps) {
     $workers.set([...$workers.get(), worker])
 }
 
@@ -31,7 +26,7 @@ export function setWorkerStatus(id: string, status: WorkerStatus) {
     )
 }
 
-export function setWorkerTask(id: string, task: PopulatedTask) {
+export function setWorkerTask(id: string, task: string) {
     $workers.set(
         $workers.get().map((worker) => {
             if (worker.id === id) {
@@ -55,55 +50,36 @@ export function clearWorkerTask(id: string) {
     )
 }
 
-export function addWorkerTaskAction(id: string, action: ActionReport) {
-    $workers.set(
-        $workers.get().map((worker) => {
-            if (worker.id === id) {
-                return {
-                    ...worker,
-                    task: worker.task
-                        ? {
-                              ...worker.task,
-                              actions: [...worker.task.actions, action],
-                          }
-                        : undefined,
-                }
-            }
-
-            return worker
-        })
-    )
-}
-
 onMount($workers, () => {
-    const client = useClient()
-
-    const source = client.workers.subscribe()
+    const sub = useClient().workers.subscribe()
+    const source = sub.subscribe()
 
     source.onmessage = (event) => {
-        const data = JSON.parse(event.data) as WorkerEvent
-
-        switch (data.type) {
+        const workerEvent: WorkerEvent = JSON.parse(event.data)
+        switch (workerEvent.type) {
             case WorkerEventType.STARTED:
-                addWorker(data.worker)
+                console.log('Adding worker', workerEvent.worker)
+                addWorker(workerEvent.worker)
                 break
-            case WorkerEventType.TASK_STARTED:
-                setWorkerTask(data.id, {
-                    ...data.task,
-                    actions: [],
-                })
-                setWorkerStatus(data.id, WorkerStatus.BUSY)
+            case WorkerEventType.DISCONNECTED:
+                console.log('Removing worker', workerEvent.id)
+                removeWorker(workerEvent.id)
                 break
-            case WorkerEventType.CYCLE_COMPLETED:
-                addWorkerTaskAction(data.id, data.report)
-                break
-            case WorkerEventType.TASK_COMPLETED:
-                addResult(data.result)
-                clearWorkerTask(data.id)
-                setWorkerStatus(data.id, WorkerStatus.READY)
-                break
-            case WorkerEventType.DISCONNECT:
-                removeWorker(data.id)
+            case WorkerEventType.STATUS_CHANGED:
+                console.log(
+                    workerEvent.id,
+                    'Setting worker status to',
+                    workerEvent.status
+                )
+                setWorkerStatus(workerEvent.id, workerEvent.status)
+                switch (workerEvent.status) {
+                    case WorkerStatus.READY:
+                        clearWorkerTask(workerEvent.id)
+                        break
+                    case WorkerStatus.BUSY:
+                        setWorkerTask(workerEvent.id, workerEvent.task)
+                        break
+                }
                 break
         }
     }

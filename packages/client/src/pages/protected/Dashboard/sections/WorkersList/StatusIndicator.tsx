@@ -5,7 +5,7 @@ import {
     keyframes,
     useColorModeValue,
 } from '@chakra-ui/react'
-import WorkerStatus from '@domain/WorkerStatus'
+import { WorkerStatus } from '@domain/worker.types'
 
 export interface StatusIndicatorProps extends BoxProps {
     status: WorkerStatus
@@ -24,9 +24,7 @@ export default function StatusIndicator({
 
     if (status === WorkerStatus.READY)
         return <ReadyIndicator {...baseProps} {...props} />
-    else if (status === WorkerStatus.BUSY)
-        return <BusyIndicator {...baseProps} {...props} />
-    else return <OfflineIndicator {...baseProps} {...props} />
+    else return <BusyIndicator {...baseProps} {...props} />
 }
 
 const pulseRing = keyframes`
@@ -74,15 +72,5 @@ function BusyIndicator(props: BoxProps) {
                 color={useColorModeValue('blue.500', 'blue.300')}
             />
         </Box>
-    )
-}
-
-function OfflineIndicator(props: BoxProps) {
-    return (
-        <Box
-            borderRadius="full"
-            bg={useColorModeValue('gray.500', 'gray.300')}
-            {...props}
-        />
     )
 }

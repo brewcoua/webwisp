@@ -1,12 +1,9 @@
-import ActionStatus from '@domain/ActionStatus'
-import ActionType from '@domain/ActionType'
-import IWorkersGateway from '@domain/gateways/workers.gateway'
-
-import Worker from '@domain/Worker'
-import WorkerStatus from '@domain/WorkerStatus'
+import IWorkersGateway from '@domain/api/gateways/workers.gateway'
+import { SseClient } from '@domain/api/sse.client'
+import { WorkerProps, WorkerStatus } from '@domain/worker.types'
 
 export default class WorkersGatewayMock implements IWorkersGateway {
-    async getWorkers(): Promise<Worker[]> {
+    async getWorkers(): Promise<WorkerProps[]> {
         return [
             {
                 id: 'mock-worker-id-1',
@@ -14,39 +11,7 @@ export default class WorkersGatewayMock implements IWorkersGateway {
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 status: WorkerStatus.BUSY,
-                task: {
-                    id: 'dsqdsq3dqsd',
-                    createdAt: new Date(),
-                    target: 'https://example.com',
-                    prompt: 'Check that the page loads.',
-                    actions: [
-                        {
-                            action: {
-                                type: ActionType.Type,
-                                description: 'Type in the input',
-                                arguments: {
-                                    label: 3,
-                                    text: 'Hello, world!',
-                                },
-                                status: ActionStatus.Success,
-                            },
-                            reasoning: 'The input seems to be working.',
-                            duration: 1740,
-                        },
-                        {
-                            action: {
-                                type: ActionType.Click,
-                                description: 'Click on the button.',
-                                arguments: {
-                                    label: 3,
-                                },
-                                status: ActionStatus.Failed,
-                            },
-                            reasoning: 'The page did not load.',
-                            duration: 1000,
-                        },
-                    ],
-                },
+                task: 'dsqdsq3dqsd',
             },
             {
                 id: 'mock-worker-id-2',
@@ -56,30 +21,17 @@ export default class WorkersGatewayMock implements IWorkersGateway {
                 status: WorkerStatus.READY,
             },
             {
-                id: 'mock-worker-id-3',
-                tag: 'mock-worker-tag',
-                createdAt: new Date(),
-                updatedAt: new Date(),
-                status: WorkerStatus.OFFLINE,
-            },
-            {
                 id: 'mock-worker-id-4',
                 tag: 'mock-worker-tag',
                 createdAt: new Date(),
                 updatedAt: new Date(),
                 status: WorkerStatus.BUSY,
-                task: {
-                    id: 'dsqdsq3dqsd',
-                    createdAt: new Date(),
-                    target: 'https://example.com',
-                    prompt: 'Check that the page loads.',
-                    actions: [],
-                },
+                task: 'dsqdsq3dqssd',
             },
         ]
     }
 
-    subscribe(): EventSource {
-        return new EventSource('/api/workers/events')
+    subscribe(): SseClient<any> {
+        return new SseClient('')
     }
 }

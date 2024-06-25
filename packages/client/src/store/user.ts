@@ -1,8 +1,8 @@
-import User from '@domain/User'
+import { UserProps } from '@domain/user.types'
 import { atom } from 'nanostores'
 
-export const $user = atom<User | null>(null)
+export const $user = atom<UserProps | null>(null)
 
-export function setUser(user: User) {
+export function setUser(user: UserProps) {
     $user.set(user)
 }

@@ -1,10 +1,12 @@
 import { fetchAuthed } from '@api/client'
-import IWorkersGateway from '@domain/gateways/workers.gateway'
-import Worker from '@domain/Worker'
+import IWorkersGateway from '@domain/api/gateways/workers.gateway'
 import { useAccessToken } from './auth.gateway'
+import { WorkerProps } from '@domain/worker.types'
+import { SseClient } from '@domain/api/sse.client'
+import { WorkerEvent } from '@domain/worker.events'
 
 export default class WorkersGateway implements IWorkersGateway {
-    async getWorkers(): Promise<Worker[]> {
+    async getWorkers(): Promise<WorkerProps[]> {
         const response = await fetchAuthed('/api/workers')
         if (!response?.ok) {
             throw new Error('Failed to fetch workers')
@@ -13,10 +15,10 @@ export default class WorkersGateway implements IWorkersGateway {
         return response.json()
     }
 
-    subscribe(): EventSource {
-        return new EventSource(
-            '/api/workers/events?access_token=' +
-                encodeURIComponent(useAccessToken() || '')
+    subscribe(): SseClient<WorkerEvent> {
+        return new SseClient(
+            '/api/workers/subscribe',
+            useAccessToken() ?? undefined
         )
     }
 }

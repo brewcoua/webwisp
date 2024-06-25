@@ -2,13 +2,13 @@ import { useStore } from '@nanostores/preact'
 import { Accordion, SlideFade, Text } from '@chakra-ui/react'
 
 import { $workers } from '@store/workers'
+import { useClient } from '@api/client'
+import { useEffect } from 'preact/hooks'
 
 import BentoBox from '../../BentoBox'
 import { WorkerItem } from './WorkerItem'
 
 import styles from './WorkersList.module.scss'
-import { useEffect } from 'preact/hooks'
-import { useClient } from '@api/client'
 
 export default function WorkersList(): JSX.Element {
     useEffect(() => {

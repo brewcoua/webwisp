@@ -5,9 +5,9 @@ import { TasksGateway, WorkersGateway, AuthGateway } from './gateways'
 import { TasksGatewayMock, WorkersGatewayMock, AuthGatewayMock } from './mock'
 import { useAccessToken } from './gateways/auth.gateway'
 
-import ITasksGateway from '@domain/gateways/tasks.gateway'
-import IWorkersGateway from '@domain/gateways/workers.gateway'
-import IAuthGateway from '@domain/gateways/auth.gateway'
+import ITasksGateway from '@domain/api/gateways/tasks.gateway'
+import IWorkersGateway from '@domain/api/gateways/workers.gateway'
+import IAuthGateway from '@domain/api/gateways/auth.gateway'
 
 export class Client {
     public readonly auth: IAuthGateway
@@ -32,10 +32,13 @@ export class Client {
 export const client = signal<Client>(new Client())
 export const useClient = () => client.value
 
-export const fetchAuthed = async (input: RequestInfo, init?: RequestInit) => {
+export const fetchAuthed = async (
+    input: RequestInfo,
+    init?: RequestInit
+): Promise<Response | null> => {
     const token = useAccessToken()
     if (!token) {
-        return navigate('/login')
+        return null
     }
 
     const headers: any = init?.headers || {}
@@ -45,7 +48,7 @@ export const fetchAuthed = async (input: RequestInfo, init?: RequestInit) => {
 
     // Check if response is unauthorized
     if (response.status === 401) {
-        return navigate('/login')
+        return null
     }
 
     return response

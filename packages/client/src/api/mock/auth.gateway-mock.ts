@@ -1,5 +1,6 @@
 import { deleteAccessToken, setAccessToken } from '@api/gateways/auth.gateway'
-import IAuthGateway from '@domain/gateways/auth.gateway'
+import IAuthGateway from '@domain/api/gateways/auth.gateway'
+import { UserScopes } from '@domain/user.types'
 
 export default class AuthGatewayMock implements IAuthGateway {
     async login() {
@@ -20,6 +21,8 @@ export default class AuthGatewayMock implements IAuthGateway {
         return {
             id: 'edsqdqs',
             username: 'user',
+            displayName: 'User',
+            scopes: [UserScopes.VIEW, UserScopes.EDIT],
         }
     }
 }

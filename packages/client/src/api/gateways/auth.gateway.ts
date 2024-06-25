@@ -1,6 +1,6 @@
 import { fetchAuthed } from '@api/client'
-import User from '@domain/User'
-import IAuthGateway from '@domain/gateways/auth.gateway'
+import IAuthGateway from '@domain/api/gateways/auth.gateway'
+import { UserProps } from '@domain/user.types'
 
 export default class AuthGateway implements IAuthGateway {
     async login(username: string, password: string): Promise<boolean> {
@@ -38,7 +38,7 @@ export default class AuthGateway implements IAuthGateway {
         deleteAccessToken()
     }
 
-    async me(): Promise<User | null> {
+    async me(): Promise<UserProps | null> {
         const response = await fetchAuthed('/api/auth/me')
 
         if (!response?.ok) {

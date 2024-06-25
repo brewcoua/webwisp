@@ -2,19 +2,18 @@ import {
     AccordionButton,
     AccordionIcon,
     AccordionItem,
-    AccordionPanel,
     Flex,
     SlideFade,
     Text,
     useColorModeValue,
 } from '@chakra-ui/react'
 
-import Worker from '@domain/Worker'
+import { WorkerProps } from '@domain/worker.types'
 
 import StatusIndicator from './StatusIndicator'
-import TaskDescription from './TaskDescription'
+import TaskDisplay from './TaskDisplay'
 
-export function WorkerItem({ worker }: { worker: Worker }): JSX.Element {
+export function WorkerItem({ worker }: { worker: WorkerProps }): JSX.Element {
     return (
         <SlideFade in offsetY="20px">
             <AccordionItem border="none" mt={2}>
@@ -39,7 +38,7 @@ export function WorkerItem({ worker }: { worker: Worker }): JSX.Element {
                     {worker.task && <AccordionIcon />}
                 </AccordionButton>
                 {worker.task && (
-                    <TaskDescription
+                    <TaskDisplay
                         task={worker.task}
                         bg={useColorModeValue('gray.300', 'gray.500')}
                         borderBottomRadius="lg"
