@@ -1,5 +1,6 @@
 import {
     Inject,
+    Logger,
     Module,
     OnApplicationBootstrap,
     Provider,
@@ -13,14 +14,23 @@ import { Task, TaskSchema } from './database/models/task.model'
 import { TASK_QUEUES_REPOSITORY } from './tasks.tokens'
 import { TaskQueuesRepositoryPort } from './database/repositories/queues.repository.port'
 
-import { CreateTaskHttpController } from './commands/create-task/create-task.http.controller'
-import { CreateTaskService } from './commands/create-task/create-task.service'
 import { Repositories } from './database/repositories'
 
-const HttpControllers = [CreateTaskHttpController]
+import { CreateTaskHttpController } from './commands/create-task/create-task.http.controller'
+import { CreateTaskService } from './commands/create-task/create-task.service'
+
+import { GetTaskHttpController } from './queries/get-task/get-task.http.controller'
+import { GetTaskQueryHandler } from './queries/get-task/get-task.query-handler'
+import { SubscribeHttpController } from './queries/subscribe/subscribe.http.controller'
+
+const HttpControllers = [
+    CreateTaskHttpController,
+    GetTaskHttpController,
+    SubscribeHttpController,
+]
 
 const CommandHandlers: Provider[] = [CreateTaskService]
-const QueryHandlers: Provider[] = []
+const QueryHandlers: Provider[] = [GetTaskQueryHandler]
 
 const Mappers: Provider[] = [TasksMapper]
 
@@ -49,5 +59,6 @@ export default class TasksModule implements OnApplicationBootstrap {
 
     async onApplicationBootstrap() {
         await this.taskQueueRepository.connect()
+        Logger.log('Task queues repository connected', 'TasksModule')
     }
 }

@@ -3,7 +3,7 @@ import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
 import { CommandBus } from '@nestjs/cqrs'
 import { Result, match } from 'oxide.ts'
 
-import { Public } from '../../guards/public.guard'
+import { Public } from '../../guards/meta'
 import { SignUpRequestDto } from './signup.request.dto'
 import { SignUpCommand } from './signup.command'
 import AuthMapper from '../../auth.mapper'

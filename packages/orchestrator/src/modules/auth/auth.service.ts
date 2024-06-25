@@ -11,8 +11,6 @@ export default class AuthService {
         const props = user.getProps()
         const payload = {
             username: props.username,
-            displayName: props.displayName,
-            scopes: props.scopes,
             sub: user.id,
         }
 

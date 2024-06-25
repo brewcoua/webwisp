@@ -11,8 +11,8 @@ import { useEnv } from '@configs/env'
 
 import TasksModule from '@modules/tasks'
 import HealthModule from '@modules/health'
-import { WorkersModule } from '@modules/workers'
-import AuthModule, { JwtAuthGuard } from '@modules/auth'
+import WorkersModule from '@modules/workers'
+import AuthModule, { JwtAuthGuard, ScopesGuard } from '@modules/auth'
 
 import { RabbitMQModule } from '@services/rabbitmq'
 
@@ -53,6 +53,10 @@ import { RabbitMQModule } from '@services/rabbitmq'
         {
             provide: APP_GUARD,
             useClass: JwtAuthGuard,
+        },
+        {
+            provide: APP_GUARD,
+            useClass: ScopesGuard,
         },
     ],
 })

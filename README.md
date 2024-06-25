@@ -22,6 +22,8 @@ docker-compose up --build -d
 
 > [!NOTE]
 > You can tweak the number of workers by changing the `replicas` field in the `docker-compose.yml` file.
+> For the sake of simplicity, a `docker-compose.prod.yml` file is also provided, which allows pulling the pre-built images from the GitHub Container Registry.
+> However, it still uses env-files for configuration, so you will need to either provide them, or provide the environment variables directly in the command line.
 
 ## Configuration
 

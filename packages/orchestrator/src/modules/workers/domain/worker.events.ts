@@ -1,25 +1,24 @@
-import Worker from './Worker'
-import WorkerStatus from './WorkerStatus'
+import { CreateWorkerProps, WorkerStatus } from './worker.types'
 
 export enum WorkerEventType {
     STARTED = 'started',
     STATUS_CHANGED = 'status-changed',
-    DISCONNECT = 'disconnect',
+    DISCONNECTED = 'disconnected',
 }
 
 export type WorkerEvent = (
     | StartedWorkerEvent
     | StatusChangedWorkerEvent
-    | DisconnectWorkerEvent
+    | DisconnectedWorkerEvent
 ) & { id: string }
 
 export type StartedWorkerEvent = {
     type: WorkerEventType.STARTED
-    worker?: Worker
+    worker: CreateWorkerProps
 }
 
-export type DisconnectWorkerEvent = {
-    type: WorkerEventType.DISCONNECT
+export type DisconnectedWorkerEvent = {
+    type: WorkerEventType.DISCONNECTED
 }
 
 export type StatusChangedWorkerEvent =
@@ -33,5 +32,5 @@ export type StatusChangedReadyWorkerEvent = {
 export type StatusChangedBusyWorkerEvent = {
     type: WorkerEventType.STATUS_CHANGED
     status: WorkerStatus.BUSY
-    task_id: string
+    task: string
 }

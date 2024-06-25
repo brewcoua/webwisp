@@ -9,3 +9,7 @@ export interface Mapper<
     toDomain(record: any): DomainEntity
     toResponse(entity: DomainEntity): Response
 }
+
+export interface HalfMapper<DomainEntity extends Entity<any>, Response = any> {
+    toResponse(entity: DomainEntity): Response
+}

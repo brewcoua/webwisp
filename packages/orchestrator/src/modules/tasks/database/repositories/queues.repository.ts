@@ -1,19 +1,32 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Inject, Injectable, Logger } from '@nestjs/common'
 import amqp from 'amqplib'
 
+import LinkedList from '@domain/LinkedList'
 import { RabbitMQService } from '@services/rabbitmq'
 import { MessageQueues } from '@configs/app.const'
 
 import { TaskQueuesRepositoryPort } from './queues.repository.port'
 import TaskEntity from '../../domain/task.entity'
-import { TaskEvent } from '../../domain/task.events'
+import { TaskEvent, TaskEventType } from '../../domain/task.events'
+import { EventEmitter2 } from '@nestjs/event-emitter'
+
+import { TASK_REPOSITORY } from '../../tasks.tokens'
+import { TaskRepositoryPort } from './task.repository.port'
+import { TaskStatus } from '../../domain/task.types'
 
 @Injectable()
 export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
     private tasksQueue: amqp.Channel | null = null
     private eventsQueue: amqp.Channel | null = null
 
-    constructor(private readonly rabbitMQService: RabbitMQService) {}
+    private readonly enqueuedTasks: LinkedList<TaskEntity> = new LinkedList()
+
+    constructor(
+        private readonly rabbitMQService: RabbitMQService,
+        @Inject(TASK_REPOSITORY)
+        private readonly taskRepository: TaskRepositoryPort,
+        private readonly eventEmitter: EventEmitter2
+    ) {}
 
     async connect(): Promise<void> {
         this.tasksQueue = await this.rabbitMQService.getQueue(
@@ -22,6 +35,13 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
         this.eventsQueue = await this.rabbitMQService.getQueue(
             MessageQueues.TaskEvents
         )
+        this.bindEvents()
+    }
+
+    findTaskById(id: string): TaskEntity | null {
+        const task = this.enqueuedTasks.findById(id)
+
+        return task?.value || null
     }
 
     sendTaskToQueue(task: TaskEntity): boolean {
@@ -43,26 +63,70 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
         )
 
         if (result) {
-            Logger.log(`Task published: ${task.id}`)
+            Logger.log(`Task published: ${task.id}`, 'TaskQueuesRepository')
+            this.enqueuedTasks.append(task)
         }
 
         return result
     }
 
-    bindEvents(handler: (event: TaskEvent) => void): void {
+    private bindEvents(): void {
         if (!this.eventsQueue) {
             throw new Error('Channel not initialized')
         }
 
         this.eventsQueue.consume(
             MessageQueues.TaskEvents,
-            (message) => {
+            async (message) => {
                 if (!message) {
                     return
                 }
 
                 const event: TaskEvent = JSON.parse(message.content.toString())
-                handler(event)
+                switch (event.type) {
+                    case TaskEventType.COMPLETED: {
+                        const task = this.enqueuedTasks.findById(event.id)
+                        if (task) {
+                            this.enqueuedTasks.remove(task.value)
+                        }
+
+                        // Now, save the task to the database
+                        const entity = new TaskEntity({
+                            id: event.id,
+                            createdAt: task?.value.createdAt || new Date(),
+                            updatedAt: new Date(),
+                            props: event.task,
+                        })
+
+                        await this.taskRepository.transaction(async () => {
+                            await this.taskRepository.insert(entity)
+                        })
+
+                        Logger.log(
+                            `Task completed: ${event.id}`,
+                            'TaskQueuesRepository'
+                        )
+                        break
+                    }
+                    case TaskEventType.CYCLE_COMPLETED: {
+                        const task = this.enqueuedTasks.findById(event.id)
+                        if (task) {
+                            task.value.pushCycle(event.report)
+                        }
+                        break
+                    }
+                    case TaskEventType.STARTED: {
+                        const task = this.enqueuedTasks.findById(event.id)
+                        if (task) {
+                            task.value.setStatus(TaskStatus.RUNNING)
+                        }
+                        break
+                    }
+                    default:
+                        break
+                }
+
+                this.eventEmitter.emit('task', event)
             },
             { noAck: true }
         )

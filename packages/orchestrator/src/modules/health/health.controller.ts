@@ -7,7 +7,7 @@ import {
 } from '@nestjs/terminus'
 import { ApiTags } from '@nestjs/swagger'
 
-import { Public } from '@modules/auth/guards/public.guard'
+import { Public } from '@modules/auth/guards/meta'
 
 @ApiTags('health')
 @Controller('health')

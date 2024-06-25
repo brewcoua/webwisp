@@ -1,2 +1,2 @@
 export { default as JwtStrategy } from './jwt.strategy'
-export { JwtAuthGuard, ScopedJwtAuthGuard } from './jwt.guard'
+export { JwtAuthGuard } from './jwt.guard'

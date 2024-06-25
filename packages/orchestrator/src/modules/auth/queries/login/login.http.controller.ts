@@ -15,7 +15,7 @@ import { LoginRequestDto } from './login.request.dto'
 import UserEntity from '../../domain/user.entity'
 import AuthService from '../../auth.service'
 import { LoginResponseDto } from './login.response.dto'
-import { Public } from '../../guards/public.guard'
+import { Public } from '../../guards/meta'
 
 @ApiTags('auth')
 @Controller('auth')

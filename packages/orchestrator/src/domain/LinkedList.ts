@@ -134,6 +134,33 @@ export default class LinkedList<T extends TrackableData> {
     }
 
     /**
+     * Find an element by a field in the list
+     * @param field Field to find
+     * @param value Value to find
+     * @returns Node containing the value or null if not found
+     */
+    findByField(field: keyof T, value: T[keyof T]): Node<T> | null {
+        let current = this.head
+        while (current && current.value[field] !== value) {
+            current = current.next
+        }
+        return current
+    }
+
+    /**
+     * Find an element by a selector in the list
+     * @param selector Selector to find
+     * @returns Node containing the value or null if not found
+     */
+    findBySelector(selector: (value: T) => boolean): Node<T> | null {
+        let current = this.head
+        while (current && !selector(current.value)) {
+            current = current.next
+        }
+        return current
+    }
+
+    /**
      * Clear the list
      */
     clear(): void {

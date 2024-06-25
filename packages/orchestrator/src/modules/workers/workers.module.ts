@@ -1,18 +1,46 @@
-import { Global, Logger, Module, OnApplicationBootstrap } from '@nestjs/common'
-import WorkersService from './workers.service'
-import WorkersController from './workers.controller'
+import {
+    Inject,
+    Logger,
+    Module,
+    OnApplicationBootstrap,
+    Provider,
+} from '@nestjs/common'
 
-@Global()
+import WorkersMapper from './workers.mapper'
+import { Repositories } from './database/repositories'
+
+import { WorkerQueuesRepositoryPort } from './database/repositories/queues.repository.port'
+import { WORKER_QUEUES_REPOSITORY } from './workers.tokens'
+
+import { GetWorkersHttpController } from './queries/get-workers/get-workers.http.controller'
+import { SubscribeHttpController } from './queries/subscribe/subscribe.http.controller'
+
+import { GetWorkersQueryHandler } from './queries/get-workers/get-workers.query-handler'
+
+const HttpControllers = [GetWorkersHttpController, SubscribeHttpController]
+
+const CommandHandlers: Provider[] = []
+const QueryHandlers: Provider[] = [GetWorkersQueryHandler]
+
+const Mappers: Provider[] = [WorkersMapper]
+
 @Module({
-    providers: [WorkersService],
-    controllers: [WorkersController],
-    exports: [WorkersService],
+    controllers: [...HttpControllers],
+    providers: [
+        ...CommandHandlers,
+        ...QueryHandlers,
+        ...Mappers,
+        ...Repositories,
+    ],
 })
 export default class WorkersModule implements OnApplicationBootstrap {
-    constructor(private readonly workersService: WorkersService) {}
+    constructor(
+        @Inject(WORKER_QUEUES_REPOSITORY)
+        private readonly workerQueueRepository: WorkerQueuesRepositoryPort
+    ) {}
 
     async onApplicationBootstrap() {
-        await this.workersService.initialize()
-        Logger.log('WorkersService initialized', 'WorkersModule')
+        await this.workerQueueRepository.connect()
+        Logger.log('Worker queues connected', 'WorkersModule')
     }
 }

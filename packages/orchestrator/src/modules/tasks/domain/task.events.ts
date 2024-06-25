@@ -1,5 +1,4 @@
-import TaskEntity from './task.entity'
-import { CycleReport } from './task.types'
+import { CycleReport, TaskProps } from './task.types'
 
 export enum TaskEventType {
     STARTED = 'started',
@@ -15,7 +14,7 @@ export type TaskEvent = (
 
 export type StartedTaskEvent = {
     type: TaskEventType.STARTED
-    task: TaskEntity
+    task: TaskProps
 }
 export type CycleCompletedTaskEvent = {
     type: TaskEventType.CYCLE_COMPLETED
@@ -23,5 +22,5 @@ export type CycleCompletedTaskEvent = {
 }
 export type CompletedTaskEvent = {
     type: TaskEventType.COMPLETED
-    task: TaskEntity
+    task: TaskProps
 }

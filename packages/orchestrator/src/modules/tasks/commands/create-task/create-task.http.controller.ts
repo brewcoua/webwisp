@@ -7,16 +7,22 @@ import {
     UseGuards,
 } from '@nestjs/common'
 import { CommandBus } from '@nestjs/cqrs'
-import { ApiOperation, ApiResponse } from '@nestjs/swagger'
+import {
+    ApiBearerAuth,
+    ApiOperation,
+    ApiResponse,
+    ApiTags,
+} from '@nestjs/swagger'
 import { Result, match } from 'oxide.ts'
 
-import { ScopedJwtAuthGuard } from '@modules/auth'
 import { UserScopes } from '@modules/auth/domain/user.types'
+import { Scopes } from '@modules/auth'
 
 import { CreateTaskResponseDto } from './create-task.response.dto'
 import { CreateTaskRequestDto } from './create-task.request.dto'
 import { CreateTaskCommand } from './create-task.command'
 
+@ApiTags('tasks')
 @Controller('tasks')
 export class CreateTaskHttpController {
     constructor(private readonly commandBus: CommandBus) {}
@@ -29,7 +35,8 @@ export class CreateTaskHttpController {
         description: 'Task created',
         type: CreateTaskResponseDto,
     })
-    @UseGuards(ScopedJwtAuthGuard(UserScopes.EDIT))
+    @ApiBearerAuth()
+    @Scopes(UserScopes.EDIT)
     @HttpCode(HttpStatus.CREATED)
     @Post('create')
     async createTask(@Body() props: CreateTaskRequestDto) {
