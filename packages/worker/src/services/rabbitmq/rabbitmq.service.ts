@@ -1,13 +1,21 @@
+import { MessageQueues } from '@configs/app.const'
 import { useEnv } from '@configs/env'
-import { WorkerEvent, WorkerEventType } from '@domain/WorkerEvent'
+import { TaskEvent, TaskEventType } from '@services/exec/domain/task.events'
+import { CreateTaskProps } from '@services/exec/domain/task.types'
+import {
+    PartialWorkerEvent,
+    WorkerEventType,
+} from '@services/exec/domain/worker.events'
 import amqp from 'amqplib'
+
 import { Logger } from 'winston'
 
 export default class RabbitMQService {
     private connection: amqp.Connection | null = null
 
     public tasksQueue: amqp.Channel | null = null
-    public eventsQueue: amqp.Channel | null = null
+    public taskEventsQueue: amqp.Channel | null = null
+    public workerEventsQueue: amqp.Channel | null = null
 
     private readonly logger: Logger
 
@@ -32,26 +40,32 @@ export default class RabbitMQService {
         }
 
         this.tasksQueue = await this.createChannel()
-        await this.createQueue(this.tasksQueue, 'tasks')
+        await this.createQueue(this.tasksQueue, MessageQueues.Tasks)
 
-        this.eventsQueue = await this.createChannel()
-        await this.createQueue(this.eventsQueue, 'events')
+        this.taskEventsQueue = await this.createChannel()
+        await this.createQueue(this.taskEventsQueue, MessageQueues.TaskEvents)
+
+        this.workerEventsQueue = await this.createChannel()
+        await this.createQueue(
+            this.workerEventsQueue,
+            MessageQueues.WorkerEvents
+        )
 
         this.logger.info('RabbitMQService initialized')
-        this.emitEvent({
-            type: WorkerEventType.STARTED,
-        })
     }
 
     async close() {
         if (this.tasksQueue) {
             await this.tasksQueue.close()
         }
-        if (this.eventsQueue) {
-            this.emitEvent({
-                type: WorkerEventType.DISCONNECT,
+        if (this.workerEventsQueue) {
+            this.emitWorkerEvent({
+                type: WorkerEventType.DISCONNECTED,
             })
-            await this.eventsQueue.close()
+            await this.workerEventsQueue.close()
+        }
+        if (this.taskEventsQueue) {
+            await this.taskEventsQueue.close()
         }
 
         if (this.connection) {
@@ -73,15 +87,41 @@ export default class RabbitMQService {
         return channel.assertQueue(name)
     }
 
-    async bindTasks(callback: (msg: amqp.ConsumeMessage) => void) {
+    async bindTasks(callback: (task: CreateTaskProps) => void) {
         if (!this.tasksQueue) {
             throw new Error('Tasks queue is not initialized')
         }
 
-        this.tasksQueue.consume('tasks', (msg) => {
+        const consumer = await this.tasksQueue.consume('tasks', (msg) => {
             if (msg) {
-                callback(msg)
+                const task: CreateTaskProps = JSON.parse(msg.content.toString())
+
+                try {
+                    callback(task)
+                    this.tasksQueue?.ack(msg)
+                } catch (err: any) {
+                    this.logger.error('Failed to process task', {
+                        id: task.id,
+                        error: {
+                            message: err.message,
+                            stack: err.stack,
+                        },
+                    })
+                    this.emitTaskEvent({
+                        type: TaskEventType.REQUEUED,
+                        id: task.id,
+                    })
+                    this.tasksQueue?.nack(msg, false, true)
+                }
             }
+        })
+
+        this.emitWorkerEvent({
+            type: WorkerEventType.STARTED,
+            worker: {
+                id: this.id,
+                tag: consumer.consumerTag,
+            },
         })
 
         return this.tasksQueue
@@ -95,19 +135,30 @@ export default class RabbitMQService {
         this.tasksQueue.ack(msg)
     }
 
-    emitEvent(event: WorkerEvent): boolean {
-        if (!this.eventsQueue) {
+    emitWorkerEvent(event: PartialWorkerEvent): boolean {
+        if (!this.workerEventsQueue) {
             throw new Error('Events queue is not initialized')
         }
 
-        return this.eventsQueue.sendToQueue(
-            'events',
+        return this.workerEventsQueue.sendToQueue(
+            MessageQueues.WorkerEvents,
             Buffer.from(
                 JSON.stringify({
                     ...event,
                     id: this.id,
                 })
             )
+        )
+    }
+
+    emitTaskEvent(event: TaskEvent): boolean {
+        if (!this.taskEventsQueue) {
+            throw new Error('Events queue is not initialized')
+        }
+
+        return this.taskEventsQueue.sendToQueue(
+            MessageQueues.TaskEvents,
+            Buffer.from(JSON.stringify(event))
         )
     }
 }

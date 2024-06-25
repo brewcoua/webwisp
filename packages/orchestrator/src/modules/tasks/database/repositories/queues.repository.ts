@@ -122,8 +122,14 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
                         }
                         break
                     }
-                    default:
+                    case TaskEventType.REQUEUED: {
+                        const task = this.enqueuedTasks.findById(event.id)
+                        if (task) {
+                            task.value.setStatus(TaskStatus.PENDING)
+                            this.enqueuedTasks.moveToBack(task)
+                        }
                         break
+                    }
                 }
 
                 this.eventEmitter.emit('task', event)

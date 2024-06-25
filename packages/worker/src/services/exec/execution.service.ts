@@ -1,19 +1,20 @@
 import { Logger } from 'winston'
-import amqp from 'amqplib'
 
 import WorkerService from 'src/worker.service'
 
-import TaskResult from '@domain/TaskResult'
-import Task from '@domain/Task'
-import ActionReport from '@domain/ActionReport'
 import config from './execution.config'
-import CycleResult from './domain/CycleResult'
-import CycleStatus from './domain/CycleStatus'
-import ActionType from '@domain/ActionType'
-import TaskStatus from '@domain/TaskStatus'
 import { PageWrapper } from '@services/browser/wrappers'
-import ActionStatus from '@domain/ActionStatus'
-import { WorkerEventType } from '@domain/WorkerEvent'
+import { TaskEventType } from './domain/task.events'
+import {
+    CreateTaskProps,
+    CycleReport,
+    TaskProps,
+    TaskStatus,
+} from './domain/task.types'
+import CycleResult, { CycleStatus } from './domain/cycle.types'
+import { ActionStatus, ActionType } from '@domain/action.types'
+import { WorkerEventType } from './domain/worker.events'
+import { WorkerStatus } from './domain/worker.types'
 
 export default class ExecutionService {
     private readonly logger: Logger
@@ -25,37 +26,69 @@ export default class ExecutionService {
         this.logger = logger.child({
             context: 'ExecutionService',
         })
-        this.worker.rabbitmq?.bindTasks((msg) => this.listener(msg))
+        this.worker.rabbitmq?.bindTasks((task) => this.listener(task))
     }
 
-    async listener(msg: amqp.ConsumeMessage) {
-        const task = JSON.parse(msg.content.toString())
-        this.logger.info('Received task', { task })
+    async listener(task: CreateTaskProps) {
+        this.logger.info('Received task to execute', { id: task.id })
+
+        await this.worker.browser?.getContext().startTracing(task.id)
 
         const result = await this.execute(task)
-        this.logger.info('Task executed', { result })
-
-        const status = this.worker.rabbitmq?.emitEvent({
-            type: WorkerEventType.TASK_COMPLETED,
-            result,
+        this.logger.info('Task executed', {
+            id: task.id,
+            status: result.status,
         })
+        this.logger.verbose('Result', result)
+
+        const status = this.worker.rabbitmq?.emitTaskEvent({
+            type: TaskEventType.COMPLETED,
+            id: task.id,
+            task: {
+                ...result,
+                target: task.target,
+                prompt: task.prompt,
+            },
+        })
+
+        this.worker.rabbitmq?.emitWorkerEvent({
+            type: WorkerEventType.STATUS_CHANGED,
+            status: WorkerStatus.READY,
+        })
+
+        await this.worker.browser?.getContext().stopTracing(task.id)
+
         if (status) {
-            this.logger.info('Published result for task', { id: task.id })
-            this.worker.rabbitmq?.ackTask(msg)
+            this.logger.debug('Published result for task', { id: task.id })
         } else {
-            this.logger.error('Failed to publish result')
+            throw new Error('Failed to publish result')
         }
     }
 
-    async execute(task: Task): Promise<TaskResult> {
+    async execute(
+        task: CreateTaskProps
+    ): Promise<Omit<TaskProps, 'target' | 'prompt'>> {
         this.logger.verbose('Executing task', { id: task.id })
-        this.worker.rabbitmq?.emitEvent({
-            type: WorkerEventType.TASK_STARTED,
-            task,
+
+        this.worker.rabbitmq?.emitTaskEvent({
+            type: TaskEventType.STARTED,
+            id: task.id,
+            task: {
+                target: task.target,
+                prompt: task.prompt,
+                status: TaskStatus.RUNNING,
+                cycles: [],
+            },
         })
 
-        const actions: ActionReport[] = []
-        const cycles = {
+        this.worker.rabbitmq?.emitWorkerEvent({
+            type: WorkerEventType.STATUS_CHANGED,
+            status: WorkerStatus.BUSY,
+            task: task.id,
+        })
+
+        const cycles: CycleReport[] = []
+        const cycleCounters = {
             total: 0,
             failed: {
                 total: 0, // Total failed cycles
@@ -66,96 +99,97 @@ export default class ExecutionService {
         const page = await this.worker.browser?.detach(task.target)
         if (!page) {
             return {
-                id: task.id,
                 status: TaskStatus.FAILED,
                 message: 'Failed to attach to page',
-                actions,
+                cycles,
             }
         }
 
         while (
-            cycles.total < config.cycles.total &&
-            cycles.failed.total < config.cycles.failed.total &&
-            cycles.failed.action < config.cycles.failed.action &&
-            cycles.failed.format < config.cycles.failed.format
+            cycleCounters.total < config.cycles.total &&
+            cycleCounters.failed.total < config.cycles.failed.total &&
+            cycleCounters.failed.action < config.cycles.failed.action &&
+            cycleCounters.failed.format < config.cycles.failed.format
         ) {
-            const cycleResult = await this.cycle(task, page, actions)
-            cycles.total++
+            const cycleResult = await this.cycle(task, page, cycles)
+            cycleCounters.total++
 
             switch (cycleResult.status) {
                 case CycleStatus.SUCCESS: {
-                    actions.push(cycleResult.report)
+                    cycles.push(cycleResult.report)
                     const action = cycleResult.report.action
-                    if (action.type === ActionType.Done) {
+                    if (action.type === ActionType.DONE) {
                         return {
-                            id: task.id,
                             status:
                                 action.arguments.status === 'success'
                                     ? TaskStatus.COMPLETED
                                     : TaskStatus.FAILED,
                             message: action.arguments.reason.toString(),
                             value: action.arguments.value as string | undefined,
-                            actions,
+                            cycles,
                         }
                     }
                     this.logger.verbose('Cycle completed', {
                         id: task.id,
-                        cycle: cycles.total,
+                        cycle: cycleCounters.total,
                         action: action,
                     })
-                    this.worker.rabbitmq?.emitEvent({
-                        type: WorkerEventType.CYCLE_COMPLETED,
+                    this.worker.rabbitmq?.emitTaskEvent({
+                        type: TaskEventType.CYCLE_COMPLETED,
+                        id: task.id,
                         report: cycleResult.report,
                     })
                     break
                 }
                 case CycleStatus.ACTION_FAILED:
-                    cycles.failed.total++
-                    cycles.failed.action++
-                    actions.push(cycleResult.report)
+                    cycleCounters.failed.total++
+                    cycleCounters.failed.action++
+                    cycles.push(cycleResult.report)
+
                     this.logger.verbose('Cycle action failed', {
                         id: task.id,
-                        cycle: cycles.total,
-                        failed: cycles.failed,
+                        cycle: cycleCounters.total,
+                        failed: cycleCounters.failed,
                         action: cycleResult.report.action,
                     })
+
                     break
                 case CycleStatus.FORMAT_FAILED:
-                    cycles.failed.total++
-                    cycles.failed.format++
+                    cycleCounters.failed.total++
+                    cycleCounters.failed.format++
+
                     this.logger.verbose('Cycle format failed', {
                         id: task.id,
-                        cycle: cycles.total,
-                        failed: cycles.failed,
+                        cycle: cycleCounters.total,
+                        failed: cycleCounters.failed,
                     })
+
                     break
             }
         }
 
         let message
-        if (cycles.total >= config.cycles.total) {
+        if (cycleCounters.total >= config.cycles.total) {
             message = `Reached maximum cycles (${config.cycles.total})`
-        } else if (cycles.failed.total >= config.cycles.failed.total) {
+        } else if (cycleCounters.failed.total >= config.cycles.failed.total) {
             message = `Reached maximum failed cycles (${config.cycles.failed.total})`
-        } else if (cycles.failed.action >= config.cycles.failed.action) {
+        } else if (cycleCounters.failed.action >= config.cycles.failed.action) {
             message = `Reached maximum action failed cycles (${config.cycles.failed.action})`
         } else {
             message = `Reached maximum format failed cycles (${config.cycles.failed.format})`
         }
 
         return {
-            id: task.id,
             status: TaskStatus.FAILED,
             message,
-            value: JSON.stringify(actions),
-            actions,
+            cycles,
         }
     }
 
     private async cycle(
-        task: Task,
+        task: CreateTaskProps,
         page: PageWrapper,
-        actions: ActionReport[]
+        cycles: CycleReport[]
     ): Promise<CycleResult> {
         const startedAt = Date.now()
 
@@ -187,7 +221,7 @@ export default class ExecutionService {
                 title,
                 url,
                 task: task.prompt,
-                previous_actions: actions,
+                previous_cycles: cycles,
                 screenshot,
             },
         })
@@ -227,7 +261,7 @@ export default class ExecutionService {
 
         return {
             status:
-                status === ActionStatus.Success
+                status === ActionStatus.COMPLETED
                     ? CycleStatus.SUCCESS
                     : CycleStatus.ACTION_FAILED,
             report: {

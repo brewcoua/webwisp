@@ -60,7 +60,7 @@ export default class WorkerQueuesRepository
 
         this.workersQueue.consume(
             MessageQueues.WorkerEvents,
-            async (message) => {
+            async (message: amqp.ConsumeMessage | null) => {
                 if (!message) return
 
                 const event: WorkerEvent = JSON.parse(

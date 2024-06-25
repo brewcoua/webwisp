@@ -8,9 +8,8 @@ import prompts, {
     PromptExample,
 } from './mind.prompts'
 import Message from './domain/Message'
-import ActionType from '@domain/ActionType'
-import Action from '@domain/Action'
-import AbstractAction from '@domain/AbstractAction'
+import { Action, ActionType } from '@domain/action.types'
+import { AbstractAction } from '@domain/action.abstract-types'
 
 export default class MindTransformer {
     public makePrompt(placeholders: MindPromptPlaceholders): Message[] {
@@ -57,10 +56,11 @@ export default class MindTransformer {
                     {
                         type: 'text',
                         text: this.fillPlaceholders(prompt.prompt, {
-                            ...placeholders,
-                            screenshot: '',
-                            previous_actions: placeholders.previous_actions
-                                .map((action) => this.mapAction(action.action))
+                            title: placeholders.title,
+                            url: placeholders.url,
+                            task: placeholders.task,
+                            previous_actions: placeholders.previous_cycles
+                                .map((cycle) => this.mapAction(cycle.action))
                                 .join('\n'),
                         }),
                     },

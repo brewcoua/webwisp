@@ -21,16 +21,21 @@ import { CreateTaskService } from './commands/create-task/create-task.service'
 
 import { GetTaskHttpController } from './queries/get-task/get-task.http.controller'
 import { GetTaskQueryHandler } from './queries/get-task/get-task.query-handler'
+
 import { SubscribeHttpController } from './queries/subscribe/subscribe.http.controller'
+
+import { GetTraceHttpController } from './queries/get-trace/get-trace.http.controller'
+import { GetTraceQueryHandler } from './queries/get-trace/get-trace.query-handler'
 
 const HttpControllers = [
     CreateTaskHttpController,
     GetTaskHttpController,
     SubscribeHttpController,
+    GetTraceHttpController,
 ]
 
 const CommandHandlers: Provider[] = [CreateTaskService]
-const QueryHandlers: Provider[] = [GetTaskQueryHandler]
+const QueryHandlers: Provider[] = [GetTaskQueryHandler, GetTraceQueryHandler]
 
 const Mappers: Provider[] = [TasksMapper]
 

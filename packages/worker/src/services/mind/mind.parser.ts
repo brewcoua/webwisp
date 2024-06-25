@@ -1,4 +1,4 @@
-import ActionType from '@domain/ActionType'
+import { ActionArguments, ActionStatus, ActionType } from '@domain/action.types'
 import ParsedResult, {
     ParseError,
     ParsedAction,
@@ -6,13 +6,11 @@ import ParsedResult, {
     ParsedArguments,
 } from './domain/ParsedResult'
 import config from '@services/exec/execution.config'
-
-import ActionStatus from '@domain/ActionStatus'
-import AbstractAction from '@domain/AbstractAction'
-import { ActionArguments } from '@domain/Action'
-import AbstractArgument, {
+import {
+    AbstractAction,
+    AbstractArgument,
     AbstractArgumentType,
-} from '@domain/AbstractArgument'
+} from '@domain/action.abstract-types'
 
 const RAW_ACTION_REGEX = /~~~([^]*)~~~/
 
@@ -99,7 +97,7 @@ export default class MindParser {
         return {
             success: true,
             action: {
-                status: ActionStatus.Pending,
+                status: ActionStatus.PENDING,
                 type: actionType,
                 description: description.substring(2),
                 arguments: parsedArgs.arguments,
@@ -234,7 +232,7 @@ export default class MindParser {
         argument: AbstractArgument
     ): ParsedArgument | ParseError {
         switch (argument.type) {
-            case AbstractArgumentType.String:
+            case AbstractArgumentType.STRING:
                 if (argument.enum && !argument.enum.includes(buf)) {
                     return {
                         success: false,
@@ -245,7 +243,7 @@ export default class MindParser {
                     success: true,
                     argument: buf,
                 }
-            case AbstractArgumentType.Number: {
+            case AbstractArgumentType.NUMBER: {
                 const parsedNumber = parseInt(buf)
                 if (isNaN(parsedNumber)) {
                     return {
@@ -258,7 +256,7 @@ export default class MindParser {
                     argument: parsedNumber,
                 }
             }
-            case AbstractArgumentType.Boolean:
+            case AbstractArgumentType.BOOLEAN:
                 let val
                 if (buf === 'true' || buf === '1') {
                     val = true

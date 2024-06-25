@@ -59,4 +59,11 @@ export default class BrowserService {
         }
         return page
     }
+
+    public getContext(): ContextWrapper {
+        if (!this.context) {
+            throw new Error('Context not initialized')
+        }
+        return this.context
+    }
 }

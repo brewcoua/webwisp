@@ -10,4 +10,5 @@ export default class Node<T> {
 
 export interface TrackableData {
     id: unknown
+    clone: () => any
 }

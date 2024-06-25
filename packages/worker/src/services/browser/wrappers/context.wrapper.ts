@@ -70,4 +70,18 @@ export default class ContextWrapper {
             throw new Error('Failed to create page: ' + error)
         }
     }
+
+    public async startTracing(id: string): Promise<void> {
+        return this.context.tracing.start({
+            name: id,
+            screenshots: true,
+            snapshots: true,
+        })
+    }
+
+    public async stopTracing(id: string): Promise<void> {
+        return this.context.tracing.stop({
+            path: `/data/traces/${id}.zip`,
+        })
+    }
 }

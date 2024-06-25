@@ -46,6 +46,34 @@ export default class LinkedList<T extends TrackableData> {
     }
 
     /**
+     * Move an element to the front of the list
+     * @param node Node to move
+     * @returns Node containing the value or null if not found
+     */
+    moveToBack(node: Node<T>): void {
+        if (node === this.tail) return
+
+        if (node.prev) {
+            node.prev.next = node.next
+        } else {
+            this.head = node.next
+        }
+
+        if (node.next) {
+            node.next.prev = node.prev
+        }
+
+        node.prev = this.tail
+        node.next = null
+
+        if (this.tail) {
+            this.tail.next = node
+        }
+
+        this.tail = node
+    }
+
+    /**
      * Remove an element from the list
      * @param value Value to remove
      * @returns Node containing the value or null if not found
@@ -177,7 +205,7 @@ export default class LinkedList<T extends TrackableData> {
         const array: T[] = []
         let current = this.head
         while (current) {
-            array.push({ ...current.value })
+            array.push(current.value.clone())
             current = current.next
         }
         return array

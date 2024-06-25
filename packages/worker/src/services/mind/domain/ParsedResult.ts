@@ -1,7 +1,8 @@
-import Action, {
+import {
+    Action,
     ActionArgumentPrimitive,
     ActionArguments,
-} from '@domain/Action'
+} from '@domain/action.types'
 
 export type ParsedResult = {
     success: true

@@ -1,6 +1,8 @@
-import AbstractAction from '@domain/AbstractAction'
-import { AbstractArgumentType } from '@domain/AbstractArgument'
-import ActionType from '@domain/ActionType'
+import {
+    AbstractAction,
+    AbstractArgumentType,
+} from '@domain/action.abstract-types'
+import { ActionType } from '@domain/action.types'
 
 const config: RunnerConfig = {
     cycles: {
@@ -18,7 +20,7 @@ const config: RunnerConfig = {
             arguments: [
                 {
                     name: 'label',
-                    type: AbstractArgumentType.Number,
+                    type: AbstractArgumentType.NUMBER,
                     required: true,
                 },
             ],
@@ -30,12 +32,12 @@ const config: RunnerConfig = {
             arguments: [
                 {
                     name: 'label',
-                    type: AbstractArgumentType.Number,
+                    type: AbstractArgumentType.NUMBER,
                     required: true,
                 },
                 {
                     name: 'text',
-                    type: AbstractArgumentType.String,
+                    type: AbstractArgumentType.STRING,
                     required: true,
                 },
             ],
@@ -51,7 +53,7 @@ const config: RunnerConfig = {
             arguments: [
                 {
                     name: 'direction',
-                    type: AbstractArgumentType.String,
+                    type: AbstractArgumentType.STRING,
                     enum: ['up', 'down'],
                     required: true,
                 },
@@ -74,18 +76,18 @@ const config: RunnerConfig = {
             arguments: [
                 {
                     name: 'status',
-                    type: AbstractArgumentType.String,
+                    type: AbstractArgumentType.STRING,
                     enum: ['success', 'failure'],
                     required: true,
                 },
                 {
                     name: 'reason',
-                    type: AbstractArgumentType.String,
+                    type: AbstractArgumentType.STRING,
                     required: true,
                 },
                 {
                     name: 'value',
-                    type: AbstractArgumentType.String,
+                    type: AbstractArgumentType.STRING,
                     required: false,
                 },
             ],

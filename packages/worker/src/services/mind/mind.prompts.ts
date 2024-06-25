@@ -1,4 +1,4 @@
-import ActionReport from '@domain/ActionReport'
+import { CycleReport } from '@services/exec/domain/task.types'
 
 const prompts: Prompts = {
     system: {
@@ -102,6 +102,6 @@ export type MindPromptUserPlaceholders = {
     title: string
     url: string
     task: string
-    previous_actions: ActionReport[]
+    previous_cycles: CycleReport[]
     screenshot: string
 }

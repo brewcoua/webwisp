@@ -102,6 +102,10 @@ export default abstract class Entity<EntityProps> {
         return Object.freeze(result)
     }
 
+    public clone(): Entity<EntityProps> {
+        return Object.assign(Object.create(Object.getPrototypeOf(this)), this)
+    }
+
     public abstract validate(): void
 
     private validateProps(props: EntityProps): void {

@@ -3,9 +3,7 @@ import { mkdirSync, readFileSync } from 'node:fs'
 import { Logger } from 'winston'
 
 import config, { REMOTE_PORT } from '../browser.config'
-import Action from '@domain/Action'
-import ActionStatus from '@domain/ActionStatus'
-import ActionType from '@domain/ActionType'
+import { Action, ActionStatus, ActionType } from '@domain/action.types'
 
 const SoMUrl = 'https://unpkg.com/@brewcoua/web-som@1.2.2/SoM.min.js'
 
@@ -169,47 +167,47 @@ export default class PageWrapper {
      */
     public async perform(action: Action): Promise<ActionStatus> {
         try {
-            if (action.type === ActionType.Scroll) {
+            if (action.type === ActionType.SCROLL) {
                 await this.page.evaluate(
                     `window.scrollBy({ top: ${
                         action.arguments.direction === 'down' ? '' : '-'
                     }((window.innerHeight / 3) * 2) })`
                 )
-            } else if (action.type === ActionType.PressEnter) {
+            } else if (action.type === ActionType.PRESS_ENTER) {
                 await this.page.keyboard.press('Enter')
-            } else if (action.type === ActionType.Back) {
+            } else if (action.type === ActionType.BACK) {
                 await this.page.goBack({
                     waitUntil: 'domcontentloaded',
                 })
-            } else if (action.type === ActionType.Forward) {
+            } else if (action.type === ActionType.FORWARD) {
                 await this.page.goForward({
                     waitUntil: 'domcontentloaded',
                 })
             } else if (
-                action.type === ActionType.Click ||
-                action.type === ActionType.Type
+                action.type === ActionType.CLICK ||
+                action.type === ActionType.TYPE
             ) {
                 const element = await this.page.$(
                     `[data-som="${action.arguments.label}"]`
                 )
                 if (!element) {
-                    return ActionStatus.Failed
+                    return ActionStatus.FAILED
                 }
 
                 switch (action.type) {
-                    case ActionType.Click:
+                    case ActionType.CLICK:
                         await element.click()
                         break
-                    case ActionType.Type:
+                    case ActionType.TYPE:
                         await element.fill(action.arguments.text as string)
                         break
                 }
             }
 
-            return ActionStatus.Success
+            return ActionStatus.COMPLETED
         } catch (err: any) {
             this.logger.debug('Failed to perform action: ' + err.message)
-            return ActionStatus.Failed
+            return ActionStatus.FAILED
         }
     }
 }
