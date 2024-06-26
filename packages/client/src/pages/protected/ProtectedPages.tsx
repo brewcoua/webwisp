@@ -6,6 +6,7 @@ import { useEffect, useState } from 'preact/hooks'
 import Dashboard from './Dashboard'
 import { useClient } from '@api/client'
 import { setUser } from '@store/user'
+import { UserScopes } from '@domain/user.types'
 
 export default function ProtectedPages() {
     const [isLoading, setIsLoading] = useState(false)
@@ -17,7 +18,7 @@ export default function ProtectedPages() {
             useClient()
                 .auth.me()
                 .then((user) => {
-                    if (!user) {
+                    if (!user || !user.scopes.includes(UserScopes.VIEW)) {
                         navigate('/login')
                         reject()
                     } else {

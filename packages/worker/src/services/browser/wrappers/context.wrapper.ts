@@ -73,7 +73,7 @@ export default class ContextWrapper {
 
     public async startTracing(id: string): Promise<void> {
         return this.context.tracing.start({
-            name: id,
+            title: id,
             screenshots: true,
             snapshots: true,
         })

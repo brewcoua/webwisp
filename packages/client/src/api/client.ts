@@ -1,13 +1,13 @@
 import { signal } from '@preact/signals'
-import { navigate } from 'wouter/use-browser-location'
 
 import { TasksGateway, WorkersGateway, AuthGateway } from './gateways'
-import { TasksGatewayMock, WorkersGatewayMock, AuthGatewayMock } from './mock'
 import { useAccessToken } from './gateways/auth.gateway'
 
 import ITasksGateway from '@domain/api/gateways/tasks.gateway'
 import IWorkersGateway from '@domain/api/gateways/workers.gateway'
 import IAuthGateway from '@domain/api/gateways/auth.gateway'
+
+export const BASE_URL = import.meta.env.DEV ? 'http://localhost:3000' : ''
 
 export class Client {
     public readonly auth: IAuthGateway
@@ -15,17 +15,9 @@ export class Client {
     public readonly workers: IWorkersGateway
 
     constructor() {
-        const isDevelopment = import.meta.env.DEV === true
-
-        if (isDevelopment) {
-            this.auth = new AuthGatewayMock()
-            this.tasks = new TasksGatewayMock()
-            this.workers = new WorkersGatewayMock()
-        } else {
-            this.auth = new AuthGateway()
-            this.tasks = new TasksGateway()
-            this.workers = new WorkersGateway()
-        }
+        this.auth = new AuthGateway()
+        this.tasks = new TasksGateway()
+        this.workers = new WorkersGateway()
     }
 }
 

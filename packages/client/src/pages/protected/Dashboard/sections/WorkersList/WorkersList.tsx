@@ -3,7 +3,7 @@ import { Accordion, SlideFade, Text } from '@chakra-ui/react'
 
 import { $workers } from '@store/workers'
 import { useClient } from '@api/client'
-import { useEffect } from 'preact/hooks'
+import { useEffect, useState } from 'preact/hooks'
 
 import BentoBox from '../../BentoBox'
 import { WorkerItem } from './WorkerItem'
@@ -20,6 +20,7 @@ export default function WorkersList(): JSX.Element {
     }, [])
 
     const workers = useStore($workers)
+    const [selectedWorker, setSelectedWorker] = useState<string | null>(null)
 
     return (
         <BentoBox h="100%" w="50%" position="relative" overflow="hidden">
@@ -34,16 +35,30 @@ export default function WorkersList(): JSX.Element {
                     className={styles.workersList}
                     allowToggle
                     p={3}
+                    onChange={(index) =>
+                        setSelectedWorker(
+                            workers[(index as number[])[0]]?.id || null
+                        )
+                    }
                 >
                     {workers.map((worker) => (
-                        <WorkerItem worker={worker} key={worker.id} />
+                        <WorkerItem
+                            worker={worker}
+                            key={worker.id}
+                            isSelected={selectedWorker === worker.id}
+                        />
                     ))}
                 </Accordion>
             )}
             {workers.length === 0 && (
-                <SlideFade in offsetY="20px">
+                <SlideFade
+                    in
+                    offsetY="20px"
+                    style={{ width: '100%', height: '100%' }}
+                >
                     <Text
                         position="absolute"
+                        pt={3}
                         top="50%"
                         left="50%"
                         transform="translate(-50%, -50%)"

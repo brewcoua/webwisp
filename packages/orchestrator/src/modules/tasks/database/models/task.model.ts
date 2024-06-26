@@ -91,3 +91,14 @@ export interface ITask extends ObjectLiteral {
     value?: string
     cycles: CycleReport[]
 }
+
+export const SortableTaskFields = {
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt',
+    status: 'status',
+} satisfies {
+    [key in keyof ITask]?: string
+}
+
+export type SortableTaskField =
+    (typeof SortableTaskFields)[keyof typeof SortableTaskFields]

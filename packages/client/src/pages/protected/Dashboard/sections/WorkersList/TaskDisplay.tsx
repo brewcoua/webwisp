@@ -33,14 +33,20 @@ export default function TaskDisplay({
 
     if (isLoading) {
         return (
-            <Flex h="5rem" w="100%" justify="center" align="center">
+            <AccordionPanel
+                h="5rem"
+                w="100%"
+                display="flex"
+                justifyContent="center"
+                alignItems="center"
+            >
                 <Spinner size="lg" />
-            </Flex>
+            </AccordionPanel>
         )
     }
 
     if (!props) {
-        return <Box {...rest}>Task not found</Box>
+        return <AccordionPanel {...rest}>Task not found</AccordionPanel>
     }
 
     return (

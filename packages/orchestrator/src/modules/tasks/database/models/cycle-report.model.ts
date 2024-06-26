@@ -7,6 +7,7 @@ import { Action, ActionSchema, IAction } from './action.model'
 @Schema({
     timestamps: false,
     versionKey: false,
+    id: false,
 })
 export class CycleReport {
     @Prop({

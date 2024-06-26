@@ -1,3 +1,4 @@
+import { useClient } from '@api/client'
 import { Flex, Spinner, Text, useColorModeValue } from '@chakra-ui/react'
 import { useEffect, useRef, useState } from 'preact/hooks'
 
@@ -28,19 +29,34 @@ export default function Preview({ task_id }: PreviewProps): JSX.Element {
             return
         }
 
-        const onLoad = () => {
+        setIsLoading(true)
+        useClient()
+            .tasks.getTrace(task_id)
+            .then((url) => {
+                frameRef.current!.src = url
+            })
+
+        const onLoad = async () => {
+            const iframeDocument =
+                frameRef.current?.contentDocument ||
+                frameRef.current?.contentWindow?.document
+            const style = iframeDocument?.createElement('style')
+            style!.textContent = `
+                .header {
+                    display: none !important;
+                }
+            `
+            iframeDocument?.head.appendChild(style!)
             setIsLoading(false)
         }
 
-        frameRef.current.addEventListener('load', onLoad)
+        frameRef.current?.addEventListener('load', onLoad)
 
         return () => {
             frameRef.current?.removeEventListener('load', onLoad)
             setIsLoading(true)
         }
     }, [task_id])
-
-    const traceUrl = `https://trace.playwright.dev/?trace=http://localhost:3000/api/tasks/trace/${task_id}`
 
     return (
         <Flex w="100%" h="100%" direction="column" position="relative">
@@ -59,11 +75,7 @@ export default function Preview({ task_id }: PreviewProps): JSX.Element {
                     <Spinner size="xl" />
                 </Flex>
             )}
-            <iframe
-                ref={frameRef}
-                src={traceUrl}
-                style={{ width: '100%', height: '100%' }}
-            />
+            <iframe ref={frameRef} style={{ width: '100%', height: '100%' }} />
         </Flex>
     )
 }

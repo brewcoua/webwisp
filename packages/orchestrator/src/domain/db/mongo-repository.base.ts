@@ -5,6 +5,7 @@ import { None, Option, Some } from 'oxide.ts'
 import {
     Entity,
     Mapper,
+    MatchQueryParams,
     Paginated,
     PaginatedQueryParams,
     RepositoryPort,
@@ -44,9 +45,20 @@ export abstract class MongoRepositoryBase<
     }
 
     async findAllPaginated(
-        params: PaginatedQueryParams
+        params: PaginatedQueryParams,
+        matches: MatchQueryParams[] = []
     ): Promise<Paginated<Aggregate>> {
-        return this.findPaginated(params)
+        return this.findPaginated(
+            params,
+            matches.map((match) => ({
+                $match: {
+                    [match.key]: {
+                        $regex: match.query,
+                        $options: 'i',
+                    },
+                },
+            }))
+        )
     }
 
     async delete(entity: Aggregate): Promise<boolean> {

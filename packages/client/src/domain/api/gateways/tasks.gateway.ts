@@ -5,6 +5,7 @@ import { TaskEvent } from '@domain/task.events'
 export default interface ITasksGateway {
     createTask(task: CreateTaskProps): Promise<{ id: string }>
     getTask(id: string): Promise<TaskProps | null>
-    getTrace(id: string): Promise<Blob | null>
+    getTasks(): Promise<TaskProps[] | null>
+    getTrace(id: string): Promise<string>
     subscribe(): SseClient<TaskEvent>
 }

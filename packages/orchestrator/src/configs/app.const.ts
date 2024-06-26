@@ -1,6 +1,6 @@
 import { RequireAtLeastOne } from '@domain/types'
 
-export const ValidationOptions: IValidationOptions = {
+export const ValidationOptions = {
     id: {
         length: 24,
         match: /^[a-fA-F0-9]{24}$/,
@@ -18,9 +18,9 @@ export const ValidationOptions: IValidationOptions = {
         minLength: 8,
         maxLength: 64,
     },
-}
+} satisfies IValidationOptions
 
-export const LimitOptions: ILimitOptions = {
+export const LimitOptions = {
     pagination: {
         limit: {
             min: 1,
@@ -33,7 +33,7 @@ export const LimitOptions: ILimitOptions = {
             default: 1,
         },
     },
-}
+} satisfies ILimitOptions
 
 export enum MessageQueues {
     Tasks = 'tasks',

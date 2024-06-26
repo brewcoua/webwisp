@@ -1,10 +1,10 @@
-import { fetchAuthed } from '@api/client'
+import { BASE_URL, fetchAuthed } from '@api/client'
 import IAuthGateway from '@domain/api/gateways/auth.gateway'
 import { UserProps } from '@domain/user.types'
 
 export default class AuthGateway implements IAuthGateway {
     async login(username: string, password: string): Promise<boolean> {
-        const response = await fetch('/api/auth/login', {
+        const response = await fetch(`${BASE_URL}/api/auth/login`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -23,7 +23,7 @@ export default class AuthGateway implements IAuthGateway {
     }
 
     async signup(username: string, password: string): Promise<boolean> {
-        const response = await fetch('/api/auth/signup', {
+        const response = await fetch(`${BASE_URL}/api/auth/signup`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -39,7 +39,7 @@ export default class AuthGateway implements IAuthGateway {
     }
 
     async me(): Promise<UserProps | null> {
-        const response = await fetchAuthed('/api/auth/me')
+        const response = await fetchAuthed(`${BASE_URL}/api/auth/me`)
 
         if (!response?.ok) {
             return null

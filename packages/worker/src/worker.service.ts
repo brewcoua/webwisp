@@ -14,10 +14,10 @@ export default class WorkerService {
 
     public readonly id = nanoid()
 
-    private execution: ExecutionService | null = null
-    public rabbitmq: RabbitMQService | null = null
-    public browser: BrowserService | null = null
-    public mind: MindService | null = null
+    private execution!: ExecutionService
+    public rabbitmq!: RabbitMQService
+    public browser!: BrowserService
+    public mind!: MindService
 
     async initialize() {
         this.logger.info('Initializing WorkerService')

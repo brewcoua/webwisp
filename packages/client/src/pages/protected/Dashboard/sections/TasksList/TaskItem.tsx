@@ -1,10 +1,12 @@
 import {
+    BoxProps,
     Button,
     ButtonProps,
     Flex,
     Icon,
     IconProps,
     Link,
+    SlideFade,
     Spinner,
     Text,
     Tooltip,
@@ -25,17 +27,7 @@ export default function TaskItem({
     ...props
 }: TaskItemProps): JSX.Element {
     return (
-        <Tooltip
-            label={task.id}
-            aria-label={task.id}
-            bg={useColorModeValue('gray.400', 'gray.500')}
-            color={useColorModeValue('gray.800', 'gray.200')}
-            fontSize="sm"
-            borderRadius="md"
-            hasArrow
-            placement="right"
-            openDelay={300}
-        >
+        <SlideFade in offsetY="20px" style={{ width: '100%' }}>
             <Button
                 bg={useColorModeValue('gray.200', 'gray.600')}
                 opacity={selectedTask.value === task.id ? 1 : 0.7}
@@ -55,11 +47,20 @@ export default function TaskItem({
                 }}
                 {...props}
             >
-                <Flex direction="row" gap={2} w="100%" h="100%">
-                    <Flex w="1rem" h="100%" align="center" justify="center">
-                        <TaskStatusIcon status={task.status} />
+                <Flex direction="row" gap="0.5rem" w="100%" h="100%">
+                    <Flex w="1.5rem" h="100%" align="center" justify="center">
+                        <TaskStatusIcon
+                            status={task.status}
+                            h="100%"
+                            w="100%"
+                        />
                     </Flex>
-                    <Flex direction="column" gap={1} align="flex-start">
+                    <Flex
+                        direction="column"
+                        gap={1}
+                        align="flex-start"
+                        w="calc(100% - 2rem)"
+                    >
                         <Link
                             fontSize="xs"
                             isExternal
@@ -68,13 +69,24 @@ export default function TaskItem({
                         >
                             {task.target}
                         </Link>
-                        <Text fontSize="sm" maxWidth="100%">
-                            {task.prompt}
-                        </Text>
+                        <Tooltip
+                            label={task.prompt}
+                            aria-label="Task prompt"
+                            openDelay={500}
+                        >
+                            <Text
+                                fontSize="sm"
+                                maxWidth="100%"
+                                textOverflow="ellipsis"
+                                overflow="hidden"
+                            >
+                                {task.prompt}
+                            </Text>
+                        </Tooltip>
                     </Flex>
                 </Flex>
             </Button>
-        </Tooltip>
+        </SlideFade>
     )
 }
 
@@ -90,6 +102,7 @@ export function TaskStatusIcon({
             <Icon
                 as={MdOutlinePending}
                 color={useColorModeValue('gray.500', 'gray.300')}
+                {...props}
             />
         )
     } else if (status === TaskStatus.RUNNING) {
@@ -104,6 +117,7 @@ export function TaskStatusIcon({
             <Icon
                 as={IoCheckmarkCircle}
                 color={useColorModeValue('green.500', 'green.300')}
+                {...props}
             />
         )
     } else {
@@ -111,6 +125,7 @@ export function TaskStatusIcon({
             <Icon
                 as={IoCloseCircle}
                 color={useColorModeValue('red.500', 'red.300')}
+                {...props}
             />
         )
     }

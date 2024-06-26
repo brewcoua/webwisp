@@ -19,7 +19,11 @@ async function bootstrap() {
     })
 
     app.setGlobalPrefix('api')
-    app.useGlobalPipes(new ValidationPipe())
+    app.useGlobalPipes(
+        new ValidationPipe({
+            transform: true,
+        })
+    )
     app.getHttpAdapter().getInstance().disable('x-powered-by')
 
     const document = SwaggerModule.createDocument(app, makeSwaggerConfig())

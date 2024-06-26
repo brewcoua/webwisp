@@ -29,11 +29,19 @@ export type PaginatedQueryParams = {
     createdBefore?: Date
 }
 
+export type MatchQueryParams = {
+    key: string
+    query: string
+}
+
 export interface RepositoryPort<Entity> {
     insert(entity: Entity | Entity[]): Promise<void>
     findOneById(id: string): Promise<Option<Entity>>
     findAll(): Promise<Entity[]>
-    findAllPaginated(params: PaginatedQueryParams): Promise<Paginated<Entity>>
+    findAllPaginated(
+        params: PaginatedQueryParams,
+        matches?: MatchQueryParams[]
+    ): Promise<Paginated<Entity>>
     delete(entity: Entity): Promise<boolean>
     deleteById(id: string): Promise<boolean>
 

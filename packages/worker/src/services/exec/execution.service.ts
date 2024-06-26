@@ -26,22 +26,25 @@ export default class ExecutionService {
         this.logger = logger.child({
             context: 'ExecutionService',
         })
-        this.worker.rabbitmq?.bindTasks((task) => this.listener(task))
+        this.worker.rabbitmq.bindTasks((task) => this.listener(task))
     }
 
     async listener(task: CreateTaskProps) {
         this.logger.info('Received task to execute', { id: task.id })
 
-        await this.worker.browser?.getContext().startTracing(task.id)
+        await this.worker.browser.getContext().startTracing(task.id)
 
         const result = await this.execute(task)
+
+        await this.worker.browser.getContext().stopTracing(task.id)
+
         this.logger.info('Task executed', {
             id: task.id,
             status: result.status,
         })
         this.logger.verbose('Result', result)
 
-        const status = this.worker.rabbitmq?.emitTaskEvent({
+        const status = this.worker.rabbitmq.emitTaskEvent({
             type: TaskEventType.COMPLETED,
             id: task.id,
             task: {
@@ -51,12 +54,10 @@ export default class ExecutionService {
             },
         })
 
-        this.worker.rabbitmq?.emitWorkerEvent({
+        this.worker.rabbitmq.emitWorkerEvent({
             type: WorkerEventType.STATUS_CHANGED,
             status: WorkerStatus.READY,
         })
-
-        await this.worker.browser?.getContext().stopTracing(task.id)
 
         if (status) {
             this.logger.debug('Published result for task', { id: task.id })
@@ -70,7 +71,7 @@ export default class ExecutionService {
     ): Promise<Omit<TaskProps, 'target' | 'prompt'>> {
         this.logger.verbose('Executing task', { id: task.id })
 
-        this.worker.rabbitmq?.emitTaskEvent({
+        this.worker.rabbitmq.emitTaskEvent({
             type: TaskEventType.STARTED,
             id: task.id,
             task: {
@@ -81,7 +82,7 @@ export default class ExecutionService {
             },
         })
 
-        this.worker.rabbitmq?.emitWorkerEvent({
+        this.worker.rabbitmq.emitWorkerEvent({
             type: WorkerEventType.STATUS_CHANGED,
             status: WorkerStatus.BUSY,
             task: task.id,
@@ -96,7 +97,7 @@ export default class ExecutionService {
                 format: 0, // Format is wrong
             },
         }
-        const page = await this.worker.browser?.detach(task.target)
+        const page = await this.worker.browser.detach(task.target)
         if (!page) {
             return {
                 status: TaskStatus.FAILED,
@@ -134,7 +135,7 @@ export default class ExecutionService {
                         cycle: cycleCounters.total,
                         action: action,
                     })
-                    this.worker.rabbitmq?.emitTaskEvent({
+                    this.worker.rabbitmq.emitTaskEvent({
                         type: TaskEventType.CYCLE_COMPLETED,
                         id: task.id,
                         report: cycleResult.report,
@@ -216,7 +217,7 @@ export default class ExecutionService {
             }
         }
 
-        const messages = this.worker.mind?.transformer.makePrompt({
+        const messages = this.worker.mind.transformer.makePrompt({
             user: {
                 title,
                 url,
@@ -234,7 +235,7 @@ export default class ExecutionService {
             }
         }
 
-        const completion = await this.worker.mind?.model.generate(messages)
+        const completion = await this.worker.mind.model.generate(messages)
         if (!completion) {
             this.logger.error('Failed to generate completion during cycle', {
                 id: task.id,
@@ -244,12 +245,12 @@ export default class ExecutionService {
             }
         }
 
-        const parsed = this.worker.mind?.parser.parse(completion)
+        const parsed = this.worker.mind.parser.parse(completion)
 
         if (!parsed || !parsed.success) {
             this.logger.verbose('Failed to parse completion during cycle', {
                 id: task.id,
-                reason: parsed?.error,
+                reason: parsed.error,
             })
             return {
                 status: CycleStatus.FORMAT_FAILED,

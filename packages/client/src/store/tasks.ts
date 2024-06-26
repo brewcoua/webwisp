@@ -1,7 +1,9 @@
+import { atom, onMount } from 'nanostores'
+import { navigate } from 'wouter/use-browser-location'
+
 import { useClient } from '@api/client'
 import { TaskEvent, TaskEventType } from '@domain/task.events'
 import { CycleReport, TaskProps, TaskStatus } from '@domain/task.types'
-import { atom, onMount } from 'nanostores'
 
 export const $tasks = atom<TaskProps[]>([])
 
@@ -27,6 +29,7 @@ export async function getTask(id: string): Promise<TaskProps | null> {
     if (response) {
         addTask(response)
     }
+
     return response
 }
 
@@ -67,6 +70,16 @@ export function setTaskStatus(id: string, status: TaskStatus) {
 }
 
 onMount($tasks, () => {
+    useClient()
+        .tasks.getTasks()
+        .then((tasks) => {
+            if (tasks) {
+                $tasks.set(tasks)
+            } else {
+                navigate('/login')
+            }
+        })
+
     const sub = useClient().tasks.subscribe()
     const source = sub.subscribe()
 

@@ -7,6 +7,7 @@ import { ActionStatus, ActionType } from '../../domain/action.types'
 @Schema({
     timestamps: false,
     versionKey: false,
+    id: false,
 })
 export class Action {
     @Prop({
