@@ -27,14 +27,18 @@ import { SubscribeHttpController } from './queries/subscribe/subscribe.http.cont
 import { GetTraceHttpController } from './queries/get-trace/get-trace.http.controller'
 import { GetTraceQueryHandler } from './queries/get-trace/get-trace.query-handler'
 
+import { DeleteTaskHttpController } from './commands/delete-task/delete-task.http.controller'
+import { DeleteTaskService } from './commands/delete-task/delete-task.service'
+
 const HttpControllers = [
     CreateTaskHttpController,
     GetTaskHttpController,
     SubscribeHttpController,
     GetTraceHttpController,
+    DeleteTaskHttpController,
 ]
 
-const CommandHandlers: Provider[] = [CreateTaskService]
+const CommandHandlers: Provider[] = [CreateTaskService, DeleteTaskService]
 const QueryHandlers: Provider[] = [GetTaskQueryHandler, GetTraceQueryHandler]
 
 const Mappers: Provider[] = [TasksMapper]

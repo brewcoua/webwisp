@@ -5,17 +5,23 @@ import LaunchBenchmark from './sections/LaunchBenchmark'
 import WorkersList from './sections/WorkersList'
 import TasksList from './sections/TasksList'
 import BentoBox from './BentoBox'
+import TaskInfo from './sections/TaskInfo'
 
 export default function Dashboard(): JSX.Element {
     return (
-        <Flex h="200%" w="100%" direction="column">
+        <Flex
+            h="180%"
+            w="100%"
+            direction="column"
+            gap={5}
+            p={{
+                base: 3,
+                sm: 5,
+                md: 10,
+                lg: 20,
+            }}
+        >
             <Flex
-                p={{
-                    base: 3,
-                    sm: 5,
-                    md: 10,
-                    lg: 20,
-                }}
                 pb={0}
                 direction="row"
                 gap={5}
@@ -31,12 +37,6 @@ export default function Dashboard(): JSX.Element {
                 </Flex>
             </Flex>
             <Flex
-                p={{
-                    base: 3,
-                    sm: 5,
-                    md: 10,
-                    lg: 20,
-                }}
                 pt={0}
                 direction="row"
                 gap={5}
@@ -46,9 +46,7 @@ export default function Dashboard(): JSX.Element {
                 justifyContent="center"
             >
                 <TasksList />
-                <BentoBox direction="column" gap={5} h="100%" w="70%">
-                    TODO
-                </BentoBox>
+                <TaskInfo />
             </Flex>
         </Flex>
     )

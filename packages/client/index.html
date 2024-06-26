@@ -3,9 +3,10 @@
     <head>
         <meta charset="UTF-8" />
         <title>WebWisp</title>
+        <!-- CSP, but allow trace.playwright.dev -->
         <meta
             http-equiv="Content-Security-Policy"
-            content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:"
+            content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self'; frame-src 'self' https://trace.playwright.dev; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; manifest-src 'self'; media-src 'self'; worker-src 'self'; report-uri /csp-report"
         />
     </head>
 

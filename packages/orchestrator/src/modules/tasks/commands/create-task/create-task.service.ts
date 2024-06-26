@@ -4,7 +4,6 @@ import { Err, Ok, Result } from 'oxide.ts'
 
 import { CreateTaskCommand } from './create-task.command'
 import TaskEntity from '../../domain/task.entity'
-import { TaskStatus } from '../../domain/task.types'
 
 import { TASK_QUEUES_REPOSITORY } from '../../tasks.tokens'
 import { TaskQueuesRepositoryPort } from '../../database/repositories/queues.repository.port'

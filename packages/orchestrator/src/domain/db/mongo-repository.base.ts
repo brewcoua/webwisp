@@ -54,7 +54,13 @@ export abstract class MongoRepositoryBase<
 
         const result = await this.model.findByIdAndDelete(entity.id).exec()
 
-        return result.length > 0
+        return !!result
+    }
+
+    async deleteById(id: string): Promise<boolean> {
+        const result = await this.model.findByIdAndDelete(id).exec()
+
+        return !!result
     }
 
     async insert(entity: Aggregate | Aggregate[]): Promise<void> {

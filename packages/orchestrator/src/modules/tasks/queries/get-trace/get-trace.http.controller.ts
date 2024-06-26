@@ -14,11 +14,11 @@ import {
     ApiTags,
 } from '@nestjs/swagger'
 
-import { Scopes } from '@modules/auth'
-import { UserScopes } from '@modules/auth/domain/user.types'
+import { Public } from '@modules/auth'
 import { Result, match } from 'oxide.ts'
 import { GetTraceQuery } from './get-trace.query'
 import { Response } from 'express'
+import { ReadStream } from 'fs'
 
 @ApiTags('tasks')
 @Controller('tasks')
@@ -32,14 +32,15 @@ export class GetTraceHttpController {
         type: StreamableFile,
     })
     @ApiBearerAuth()
-    @Scopes(UserScopes.VIEW)
+    @Public()
     @Get('trace/:id')
     async getTrace(
         @Param('id') id: string,
         @Res() res: Response
-    ): Promise<StreamableFile> {
-        const result: Result<StreamableFile, Error> =
-            await this.queryBus.execute(new GetTraceQuery({ id }))
+    ): Promise<void> {
+        const result: Result<ReadStream, Error> = await this.queryBus.execute(
+            new GetTraceQuery({ id })
+        )
 
         return match(result, {
             Ok: (file) => {
@@ -48,7 +49,7 @@ export class GetTraceHttpController {
                     'Content-Disposition': `attachment; filename=${id}.zip`,
                 })
 
-                return file
+                file.pipe(res)
             },
             Err: (error) => {
                 throw error
