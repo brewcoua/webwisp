@@ -6,6 +6,7 @@ export default interface ITasksGateway {
     createTask(task: CreateTaskProps): Promise<{ id: string }>
     getTask(id: string): Promise<TaskProps | null>
     getTasks(): Promise<TaskProps[] | null>
-    getTrace(id: string): Promise<string>
+    getTrace(id: string): string
+    deleteTask(id: string): Promise<void>
     subscribe(): SseClient<TaskEvent>
 }

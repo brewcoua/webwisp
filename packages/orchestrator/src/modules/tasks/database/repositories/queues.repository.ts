@@ -10,9 +10,10 @@ import TaskEntity from '../../domain/task.entity'
 import { TaskEvent, TaskEventType } from '../../domain/task.events'
 import { EventEmitter2 } from '@nestjs/event-emitter'
 
-import { TASK_REPOSITORY } from '../../tasks.tokens'
+import { TASK_REPOSITORY, TRACES_REPOSITORY } from '../../tasks.tokens'
 import { TaskRepositoryPort } from './task.repository.port'
 import { TaskStatus } from '../../domain/task.types'
+import { TracesRepositoryPort } from './traces.repository.port'
 
 @Injectable()
 export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
@@ -25,6 +26,8 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
         private readonly rabbitMQService: RabbitMQService,
         @Inject(TASK_REPOSITORY)
         private readonly taskRepository: TaskRepositoryPort,
+        @Inject(TRACES_REPOSITORY)
+        private readonly tracesRepository: TracesRepositoryPort,
         private readonly eventEmitter: EventEmitter2
     ) {}
 
@@ -101,6 +104,8 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
                         await this.taskRepository.transaction(async () => {
                             await this.taskRepository.insert(entity)
                         })
+
+                        await this.tracesRepository.uploadTrace(event.id)
 
                         Logger.log(
                             `Task completed: ${event.id}`,

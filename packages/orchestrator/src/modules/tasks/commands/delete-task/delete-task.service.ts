@@ -3,15 +3,18 @@ import { Inject, NotFoundException } from '@nestjs/common'
 import { Err, Ok, Result } from 'oxide.ts'
 import { existsSync, rmSync } from 'fs'
 
-import { TASK_REPOSITORY } from '../../tasks.tokens'
+import { TASK_REPOSITORY, TRACES_REPOSITORY } from '../../tasks.tokens'
 import { DeleteTaskCommand } from './delete-task.command'
 import { TaskRepositoryPort } from '../../database/repositories/task.repository.port'
+import { TracesRepositoryPort } from '../../database/repositories/traces.repository.port'
 
 @CommandHandler(DeleteTaskCommand)
 export class DeleteTaskService implements ICommandHandler<DeleteTaskCommand> {
     constructor(
         @Inject(TASK_REPOSITORY)
-        private readonly taskRepository: TaskRepositoryPort
+        private readonly taskRepository: TaskRepositoryPort,
+        @Inject(TRACES_REPOSITORY)
+        private readonly tracesRepository: TracesRepositoryPort
     ) {}
 
     async execute(command: DeleteTaskCommand): Promise<Result<void, Error>> {
@@ -24,19 +27,7 @@ export class DeleteTaskService implements ICommandHandler<DeleteTaskCommand> {
             )
         }
 
-        // Now let's check if it has a trace leftover
-        if (existsSync(`/data/traces/${command.task_id}.zip`)) {
-            // If it does, let's delete it
-            try {
-                rmSync(`/data/traces/${command.task_id}.zip`)
-            } catch (error) {
-                return Err(
-                    new Error(
-                        `Failed to delete trace for task with id ${command.task_id}`
-                    )
-                )
-            }
-        }
+        await this.tracesRepository.deleteTrace(command.task_id)
 
         return Ok(undefined)
     }

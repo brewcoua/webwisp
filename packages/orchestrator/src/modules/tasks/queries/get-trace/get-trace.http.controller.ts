@@ -27,9 +27,8 @@ export class GetTraceHttpController {
 
     @ApiOperation({ summary: 'Get playwright trace for task' })
     @ApiResponse({
-        status: HttpStatus.OK,
-        description: 'Playwright trace',
-        type: StreamableFile,
+        status: HttpStatus.PERMANENT_REDIRECT,
+        description: 'Redirect to the trace file',
     })
     @ApiBearerAuth()
     @Public()
@@ -38,18 +37,13 @@ export class GetTraceHttpController {
         @Param('id') id: string,
         @Res() res: Response
     ): Promise<void> {
-        const result: Result<ReadStream, Error> = await this.queryBus.execute(
+        const result: Result<string, Error> = await this.queryBus.execute(
             new GetTraceQuery({ id })
         )
 
         return match(result, {
-            Ok: (file) => {
-                res.set({
-                    'Content-Type': 'application/zip',
-                    'Content-Disposition': `attachment; filename=${id}.zip`,
-                })
-
-                file.pipe(res)
+            Ok: (url) => {
+                res.redirect(url)
             },
             Err: (error) => {
                 throw error

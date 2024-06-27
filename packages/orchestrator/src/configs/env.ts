@@ -26,6 +26,19 @@ export const EnvVars = [
         name: 'RABBITMQ_DEFAULT_PASS',
         required: false,
     },
+
+    {
+        name: 'GCLOUD_KEYFILE_PATH',
+        required: false,
+    },
+    {
+        name: 'GCLOUD_PROJECT_ID',
+        required: false,
+    },
+    {
+        name: 'GCLOUD_BUCKET',
+        required: false,
+    },
 ] as const
 
 export function useEnv<T extends keyof TypedEnv>(key: T): TypedEnv[T] {

@@ -39,6 +39,7 @@
         "nanoid": "^5.0.7"
     },
     "dependencies": {
+        "@google-cloud/storage": "^7.11.2",
         "@nestjs/common": "^10.3.9",
         "@nestjs/config": "^3.2.2",
         "@nestjs/core": "^10.3.9",

@@ -18,6 +18,10 @@ export function addTask(task: TaskProps) {
     $tasks.set([...$tasks.get(), task])
 }
 
+export function removeTask(id: string) {
+    $tasks.set($tasks.get().filter((task) => task.id !== id))
+}
+
 export async function getTask(id: string): Promise<TaskProps | null> {
     const cached = $tasks.get().find((task) => task.id === id)
     if (cached) {
@@ -87,7 +91,10 @@ onMount($tasks, () => {
         const taskEvent: TaskEvent = JSON.parse(event.data)
         switch (taskEvent.type) {
             case TaskEventType.STARTED:
-                addTask(taskEvent.task)
+                addTask({
+                    ...taskEvent.task,
+                    id: taskEvent.id,
+                })
                 break
             case TaskEventType.CYCLE_COMPLETED:
                 addTaskCycle(taskEvent.id, taskEvent.report)

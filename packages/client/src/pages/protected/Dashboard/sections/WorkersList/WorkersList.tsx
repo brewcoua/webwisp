@@ -20,7 +20,6 @@ export default function WorkersList(): JSX.Element {
     }, [])
 
     const workers = useStore($workers)
-    const [selectedWorker, setSelectedWorker] = useState<string | null>(null)
 
     return (
         <BentoBox h="100%" w="50%" position="relative" overflow="hidden">
@@ -35,18 +34,9 @@ export default function WorkersList(): JSX.Element {
                     className={styles.workersList}
                     allowToggle
                     p={3}
-                    onChange={(index) =>
-                        setSelectedWorker(
-                            workers[(index as number[])[0]]?.id || null
-                        )
-                    }
                 >
                     {workers.map((worker) => (
-                        <WorkerItem
-                            worker={worker}
-                            key={worker.id}
-                            isSelected={selectedWorker === worker.id}
-                        />
+                        <WorkerItem worker={worker} key={worker.id} />
                     ))}
                 </Accordion>
             )}

@@ -30,11 +30,7 @@ export default function Preview({ task_id }: PreviewProps): JSX.Element {
         }
 
         setIsLoading(true)
-        useClient()
-            .tasks.getTrace(task_id)
-            .then((url) => {
-                frameRef.current!.src = url
-            })
+        const traceUrl = useClient().tasks.getTrace(task_id)
 
         const onLoad = async () => {
             const iframeDocument =
@@ -50,7 +46,8 @@ export default function Preview({ task_id }: PreviewProps): JSX.Element {
             setIsLoading(false)
         }
 
-        frameRef.current?.addEventListener('load', onLoad)
+        frameRef.current.src = traceUrl
+        frameRef.current.addEventListener('load', onLoad)
 
         return () => {
             frameRef.current?.removeEventListener('load', onLoad)
@@ -59,7 +56,13 @@ export default function Preview({ task_id }: PreviewProps): JSX.Element {
     }, [task_id])
 
     return (
-        <Flex w="100%" h="100%" direction="column" position="relative">
+        <Flex
+            w="100%"
+            h="100%"
+            direction="column"
+            position="relative"
+            borderRadius="lg"
+        >
             {isLoading && (
                 <Flex
                     h="100%"
@@ -71,11 +74,19 @@ export default function Preview({ task_id }: PreviewProps): JSX.Element {
                     zIndex="1"
                     top="0"
                     left="0"
+                    borderRadius="3xl"
                 >
                     <Spinner size="xl" />
                 </Flex>
             )}
-            <iframe ref={frameRef} style={{ width: '100%', height: '100%' }} />
+            <iframe
+                ref={frameRef}
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    borderRadius: '1.5rem',
+                }}
+            />
         </Flex>
     )
 }

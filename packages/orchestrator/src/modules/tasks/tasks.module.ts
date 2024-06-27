@@ -6,13 +6,15 @@ import {
     Provider,
 } from '@nestjs/common'
 import { MongooseModule } from '@nestjs/mongoose'
+import { ServeStaticModule } from '@nestjs/serve-static'
 
 import TasksMapper from './tasks.mapper'
 
 import { Task, TaskSchema } from './database/models/task.model'
 
-import { TASK_QUEUES_REPOSITORY } from './tasks.tokens'
+import { TASK_QUEUES_REPOSITORY, TRACES_REPOSITORY } from './tasks.tokens'
 import { TaskQueuesRepositoryPort } from './database/repositories/queues.repository.port'
+import { TracesRepositoryPort } from './database/repositories/traces.repository.port'
 
 import { Repositories } from './database/repositories'
 
@@ -57,6 +59,10 @@ const Mappers: Provider[] = [TasksMapper]
                 schema: TaskSchema,
             },
         ]),
+        ServeStaticModule.forRoot({
+            rootPath: '/data/traces',
+            serveRoot: '/api/local/traces',
+        }),
     ],
     controllers: [...HttpControllers],
     providers: [
@@ -69,11 +75,16 @@ const Mappers: Provider[] = [TasksMapper]
 export default class TasksModule implements OnApplicationBootstrap {
     constructor(
         @Inject(TASK_QUEUES_REPOSITORY)
-        private readonly taskQueueRepository: TaskQueuesRepositoryPort
+        private readonly taskQueueRepository: TaskQueuesRepositoryPort,
+        @Inject(TRACES_REPOSITORY)
+        private readonly tracesRepository: TracesRepositoryPort
     ) {}
 
     async onApplicationBootstrap() {
         await this.taskQueueRepository.connect()
         Logger.log('Task queues repository connected', 'TasksModule')
+
+        await this.tracesRepository.uploadAll()
+        Logger.log('All traces uploaded', 'TasksModule')
     }
 }

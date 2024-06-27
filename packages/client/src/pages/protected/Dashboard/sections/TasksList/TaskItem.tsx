@@ -4,6 +4,7 @@ import {
     ButtonProps,
     Flex,
     Icon,
+    IconButton,
     IconProps,
     Link,
     SlideFade,
@@ -11,12 +12,21 @@ import {
     Text,
     Tooltip,
     useColorModeValue,
+    useToast,
 } from '@chakra-ui/react'
+import { useStore } from '@nanostores/preact'
+import { $user } from '@store/user'
+import { useState } from 'preact/hooks'
+
 import { TaskProps, TaskStatus } from '@domain/task.types'
 
 import { MdOutlinePending } from 'react-icons/md'
-import { IoCheckmarkCircle, IoCloseCircle } from 'react-icons/io5'
+import { IoCheckmarkCircle, IoCloseCircle, IoTrash } from 'react-icons/io5'
+
 import { selectedTask } from './TasksList'
+import { UserScopes } from '@domain/user.types'
+import { useClient } from '@api/client'
+import { removeTask } from '@store/tasks'
 
 export interface TaskItemProps extends ButtonProps {
     task: TaskProps
@@ -26,6 +36,29 @@ export default function TaskItem({
     task,
     ...props
 }: TaskItemProps): JSX.Element {
+    const user = useStore($user)
+    const toast = useToast()
+
+    const [isDeleting, setIsDeleting] = useState(false)
+    const onDelete = async () => {
+        try {
+            setIsDeleting(true)
+            await useClient().tasks.deleteTask(task.id)
+            removeTask(task.id)
+            setIsDeleting(false)
+        } catch (err: any) {
+            console.error(err)
+            toast({
+                title: 'Failed to delete task',
+                description: err.message,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+            })
+            setIsDeleting(false)
+        }
+    }
+
     return (
         <SlideFade in offsetY="20px" style={{ width: '100%' }}>
             <Button
@@ -42,9 +75,12 @@ export default function TaskItem({
                 display="flex"
                 align="center"
                 justify="space-between"
+                borderRadius="md"
                 onClick={() => {
                     selectedTask.value = task.id
                 }}
+                isDisabled={isDeleting}
+                px={1}
                 {...props}
             >
                 <Flex direction="row" gap="0.5rem" w="100%" h="100%">
@@ -59,12 +95,12 @@ export default function TaskItem({
                         direction="column"
                         gap={1}
                         align="flex-start"
-                        w="calc(100% - 2rem)"
+                        w="calc(100% - 4.5rem)"
                     >
                         <Link
                             fontSize="xs"
                             isExternal
-                            color={useColorModeValue('blue.500', 'blue.300')}
+                            color={useColorModeValue('blue.600', 'blue.200')}
                             href={task.target}
                         >
                             {task.target}
@@ -72,7 +108,7 @@ export default function TaskItem({
                         <Tooltip
                             label={task.prompt}
                             aria-label="Task prompt"
-                            openDelay={500}
+                            openDelay={900}
                         >
                             <Text
                                 fontSize="sm"
@@ -83,6 +119,25 @@ export default function TaskItem({
                                 {task.prompt}
                             </Text>
                         </Tooltip>
+                    </Flex>
+                    <Flex
+                        w="2rem"
+                        h="100%"
+                        align="center"
+                        justify="center"
+                        p={1}
+                    >
+                        <IconButton
+                            size="sm"
+                            icon={<IoTrash />}
+                            aria-label="Delete task"
+                            isDisabled={!user?.scopes.includes(UserScopes.EDIT)}
+                            isLoading={isDeleting}
+                            onClick={(e) => {
+                                e.stopPropagation()
+                                onDelete()
+                            }}
+                        />
                     </Flex>
                 </Flex>
             </Button>

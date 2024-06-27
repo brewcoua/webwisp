@@ -46,7 +46,17 @@ export default class TasksGateway implements ITasksGateway {
         return tasks.data
     }
 
-    async getTrace(id: string): Promise<string> {
+    async deleteTask(id: string): Promise<void> {
+        const response = await fetchAuthed(`${BASE_URL}/api/tasks/${id}`, {
+            method: 'DELETE',
+        })
+
+        if (!response?.ok) {
+            throw new Error('Failed to delete task')
+        }
+    }
+
+    getTrace(id: string): string {
         return `${BASE_URL}/api/tasks/viewer/-/?trace=${
             BASE_URL || location.origin
         }/api/tasks/trace/${id}`
