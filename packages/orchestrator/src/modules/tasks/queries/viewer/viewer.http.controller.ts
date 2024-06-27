@@ -1,6 +1,6 @@
 import { Public } from '@modules/auth'
 import { All, Controller, Next, Req, Res } from '@nestjs/common'
-import { ApiTags } from '@nestjs/swagger'
+import { ApiExcludeController } from '@nestjs/swagger'
 import { NextFunction, Request, Response } from 'express'
 
 import { createProxyMiddleware } from 'http-proxy-middleware'
@@ -22,7 +22,7 @@ const proxy = createProxyMiddleware({
     },
 })
 
-@ApiTags('tasks')
+@ApiExcludeController()
 @Controller('tasks')
 export class ViewerHttpController {
     @Public()

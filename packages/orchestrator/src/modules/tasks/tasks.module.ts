@@ -23,6 +23,8 @@ import { CreateTaskHttpController } from './commands/create-task/create-task.htt
 import { CreateTaskService } from './commands/create-task/create-task.service'
 import { DeleteTaskHttpController } from './commands/delete-task/delete-task.http.controller'
 import { DeleteTaskService } from './commands/delete-task/delete-task.service'
+import { BulkTasksHttpController } from './commands/bulk-tasks/bulk-tasks.http.controller'
+import { BulkTasksService } from './commands/bulk-tasks/bulk-tasks.service'
 
 import { GetTaskHttpController } from './queries/get-task/get-task.http.controller'
 import { GetTaskQueryHandler } from './queries/get-task/get-task.query-handler'
@@ -41,9 +43,14 @@ const HttpControllers = [
     DeleteTaskHttpController,
     GetTasksHttpController,
     ViewerHttpController,
+    BulkTasksHttpController,
 ]
 
-const CommandHandlers: Provider[] = [CreateTaskService, DeleteTaskService]
+const CommandHandlers: Provider[] = [
+    CreateTaskService,
+    DeleteTaskService,
+    BulkTasksService,
+]
 const QueryHandlers: Provider[] = [
     GetTaskQueryHandler,
     GetTraceQueryHandler,

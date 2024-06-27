@@ -1,7 +1,12 @@
 import { Entity } from '@domain/ddd'
 import { AggregateID } from '@domain/ddd/entity.base'
 
-import { CreateTaskProps, CycleReport, TaskProps, TaskStatus } from './task.types'
+import {
+    CreateTaskProps,
+    CycleReport,
+    TaskProps,
+    TaskStatus,
+} from './task.types'
 
 export default class TaskEntity extends Entity<TaskProps> {
     static create(create: CreateTaskProps) {
@@ -13,6 +18,10 @@ export default class TaskEntity extends Entity<TaskProps> {
                 ...create,
                 status: TaskStatus.PENDING,
                 cycles: [],
+                evaluation: create.evaluation && {
+                    results: [],
+                    config: create.evaluation,
+                },
             },
         })
 

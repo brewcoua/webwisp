@@ -21,7 +21,7 @@ export class CreateTaskService implements ICommandHandler<CreateTaskCommand> {
             prompt: command.prompt,
         })
 
-        const result = this.taskQueuesRepository.sendTaskToQueue(task)
+        const result = this.taskQueuesRepository.sendTask(task)
 
         if (!result) {
             return Err(new Error('Failed to publish task'))

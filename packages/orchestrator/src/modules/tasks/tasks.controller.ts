@@ -7,14 +7,14 @@ import {
     Param,
     Res,
 } from '@nestjs/common'
-import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger'
+import { ApiExcludeController } from '@nestjs/swagger'
 import { Response } from 'express'
 
 import { Public } from '@modules/auth'
 import { TRACES_REPOSITORY } from './tasks.tokens'
 import { TracesRepositoryPort } from './database/repositories/traces.repository.port'
 
-@ApiTags('tasks')
+@ApiExcludeController()
 @Controller('tasks')
 export class TasksController {
     constructor(
@@ -22,13 +22,6 @@ export class TasksController {
         private readonly tracesRepository: TracesRepositoryPort
     ) {}
 
-    @ApiOperation({
-        description: 'Get a remote trace',
-    })
-    @ApiResponse({
-        status: HttpStatus.OK,
-        description: 'The trace file',
-    })
     @Public()
     @Get('traces/remote/:filename')
     async getRemoteTrace(

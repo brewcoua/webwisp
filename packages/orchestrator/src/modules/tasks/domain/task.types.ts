@@ -1,4 +1,9 @@
 import { Action } from './action.types'
+import {
+    TaskDifficultyProps,
+    TaskEvaluationProps,
+    TaskEvaluationResult,
+} from './task.eval'
 
 export interface TaskProps {
     target: string
@@ -9,11 +14,20 @@ export interface TaskProps {
     value?: string
 
     cycles: CycleReport[]
+
+    difficulty?: TaskDifficultyProps
+    evaluation?: {
+        results: TaskEvaluationResult[]
+        config: TaskEvaluationProps
+    }
 }
 
 export interface CreateTaskProps {
     target: string
     prompt: string
+
+    difficulty?: TaskDifficultyProps
+    evaluation?: TaskEvaluationProps
 }
 
 export enum TaskStatus {

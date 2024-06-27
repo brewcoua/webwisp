@@ -1,5 +1,16 @@
-import { ApiProperty } from '@nestjs/swagger'
-import { IsString, IsUrl, Matches, MaxLength, MinLength } from 'class-validator'
+import {
+    TaskDifficultyDto,
+    TaskEvaluationConfigDto,
+} from '@modules/tasks/dtos/task.eval.dto'
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
+import {
+    IsOptional,
+    IsString,
+    IsUrl,
+    MaxLength,
+    MinLength,
+    ValidateNested,
+} from 'class-validator'
 
 export class CreateTaskRequestDto {
     @ApiProperty({
@@ -25,4 +36,22 @@ export class CreateTaskRequestDto {
     @MinLength(6)
     @MaxLength(1024)
     readonly prompt!: string
+
+    @ApiProperty({
+        type: () => TaskEvaluationConfigDto,
+        description: 'The evaluation configuration for the task',
+    })
+    @ApiPropertyOptional()
+    @IsOptional()
+    @ValidateNested()
+    readonly evaluation?: TaskEvaluationConfigDto
+
+    @ApiProperty({
+        type: () => TaskDifficultyDto,
+        description: 'The difficulty of the task, informative only',
+    })
+    @ApiPropertyOptional()
+    @IsOptional()
+    @ValidateNested()
+    readonly difficulty?: TaskDifficultyDto
 }

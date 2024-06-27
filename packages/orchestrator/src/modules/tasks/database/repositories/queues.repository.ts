@@ -47,7 +47,7 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
         return task?.value || null
     }
 
-    sendTaskToQueue(task: TaskEntity): boolean {
+    sendTask(task: TaskEntity): boolean {
         if (!this.tasksQueue) {
             throw new Error('Channel not initialized')
         }
@@ -71,6 +71,39 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
         }
 
         return result
+    }
+
+    bulkSendTasks(tasks: TaskEntity[]): boolean {
+        if (!this.tasksQueue) {
+            throw new Error('Channel not initialized')
+        }
+
+        const results = tasks.map((task) => {
+            const props = task.getProps()
+
+            return this.tasksQueue?.sendToQueue(
+                MessageQueues.Tasks,
+                Buffer.from(
+                    JSON.stringify({
+                        id: task.id,
+                        target: props.target,
+                        prompt: props.prompt,
+                    })
+                )
+            )
+        })
+
+        results.forEach((result, index) => {
+            if (result) {
+                Logger.log(
+                    `Task published: ${tasks[index].id}`,
+                    'TaskQueuesRepository'
+                )
+                this.enqueuedTasks.append(tasks[index])
+            }
+        })
+
+        return results.every((result) => result)
     }
 
     private bindEvents(): void {
