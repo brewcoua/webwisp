@@ -11,7 +11,7 @@ export default function TaskInfo(): JSX.Element {
     const task = useStore($tasks).find((task) => task.id === selectedTask.value)
 
     return (
-        <BentoBox direction="column" gap={5} h="100%" w="70%" p={3}>
+        <BentoBox direction="column" gap={5} h="100%" w="80%" p={3}>
             {!task && (
                 <Flex justify="center" align="center" h="100%" w="100%">
                     Select a task to view its details

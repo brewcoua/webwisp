@@ -92,7 +92,15 @@ export function CycleDisplay({ cycle }: CycleDisplayProps): JSX.Element {
                             <Text>{cycle.action.description}</Text>
                         </Flex>
                     </Flex>
-                    <AccordionIcon />
+                    <Flex align="center" gap={1}>
+                        <Text
+                            fontStyle="italic"
+                            color={useColorModeValue('gray.600', 'gray.300')}
+                        >
+                            {cycle.duration}ms
+                        </Text>
+                        <AccordionIcon />
+                    </Flex>
                 </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>

@@ -56,10 +56,18 @@ export default class TasksGateway implements ITasksGateway {
         }
     }
 
-    getTrace(id: string): string {
+    async getTrace(id: string): Promise<string | null> {
+        const response = await fetchAuthed(`${BASE_URL}/api/tasks/trace/${id}`)
+
+        if (!response?.ok) {
+            return null
+        }
+
+        const result = await response.json()
+
         return `${BASE_URL}/api/tasks/viewer/-/?trace=${
             BASE_URL || location.origin
-        }/api/tasks/trace/${id}`
+        }${result.url}`
     }
 
     subscribe(): SseClient<TaskEvent> {

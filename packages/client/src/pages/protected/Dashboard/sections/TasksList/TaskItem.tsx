@@ -81,6 +81,7 @@ export default function TaskItem({
                 }}
                 isDisabled={isDeleting}
                 px={1}
+                pl={2}
                 {...props}
             >
                 <Flex direction="row" gap="0.5rem" w="100%" h="100%">

@@ -22,6 +22,7 @@ export default function Preview({ task_id }: PreviewProps): JSX.Element {
     }
 
     const [isLoading, setIsLoading] = useState(true)
+    const [isNotFound, setIsNotFound] = useState(false)
     const frameRef = useRef<HTMLIFrameElement>(null)
 
     useEffect(() => {
@@ -30,7 +31,16 @@ export default function Preview({ task_id }: PreviewProps): JSX.Element {
         }
 
         setIsLoading(true)
-        const traceUrl = useClient().tasks.getTrace(task_id)
+        setIsNotFound(false)
+        useClient()
+            .tasks.getTrace(task_id)
+            .then((url) => {
+                if (!url) {
+                    setIsNotFound(true)
+                } else if (frameRef.current) {
+                    frameRef.current.src = url
+                }
+            })
 
         const onLoad = async () => {
             const iframeDocument =
@@ -46,7 +56,6 @@ export default function Preview({ task_id }: PreviewProps): JSX.Element {
             setIsLoading(false)
         }
 
-        frameRef.current.src = traceUrl
         frameRef.current.addEventListener('load', onLoad)
 
         return () => {
@@ -63,7 +72,7 @@ export default function Preview({ task_id }: PreviewProps): JSX.Element {
             position="relative"
             borderRadius="lg"
         >
-            {isLoading && (
+            {(isLoading || isNotFound) && (
                 <Flex
                     h="100%"
                     w="100%"
@@ -76,17 +85,20 @@ export default function Preview({ task_id }: PreviewProps): JSX.Element {
                     left="0"
                     borderRadius="3xl"
                 >
-                    <Spinner size="xl" />
+                    {isLoading && <Spinner size="xl" />}
+                    {!isLoading && isNotFound && <Text>Trace not found</Text>}
                 </Flex>
             )}
-            <iframe
-                ref={frameRef}
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    borderRadius: '1.5rem',
-                }}
-            />
+            {!isNotFound && (
+                <iframe
+                    ref={frameRef}
+                    style={{
+                        width: '100%',
+                        height: '100%',
+                        borderRadius: '1.5rem',
+                    }}
+                />
+            )}
         </Flex>
     )
 }

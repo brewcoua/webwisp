@@ -41,7 +41,7 @@ export default function BentoBox({
                     bottom={0}
                     bg={useColorModeValue('whiteAlpha.700', 'blackAlpha.700')}
                     backdropFilter="blur(5px)"
-                    borderRadius="3xl"
+                    borderRadius="2xl"
                     justify="center"
                     align="center"
                     zIndex={1}
@@ -59,7 +59,7 @@ export function BentoBoxContent(props: BentoBoxContentProps): JSX.Element {
     return (
         <Flex
             bg={useColorModeValue('gray.200', 'gray.700')}
-            borderRadius="3xl"
+            borderRadius="2xl"
             boxShadow="md"
             direction="column"
             h="full"

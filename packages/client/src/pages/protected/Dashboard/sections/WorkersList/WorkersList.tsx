@@ -33,7 +33,7 @@ export default function WorkersList(): JSX.Element {
                     overflowY="auto"
                     className={styles.workersList}
                     allowToggle
-                    p={3}
+                    p={2}
                 >
                     {workers.map((worker) => (
                         <WorkerItem worker={worker} key={worker.id} />
@@ -48,7 +48,6 @@ export default function WorkersList(): JSX.Element {
                 >
                     <Text
                         position="absolute"
-                        pt={3}
                         top="50%"
                         left="50%"
                         transform="translate(-50%, -50%)"

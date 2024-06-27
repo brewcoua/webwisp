@@ -57,14 +57,25 @@ export class TracesRepository implements TracesRepositoryPort {
             const file = this.bucket.file(`${taskId}.zip`)
             const exists = await file.exists()
             if (exists[0]) {
-                // It exists, return the public URL
-                return file.publicUrl()
+                return `/api/tasks/traces/remote/${taskId}.zip`
             }
         }
 
         // If it's not in the cloud, we check if it's in the local filesystem
         if (existsSync(`${LOCAL_TRACES_FOLDER}/${taskId}.zip`)) {
-            return `/api/local/traces/${taskId}.zip`
+            return `/api/tasks/traces/local/${taskId}.zip`
+        }
+
+        return null
+    }
+
+    async streamTrace(filename: string): Promise<NodeJS.ReadableStream | null> {
+        if (this.bucket) {
+            const file = this.bucket.file(filename)
+            const exists = await file.exists()
+            if (exists[0]) {
+                return file.createReadStream()
+            }
         }
 
         return null

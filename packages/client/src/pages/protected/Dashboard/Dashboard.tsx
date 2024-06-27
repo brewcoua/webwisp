@@ -10,15 +10,15 @@ import TaskInfo from './sections/TaskInfo'
 export default function Dashboard(): JSX.Element {
     return (
         <Flex
-            h="180%"
+            h="200%"
             w="100%"
             direction="column"
             gap={5}
             p={{
-                base: 3,
-                sm: 5,
-                md: 10,
-                lg: 20,
+                base: 2,
+                sm: 3,
+                md: 4,
+                lg: 5,
             }}
         >
             <Flex

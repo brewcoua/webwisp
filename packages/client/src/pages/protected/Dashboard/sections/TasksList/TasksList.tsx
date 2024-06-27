@@ -12,10 +12,10 @@ export default function TasksList(): JSX.Element {
     const tasks = useStore($tasks)
 
     return (
-        <Flex
+        <BentoBox
             h="100%"
-            w="30%"
-            minW="20rem"
+            w="20%"
+            minW="15rem"
             position="relative"
             overflow="hidden"
         >
@@ -26,7 +26,7 @@ export default function TasksList(): JSX.Element {
                     bottom={0}
                     left={0}
                     right={0}
-                    p={1}
+                    p={2}
                     overflowY="auto"
                     direction="column"
                     gap={2}
@@ -41,6 +41,6 @@ export default function TasksList(): JSX.Element {
                     <Text fontSize="lg">No tasks found</Text>
                 </Flex>
             )}
-        </Flex>
+        </BentoBox>
     )
 }

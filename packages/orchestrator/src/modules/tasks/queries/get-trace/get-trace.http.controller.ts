@@ -1,11 +1,4 @@
-import {
-    Controller,
-    Get,
-    HttpStatus,
-    Param,
-    Res,
-    StreamableFile,
-} from '@nestjs/common'
+import { Controller, Get, HttpStatus, Param } from '@nestjs/common'
 import { QueryBus } from '@nestjs/cqrs'
 import {
     ApiBearerAuth,
@@ -13,12 +6,13 @@ import {
     ApiResponse,
     ApiTags,
 } from '@nestjs/swagger'
-
-import { Public } from '@modules/auth'
 import { Result, match } from 'oxide.ts'
+
+import { Scopes } from '@modules/auth'
+import { UserScopes } from '@modules/auth/domain/user.types'
+
 import { GetTraceQuery } from './get-trace.query'
-import { Response } from 'express'
-import { ReadStream } from 'fs'
+import { GetTraceResponseDto } from './get-trace.response.dto'
 
 @ApiTags('tasks')
 @Controller('tasks')
@@ -31,20 +25,15 @@ export class GetTraceHttpController {
         description: 'Redirect to the trace file',
     })
     @ApiBearerAuth()
-    @Public()
+    @Scopes(UserScopes.VIEW)
     @Get('trace/:id')
-    async getTrace(
-        @Param('id') id: string,
-        @Res() res: Response
-    ): Promise<void> {
+    async getTrace(@Param('id') id: string): Promise<GetTraceResponseDto> {
         const result: Result<string, Error> = await this.queryBus.execute(
             new GetTraceQuery({ id })
         )
 
         return match(result, {
-            Ok: (url) => {
-                res.redirect(url)
-            },
+            Ok: (url) => new GetTraceResponseDto(url),
             Err: (error) => {
                 throw error
             },
