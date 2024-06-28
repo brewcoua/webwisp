@@ -13,13 +13,13 @@ import {
 import { useEffect, useState } from 'preact/hooks'
 
 import BentoBox from '../../BentoBox'
-import { selectedTask } from '../TasksList/TasksList'
 import Preview from './Preview'
 
 import CyclesList from './CyclesList'
 import { TaskProps } from '@domain/task.types'
 import { useClient } from '@api/client'
 import TaskDetails from './TaskDetails'
+import { $selected_task } from '@store/selected_task'
 
 export default function TaskInfo(): JSX.Element {
     const [isLoading, setIsLoading] = useState(false)
@@ -28,26 +28,25 @@ export default function TaskInfo(): JSX.Element {
     const [trace, setTrace] = useState<string | null>(null)
 
     const tasks = useStore($tasks)
+    const selectedTask = useStore($selected_task)
 
     useEffect(() => {
-        selectedTask.subscribe((val) => {
-            if (!val) {
-                setTask(null)
-            }
+        if (!selectedTask) {
+            setTask(null)
+        }
 
-            const foundTask = tasks.find((task) => task.id === val)
-            if (foundTask) {
-                setTask(foundTask)
-                setIsLoading(true)
-                useClient()
-                    .tasks.getTrace(foundTask.id)
-                    .then((trace) => {
-                        setTrace(trace)
-                        setIsLoading(false)
-                    })
-            }
-        })
-    }, [])
+        const foundTask = tasks.find((task) => task.id === selectedTask)
+        if (foundTask) {
+            setTask(foundTask)
+            setIsLoading(true)
+            useClient()
+                .tasks.getTrace(foundTask.id)
+                .then((trace) => {
+                    setTrace(trace)
+                    setIsLoading(false)
+                })
+        }
+    }, [selectedTask])
 
     return (
         <BentoBox direction="column" gap={5} h="100%" w="80%" p={3}>

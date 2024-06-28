@@ -59,7 +59,7 @@ export default function Preview({ trace }: PreviewProps): JSX.Element {
             h="100%"
             direction="column"
             position="relative"
-            borderRadius="3xl"
+            borderRadius="lg"
             overflow="hidden"
             border="2px solid"
             borderColor={useColorModeValue('gray.300', 'gray.700')}

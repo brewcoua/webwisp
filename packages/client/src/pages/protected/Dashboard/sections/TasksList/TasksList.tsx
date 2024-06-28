@@ -1,4 +1,3 @@
-import { signal } from '@preact/signals'
 import { useState } from 'preact/hooks'
 import { useStore } from '@nanostores/preact'
 import { Flex, Text, useToast } from '@chakra-ui/react'
@@ -9,8 +8,7 @@ import { TaskProps } from '@domain/task.types'
 
 import BentoBox from '../../BentoBox'
 import TaskItem from './TaskItem'
-
-export const selectedTask = signal<string | null>(null)
+import { setSelectedTask } from '@store/selected_task'
 
 export default function TasksList(): JSX.Element {
     const tasks = useStore($tasks)
@@ -18,7 +16,7 @@ export default function TasksList(): JSX.Element {
     const toast = useToast()
 
     const onTaskSelect = (task: TaskProps) => {
-        selectedTask.value = task.id
+        setSelectedTask(task.id)
     }
 
     const onTaskDelete = async (task: TaskProps) => {

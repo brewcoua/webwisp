@@ -20,8 +20,8 @@ import { TaskProps, TaskStatus } from '@domain/task.types'
 import { MdOutlinePending } from 'react-icons/md'
 import { IoCheckmarkCircle, IoCloseCircle, IoTrash } from 'react-icons/io5'
 
-import { selectedTask } from './TasksList'
 import { UserScopes } from '@domain/user.types'
+import { $selected_task } from '@store/selected_task'
 
 export interface TaskItemProps extends ButtonProps {
     task: TaskProps
@@ -38,14 +38,19 @@ export default function TaskItem({
     ...props
 }: TaskItemProps): JSX.Element {
     const user = useStore($user)
+    const selectedTask = useStore($selected_task)
+
+    const isEditable =
+        user?.scopes.includes(UserScopes.EDIT) &&
+        [TaskStatus.COMPLETED, TaskStatus.FAILED].includes(task.status)
 
     return (
         <SlideFade in offsetY="20px" style={{ width: '100%' }}>
             <Button
                 bg={useColorModeValue('gray.200', 'gray.600')}
-                opacity={selectedTask.value === task.id ? 1 : 0.7}
+                opacity={selectedTask === task.id ? 1 : 0.7}
                 _hover={{
-                    opacity: selectedTask.value === task.id ? 1 : 0.9,
+                    opacity: selectedTask === task.id ? 1 : 0.9,
                 }}
                 _active={{
                     bg: useColorModeValue('gray.200', 'gray.600'),
@@ -78,7 +83,11 @@ export default function TaskItem({
                         direction="column"
                         gap={1}
                         align="flex-start"
-                        w="calc(100% - 4.5rem)"
+                        w={
+                            isEditable
+                                ? 'calc(100% - 4.5rem)'
+                                : 'calc(100% - 2.5rem)'
+                        }
                     >
                         <Link
                             fontSize="xs"
@@ -106,27 +115,41 @@ export default function TaskItem({
                             </Text>
                         </Tooltip>
                     </Flex>
-                    <Flex
-                        w="2rem"
-                        h="100%"
-                        align="center"
-                        justify="center"
-                        p={1}
-                    >
-                        <IconButton
-                            size="sm"
-                            icon={<IoTrash />}
-                            aria-label="Delete task"
-                            isDisabled={!user?.scopes.includes(UserScopes.EDIT)}
-                            isLoading={isDeleting}
-                            onClick={(e) => {
-                                if (onDelete) {
-                                    e.stopPropagation()
-                                    onDelete(task)
+                    {isEditable && (
+                        <Flex
+                            w="2rem"
+                            h="100%"
+                            align="center"
+                            justify="center"
+                            p={1}
+                        >
+                            <Button
+                                size="sm"
+                                aria-label="Delete task"
+                                isDisabled={
+                                    !user?.scopes.includes(UserScopes.EDIT)
                                 }
-                            }}
-                        />
-                    </Flex>
+                                isLoading={isDeleting}
+                                bg={useColorModeValue('gray.300', 'gray.600')}
+                                color={useColorModeValue(
+                                    'gray.800',
+                                    'gray.200'
+                                )}
+                                _hover={{
+                                    bg: useColorModeValue('red.300', 'red.600'),
+                                }}
+                                onClick={(e) => {
+                                    e.stopPropagation()
+                                    if (isEditable && onDelete) {
+                                        onDelete(task)
+                                    }
+                                }}
+                                disabled={!isEditable}
+                            >
+                                <Icon as={IoTrash} />
+                            </Button>
+                        </Flex>
+                    )}
                 </Flex>
             </Button>
         </SlideFade>
