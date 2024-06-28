@@ -3,9 +3,9 @@
 }
 
 ::-webkit-scrollbar-track {
-    background: var(--chakra-colors-gray-800);
+    background: transparent;
 }
 ::-webkit-scrollbar-thumb {
-    background-color: var(--chakra-colors-gray-500);
+    background-color: var(--chakra-colors-gray-400);
     border-radius: 6px;
 }

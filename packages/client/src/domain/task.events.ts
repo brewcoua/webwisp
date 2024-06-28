@@ -1,6 +1,7 @@
 import { CycleReport, TaskProps } from './task.types'
 
 export enum TaskEventType {
+    QUEUED = 'queued',
     STARTED = 'started',
     CYCLE_COMPLETED = 'cycle-completed',
     COMPLETED = 'completed',
@@ -8,12 +9,17 @@ export enum TaskEventType {
 }
 
 export type TaskEvent = (
+    | QueuedTaskEvent
     | StartedTaskEvent
     | CycleCompletedTaskEvent
     | CompletedTaskEvent
     | RequeuedTaskEvent
 ) & { id: string }
 
+export type QueuedTaskEvent = {
+    type: TaskEventType.QUEUED
+    task: TaskProps
+}
 export type StartedTaskEvent = {
     type: TaskEventType.STARTED
     task: TaskProps

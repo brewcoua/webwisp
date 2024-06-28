@@ -5,4 +5,5 @@ export interface TaskQueuesRepositoryPort {
     findTaskById(id: string): TaskEntity | null
     sendTask(task: TaskEntity): boolean
     bulkSendTasks(tasks: TaskEntity[]): boolean
+    getEnqueuedTasks(): TaskEntity[]
 }

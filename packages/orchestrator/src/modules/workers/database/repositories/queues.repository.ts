@@ -120,7 +120,10 @@ export default class WorkerQueuesRepository
                         break
                     }
                 }
-            }
+
+                this.workersQueue?.ack(message)
+            },
+            { noAck: true }
         )
     }
 }

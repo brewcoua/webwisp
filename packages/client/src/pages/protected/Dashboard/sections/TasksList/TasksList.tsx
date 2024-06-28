@@ -1,15 +1,44 @@
 import { signal } from '@preact/signals'
+import { useState } from 'preact/hooks'
+import { useStore } from '@nanostores/preact'
+import { Flex, Text, useToast } from '@chakra-ui/react'
+
+import { useClient } from '@api/client'
+import { $tasks, removeTask } from '@store/tasks'
+import { TaskProps } from '@domain/task.types'
+
 import BentoBox from '../../BentoBox'
 import TaskItem from './TaskItem'
-
-import { useStore } from '@nanostores/preact'
-import { $tasks } from '@store/tasks'
-import { Flex, Text } from '@chakra-ui/react'
 
 export const selectedTask = signal<string | null>(null)
 
 export default function TasksList(): JSX.Element {
     const tasks = useStore($tasks)
+    const [isDeleting, setIsDeleting] = useState<string | null>(null)
+    const toast = useToast()
+
+    const onTaskSelect = (task: TaskProps) => {
+        selectedTask.value = task.id
+    }
+
+    const onTaskDelete = async (task: TaskProps) => {
+        try {
+            setIsDeleting(task.id)
+            await useClient().tasks.deleteTask(task.id)
+            removeTask(task.id)
+            setIsDeleting(null)
+        } catch (err: any) {
+            console.error(err)
+            toast({
+                title: 'Failed to delete task',
+                description: err.message,
+                status: 'error',
+                duration: 9000,
+                isClosable: true,
+            })
+            setIsDeleting(null)
+        }
+    }
 
     return (
         <BentoBox
@@ -32,7 +61,14 @@ export default function TasksList(): JSX.Element {
                     gap={2}
                 >
                     {tasks.map((task) => (
-                        <TaskItem key={task.id} task={task} w="100%" />
+                        <TaskItem
+                            key={task.id}
+                            task={task}
+                            w="100%"
+                            onTaskClick={onTaskSelect}
+                            onDelete={onTaskDelete}
+                            isDeleting={isDeleting === task.id}
+                        />
                     ))}
                 </Flex>
             )}

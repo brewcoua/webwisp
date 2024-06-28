@@ -1,13 +1,12 @@
-import { useClient } from '@api/client'
 import { Flex, Spinner, Text, useColorModeValue } from '@chakra-ui/react'
 import { useEffect, useRef, useState } from 'preact/hooks'
 
 export interface PreviewProps {
-    task_id: string | null
+    trace: string | null
 }
 
-export default function Preview({ task_id }: PreviewProps): JSX.Element {
-    if (!task_id) {
+export default function Preview({ trace }: PreviewProps): JSX.Element {
+    if (!trace) {
         return (
             <Flex
                 h="100%"
@@ -16,13 +15,12 @@ export default function Preview({ task_id }: PreviewProps): JSX.Element {
                 justify="center"
                 bg={useColorModeValue('gray.100', 'gray.800')}
             >
-                <Text>No task selected</Text>
+                <Text>No trace found</Text>
             </Flex>
         )
     }
 
     const [isLoading, setIsLoading] = useState(true)
-    const [isNotFound, setIsNotFound] = useState(false)
     const frameRef = useRef<HTMLIFrameElement>(null)
 
     useEffect(() => {
@@ -31,16 +29,7 @@ export default function Preview({ task_id }: PreviewProps): JSX.Element {
         }
 
         setIsLoading(true)
-        setIsNotFound(false)
-        useClient()
-            .tasks.getTrace(task_id)
-            .then((url) => {
-                if (!url) {
-                    setIsNotFound(true)
-                } else if (frameRef.current) {
-                    frameRef.current.src = url
-                }
-            })
+        frameRef.current.src = trace
 
         const onLoad = async () => {
             const iframeDocument =
@@ -62,7 +51,7 @@ export default function Preview({ task_id }: PreviewProps): JSX.Element {
             frameRef.current?.removeEventListener('load', onLoad)
             setIsLoading(true)
         }
-    }, [task_id])
+    }, [trace])
 
     return (
         <Flex
@@ -70,9 +59,13 @@ export default function Preview({ task_id }: PreviewProps): JSX.Element {
             h="100%"
             direction="column"
             position="relative"
-            borderRadius="lg"
+            borderRadius="3xl"
+            overflow="hidden"
+            border="2px solid"
+            borderColor={useColorModeValue('gray.300', 'gray.700')}
+            boxShadow="lg"
         >
-            {(isLoading || isNotFound) && (
+            {isLoading && (
                 <Flex
                     h="100%"
                     w="100%"
@@ -83,22 +76,17 @@ export default function Preview({ task_id }: PreviewProps): JSX.Element {
                     zIndex="1"
                     top="0"
                     left="0"
-                    borderRadius="3xl"
                 >
-                    {isLoading && <Spinner size="xl" />}
-                    {!isLoading && isNotFound && <Text>Trace not found</Text>}
+                    <Spinner size="xl" />
                 </Flex>
             )}
-            {!isNotFound && (
-                <iframe
-                    ref={frameRef}
-                    style={{
-                        width: '100%',
-                        height: '100%',
-                        borderRadius: '1.5rem',
-                    }}
-                />
-            )}
+            <iframe
+                ref={frameRef}
+                style={{
+                    width: '100%',
+                    height: '100%',
+                }}
+            />
         </Flex>
     )
 }

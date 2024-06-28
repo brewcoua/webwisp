@@ -7,6 +7,7 @@ import {
     IsOptional,
     IsString,
     IsUrl,
+    Matches,
     MaxLength,
     MinLength,
     ValidateNested,
@@ -36,6 +37,20 @@ export class CreateTaskRequestDto {
     @MinLength(6)
     @MaxLength(1024)
     readonly prompt!: string
+
+    @ApiProperty({
+        example: '60e1c1e2c1d6b2f8b9b3b2f8',
+        description: 'The correlation ID for the task',
+        minLength: 24,
+        maxLength: 24,
+    })
+    @ApiPropertyOptional()
+    @IsOptional()
+    @IsString()
+    @MinLength(24)
+    @MaxLength(24)
+    @Matches(/^[0-9a-f]{24}$/)
+    readonly correlation?: string
 
     @ApiProperty({
         type: () => TaskEvaluationConfigDto,

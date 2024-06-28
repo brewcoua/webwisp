@@ -26,6 +26,10 @@ export default class TasksMapper
             message: copy.message,
             value: copy.value,
             cycles: copy.cycles,
+
+            correlation: copy.correlation,
+            difficulty: copy.difficulty,
+            evaluation: copy.evaluation,
         }
     }
 
@@ -38,9 +42,14 @@ export default class TasksMapper
                 target: record.target,
                 prompt: record.prompt,
                 status: record.status,
+
                 message: record.message,
                 value: record.value,
                 cycles: record.cycles,
+
+                correlation: record.correlation,
+                difficulty: record.difficulty,
+                evaluation: record.evaluation,
             },
         })
     }
@@ -59,6 +68,10 @@ export default class TasksMapper
             message: props.message,
             value: props.value,
             cycles: props.cycles,
+
+            correlation: props.correlation,
+            difficulty: props.difficulty,
+            evaluation: props.evaluation,
         })
 
         return response

@@ -31,10 +31,8 @@ const colors = {
 
 const theme = extendTheme({
     theme: {
-        initialColorMode: 'dark',
-        useSystemColorMode: false,
+        initialColorMode: 'light',
     },
-    colors,
 })
 
 export default theme

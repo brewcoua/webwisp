@@ -34,7 +34,7 @@ export interface CyclesListProps {
 
 export default function CyclesList({ cycles }: CyclesListProps): JSX.Element {
     return (
-        <Flex position="relative" h="15rem" w="100%" overflow="hidden">
+        <Flex position="relative" h="100%" w="100%" overflow="hidden">
             <Flex
                 position="absolute"
                 top={0}
@@ -44,17 +44,22 @@ export default function CyclesList({ cycles }: CyclesListProps): JSX.Element {
                 overflowY="auto"
                 px={1}
             >
-                <Accordion
-                    allowToggle
-                    w="100%"
-                    gap={1}
-                    display="flex"
-                    flexDir="column"
-                >
-                    {cycles.map((cycle, index) => (
-                        <CycleDisplay key={index} cycle={cycle} />
-                    ))}
-                </Accordion>
+                {cycles.length === 0 && (
+                    <Text>No cycles to display for this task</Text>
+                )}
+                {cycles.length > 0 && (
+                    <Accordion
+                        allowToggle
+                        w="100%"
+                        gap={1}
+                        display="flex"
+                        flexDir="column"
+                    >
+                        {cycles.map((cycle, index) => (
+                            <CycleDisplay key={index} cycle={cycle} />
+                        ))}
+                    </Accordion>
+                )}
             </Flex>
         </Flex>
     )

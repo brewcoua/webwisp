@@ -8,14 +8,42 @@ import { CycleReport, TaskProps, TaskStatus } from '@domain/task.types'
 export const $tasks = atom<TaskProps[]>([])
 
 export function addTask(task: TaskProps) {
-    // Check if it doesn't exist already
-    if ($tasks.get().find((t) => t.id === task.id)) {
-        // If it does, replace it
-        $tasks.set($tasks.get().map((t) => (t.id === task.id ? task : t)))
-        return
-    }
+    // Add, check for duplicates, and sort
+    $tasks.set(
+        [...$tasks.get(), task]
+            .filter(
+                (task, index, self) =>
+                    self.findIndex((t) => t.id === task.id) === index
+            )
+            .sort(
+                (a, b) =>
+                    new Date(b.createdAt).getTime() -
+                    new Date(a.createdAt).getTime()
+            )
+    )
+}
 
-    $tasks.set([...$tasks.get(), task])
+export function addTasks(tasks: TaskProps[]) {
+    $tasks.set([...$tasks.get(), ...tasks])
+    // Remove duplicates
+    $tasks.set(
+        $tasks
+            .get()
+            .filter(
+                (task, index, self) =>
+                    self.findIndex((t) => t.id === task.id) === index
+            )
+    )
+    // Sort by date
+    $tasks.set(
+        $tasks
+            .get()
+            .sort(
+                (a, b) =>
+                    new Date(b.createdAt).getTime() -
+                    new Date(a.createdAt).getTime()
+            )
+    )
 }
 
 export function removeTask(id: string) {
@@ -74,15 +102,18 @@ export function setTaskStatus(id: string, status: TaskStatus) {
 }
 
 onMount($tasks, () => {
-    useClient()
-        .tasks.getTasks()
-        .then((tasks) => {
-            if (tasks) {
-                $tasks.set(tasks)
-            } else {
-                navigate('/login')
-            }
-        })
+    Promise.all([
+        useClient().tasks.getTasks(),
+        useClient().tasks.getQueuedTasks(),
+    ]).then(([tasks, queuedTasks]) => {
+        if (tasks === null || queuedTasks === null) {
+            navigate('/login')
+            return
+        }
+
+        addTasks(tasks)
+        addTasks(queuedTasks)
+    })
 
     const sub = useClient().tasks.subscribe()
     const source = sub.subscribe()
@@ -90,6 +121,12 @@ onMount($tasks, () => {
     source.onmessage = (event) => {
         const taskEvent: TaskEvent = JSON.parse(event.data)
         switch (taskEvent.type) {
+            case TaskEventType.QUEUED:
+                addTask({
+                    ...taskEvent.task,
+                    id: taskEvent.id,
+                })
+                break
             case TaskEventType.STARTED:
                 addTask({
                     ...taskEvent.task,

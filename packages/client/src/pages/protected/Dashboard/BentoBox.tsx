@@ -31,6 +31,10 @@ export default function BentoBox({
             minW={minW}
             minH={minH}
             overflow="hidden"
+            boxShadow="md"
+            borderRadius="2xl"
+            border="1px solid"
+            borderColor={useColorModeValue('gray.200', 'gray.700')}
         >
             {isUnauthorized && (
                 <Flex
@@ -58,9 +62,8 @@ export interface BentoBoxContentProps extends FlexProps {}
 export function BentoBoxContent(props: BentoBoxContentProps): JSX.Element {
     return (
         <Flex
-            bg={useColorModeValue('gray.200', 'gray.700')}
+            bg={useColorModeValue('gray.50', 'gray.900')}
             borderRadius="2xl"
-            boxShadow="md"
             direction="column"
             h="full"
             w="full"

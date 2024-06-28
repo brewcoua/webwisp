@@ -1,5 +1,4 @@
 import {
-    BoxProps,
     Button,
     ButtonProps,
     Flex,
@@ -12,11 +11,9 @@ import {
     Text,
     Tooltip,
     useColorModeValue,
-    useToast,
 } from '@chakra-ui/react'
 import { useStore } from '@nanostores/preact'
 import { $user } from '@store/user'
-import { useState } from 'preact/hooks'
 
 import { TaskProps, TaskStatus } from '@domain/task.types'
 
@@ -25,39 +22,22 @@ import { IoCheckmarkCircle, IoCloseCircle, IoTrash } from 'react-icons/io5'
 
 import { selectedTask } from './TasksList'
 import { UserScopes } from '@domain/user.types'
-import { useClient } from '@api/client'
-import { removeTask } from '@store/tasks'
 
 export interface TaskItemProps extends ButtonProps {
     task: TaskProps
+    onTaskClick?: (task: TaskProps) => void
+    onDelete?: (task: TaskProps) => void
+    isDeleting?: boolean
 }
 
 export default function TaskItem({
     task,
+    onTaskClick,
+    onDelete,
+    isDeleting,
     ...props
 }: TaskItemProps): JSX.Element {
     const user = useStore($user)
-    const toast = useToast()
-
-    const [isDeleting, setIsDeleting] = useState(false)
-    const onDelete = async () => {
-        try {
-            setIsDeleting(true)
-            await useClient().tasks.deleteTask(task.id)
-            removeTask(task.id)
-            setIsDeleting(false)
-        } catch (err: any) {
-            console.error(err)
-            toast({
-                title: 'Failed to delete task',
-                description: err.message,
-                status: 'error',
-                duration: 9000,
-                isClosable: true,
-            })
-            setIsDeleting(false)
-        }
-    }
 
     return (
         <SlideFade in offsetY="20px" style={{ width: '100%' }}>
@@ -77,7 +57,9 @@ export default function TaskItem({
                 justify="space-between"
                 borderRadius="md"
                 onClick={() => {
-                    selectedTask.value = task.id
+                    if (onTaskClick) {
+                        onTaskClick(task)
+                    }
                 }}
                 isDisabled={isDeleting}
                 px={1}
@@ -103,6 +85,9 @@ export default function TaskItem({
                             isExternal
                             color={useColorModeValue('blue.600', 'blue.200')}
                             href={task.target}
+                            maxWidth="100%"
+                            textOverflow="ellipsis"
+                            overflow="hidden"
                         >
                             {task.target}
                         </Link>
@@ -135,8 +120,10 @@ export default function TaskItem({
                             isDisabled={!user?.scopes.includes(UserScopes.EDIT)}
                             isLoading={isDeleting}
                             onClick={(e) => {
-                                e.stopPropagation()
-                                onDelete()
+                                if (onDelete) {
+                                    e.stopPropagation()
+                                    onDelete(task)
+                                }
                             }}
                         />
                     </Flex>

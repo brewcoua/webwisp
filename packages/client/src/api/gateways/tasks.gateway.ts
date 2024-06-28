@@ -1,13 +1,12 @@
 import { BASE_URL, fetchAuthed } from '@api/client'
 
-import ITasksGateway from '@domain/api/gateways/tasks.gateway'
 import { SseClient } from '@domain/api/sse.client'
 import { CreateTaskProps, TaskProps } from '@domain/task.types'
 
 import { useAccessToken } from './auth.gateway'
 import { TaskEvent } from '@domain/task.events'
 
-export default class TasksGateway implements ITasksGateway {
+export default class TasksGateway {
     async createTask(task: CreateTaskProps): Promise<{ id: string }> {
         const response = await fetchAuthed(`${BASE_URL}/api/tasks/create`, {
             method: 'POST',
@@ -19,6 +18,22 @@ export default class TasksGateway implements ITasksGateway {
 
         if (!response?.ok) {
             throw new Error('Failed to create task')
+        }
+
+        return response.json()
+    }
+
+    async bulkTasks(tasks: CreateTaskProps[]): Promise<string[]> {
+        const response = await fetchAuthed(`${BASE_URL}/api/tasks/bulk`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(tasks),
+        })
+
+        if (!response?.ok) {
+            throw new Error('Failed to create tasks')
         }
 
         return response.json()
@@ -44,6 +59,25 @@ export default class TasksGateway implements ITasksGateway {
         const tasks = await response.json()
 
         return tasks.data
+    }
+
+    async getCorrelation(): Promise<string | null> {
+        const response = await fetchAuthed(`${BASE_URL}/api/tasks/correlation`)
+        if (!response?.ok) {
+            return null
+        }
+
+        return response.text()
+    }
+
+    async getQueuedTasks(): Promise<TaskProps[] | null> {
+        const response = await fetchAuthed(`${BASE_URL}/api/tasks/queued`)
+
+        if (!response?.ok) {
+            return null
+        }
+
+        return response.json()
     }
 
     async deleteTask(id: string): Promise<void> {

@@ -3,7 +3,8 @@ import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose'
 import { HydratedDocument, Types } from 'mongoose'
 
 import { CycleReport, CycleReportSchema } from './cycle-report.model'
-import { TaskStatus } from '../../domain/task.types'
+import { TaskProps, TaskStatus } from '../../domain/task.types'
+import { TaskDifficultyProps } from '@modules/tasks/domain/task.eval'
 
 @Schema({
     timestamps: true,
@@ -64,6 +65,24 @@ export class Task {
     })
     cycles: CycleReport[]
 
+    @Prop({
+        required: false,
+        type: String,
+    })
+    correlation?: string
+
+    @Prop({
+        required: false,
+        type: Object,
+    })
+    difficulty?: TaskDifficultyProps
+
+    @Prop({
+        required: false,
+        type: Object,
+    })
+    evaluation?: TaskProps['evaluation']
+
     constructor(task: Task) {
         this.target = task.target
         this.prompt = task.prompt
@@ -71,6 +90,9 @@ export class Task {
         this.message = task.message
         this.value = task.value
         this.cycles = task.cycles
+        this.correlation = task.correlation
+        this.difficulty = task.difficulty
+        this.evaluation = task.evaluation
     }
 }
 
@@ -90,6 +112,10 @@ export interface ITask extends ObjectLiteral {
     message?: string
     value?: string
     cycles: CycleReport[]
+
+    correlation?: string
+    difficulty?: TaskDifficultyProps
+    evaluation?: TaskProps['evaluation']
 }
 
 export const SortableTaskFields = {

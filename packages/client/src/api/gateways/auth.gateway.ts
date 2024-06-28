@@ -1,8 +1,7 @@
 import { BASE_URL, fetchAuthed } from '@api/client'
-import IAuthGateway from '@domain/api/gateways/auth.gateway'
 import { UserProps } from '@domain/user.types'
 
-export default class AuthGateway implements IAuthGateway {
+export default class AuthGateway {
     async login(username: string, password: string): Promise<boolean> {
         const response = await fetch(`${BASE_URL}/api/auth/login`, {
             method: 'POST',

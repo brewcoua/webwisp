@@ -19,43 +19,8 @@ import { TracesRepositoryPort } from './database/repositories/traces.repository.
 
 import { Repositories } from './database/repositories'
 
-import { CreateTaskHttpController } from './commands/create-task/create-task.http.controller'
-import { CreateTaskService } from './commands/create-task/create-task.service'
-import { DeleteTaskHttpController } from './commands/delete-task/delete-task.http.controller'
-import { DeleteTaskService } from './commands/delete-task/delete-task.service'
-import { BulkTasksHttpController } from './commands/bulk-tasks/bulk-tasks.http.controller'
-import { BulkTasksService } from './commands/bulk-tasks/bulk-tasks.service'
-
-import { GetTaskHttpController } from './queries/get-task/get-task.http.controller'
-import { GetTaskQueryHandler } from './queries/get-task/get-task.query-handler'
-import { SubscribeHttpController } from './queries/subscribe/subscribe.http.controller'
-import { GetTraceHttpController } from './queries/get-trace/get-trace.http.controller'
-import { GetTraceQueryHandler } from './queries/get-trace/get-trace.query-handler'
-import { GetTasksHttpController } from './queries/get-tasks/get-tasks.http.controller'
-import { GetTasksQueryHandler } from './queries/get-tasks/get-tasks.query-handler'
-import { ViewerHttpController } from './queries/viewer/viewer.http.controller'
-
-const HttpControllers = [
-    CreateTaskHttpController,
-    GetTaskHttpController,
-    SubscribeHttpController,
-    GetTraceHttpController,
-    DeleteTaskHttpController,
-    GetTasksHttpController,
-    ViewerHttpController,
-    BulkTasksHttpController,
-]
-
-const CommandHandlers: Provider[] = [
-    CreateTaskService,
-    DeleteTaskService,
-    BulkTasksService,
-]
-const QueryHandlers: Provider[] = [
-    GetTaskQueryHandler,
-    GetTraceQueryHandler,
-    GetTasksQueryHandler,
-]
+import { QueryHandlers, QueryHttpControllers } from './queries'
+import { CommandHandlers, CommandHttpControllers } from './commands'
 
 const Mappers: Provider[] = [TasksMapper]
 
@@ -72,7 +37,11 @@ const Mappers: Provider[] = [TasksMapper]
             serveRoot: '/api/tasks/traces/local',
         }),
     ],
-    controllers: [TasksController, ...HttpControllers],
+    controllers: [
+        TasksController,
+        ...CommandHttpControllers,
+        ...QueryHttpControllers,
+    ],
     providers: [
         ...CommandHandlers,
         ...QueryHandlers,

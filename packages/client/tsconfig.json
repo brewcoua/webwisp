@@ -29,6 +29,7 @@
             "@domain/*": ["src/domain/*"],
             "@api/*": ["src/api/*"],
             "@store/*": ["src/store/*"],
+            "@logic/*": ["src/logic/*"],
             
             "react": ["./node_modules/preact/compat/"],
             "react/jsx-runtime": ["./node_modules/preact/jsx-runtime"],

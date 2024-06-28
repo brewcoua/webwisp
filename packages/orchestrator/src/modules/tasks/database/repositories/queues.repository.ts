@@ -47,6 +47,10 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
         return task?.value || null
     }
 
+    getEnqueuedTasks(): TaskEntity[] {
+        return this.enqueuedTasks.toArray()
+    }
+
     sendTask(task: TaskEntity): boolean {
         if (!this.tasksQueue) {
             throw new Error('Channel not initialized')
@@ -54,7 +58,7 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
 
         const props = task.getProps()
 
-        const result = this.tasksQueue.sendToQueue(
+        const result = true /*this.tasksQueue.sendToQueue(
             MessageQueues.Tasks,
             Buffer.from(
                 JSON.stringify({
@@ -63,11 +67,16 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
                     prompt: props.prompt,
                 })
             )
-        )
+        )*/
 
         if (result) {
             Logger.log(`Task published: ${task.id}`, 'TaskQueuesRepository')
             this.enqueuedTasks.append(task)
+            this.eventEmitter.emit('task', {
+                type: TaskEventType.QUEUED,
+                id: task.id,
+                task: props,
+            } as TaskEvent)
         }
 
         return result
@@ -78,30 +87,7 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
             throw new Error('Channel not initialized')
         }
 
-        const results = tasks.map((task) => {
-            const props = task.getProps()
-
-            return this.tasksQueue?.sendToQueue(
-                MessageQueues.Tasks,
-                Buffer.from(
-                    JSON.stringify({
-                        id: task.id,
-                        target: props.target,
-                        prompt: props.prompt,
-                    })
-                )
-            )
-        })
-
-        results.forEach((result, index) => {
-            if (result) {
-                Logger.log(
-                    `Task published: ${tasks[index].id}`,
-                    'TaskQueuesRepository'
-                )
-                this.enqueuedTasks.append(tasks[index])
-            }
-        })
+        const results = tasks.map((task) => this.sendTask(task))
 
         return results.every((result) => result)
     }
@@ -171,8 +157,9 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
                 }
 
                 this.eventEmitter.emit('task', event)
+                this.eventsQueue?.ack(message)
             },
-            { noAck: true }
+            { noAck: false }
         )
     }
 }

@@ -1,10 +1,9 @@
 import { Flex } from '@chakra-ui/react'
 
 import LaunchTask from './sections/LaunchTask'
-import LaunchBenchmark from './sections/LaunchBenchmark'
+import LaunchScenario from './sections/LaunchScenario'
 import WorkersList from './sections/WorkersList'
 import TasksList from './sections/TasksList'
-import BentoBox from './BentoBox'
 import TaskInfo from './sections/TaskInfo'
 
 export default function Dashboard(): JSX.Element {
@@ -33,7 +32,7 @@ export default function Dashboard(): JSX.Element {
                 <WorkersList />
                 <Flex direction="column" gap={5} h="100%" w="50%">
                     <LaunchTask />
-                    <LaunchBenchmark />
+                    <LaunchScenario />
                 </Flex>
             </Flex>
             <Flex

@@ -15,6 +15,7 @@ export interface TaskProps {
 
     cycles: CycleReport[]
 
+    correlation?: string
     difficulty?: TaskDifficultyProps
     evaluation?: {
         results: TaskEvaluationResult[]
@@ -26,6 +27,7 @@ export interface CreateTaskProps {
     target: string
     prompt: string
 
+    correlation?: string
     difficulty?: TaskDifficultyProps
     evaluation?: TaskEvaluationProps
 }
