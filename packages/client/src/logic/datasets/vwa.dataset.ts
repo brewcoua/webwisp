@@ -1,4 +1,4 @@
-import { DatasetBase } from '@domain/dataset.base'
+import { DatasetBase } from '@domain/logic/dataset.base'
 
 export class VisualWebArenaDataset extends DatasetBase<VisualWebArenaData> {
     constructor() {

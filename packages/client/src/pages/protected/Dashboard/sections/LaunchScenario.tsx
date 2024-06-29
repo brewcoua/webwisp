@@ -25,11 +25,10 @@ import { MdRocketLaunch } from 'react-icons/md'
 
 import BentoBox from '../BentoBox'
 import { UserScopes } from '@domain/user.types'
-import { ScenarioBase } from '@domain/scenario.base'
-import { DatasetBase } from '@domain/dataset.base'
 import { VWAClassifiedsScenario } from '@logic/scenarios'
+import { ScenarioBase } from '@domain/logic/scenario.base'
 
-export const scenarios: ScenarioBase<DatasetBase<any>>[] = [
+export const scenarios: ScenarioBase<any, any, any>[] = [
     new VWAClassifiedsScenario(),
 ]
 
@@ -39,8 +38,14 @@ export default function LaunchScenario(): JSX.Element {
 
     const [isScenarioLoading, setIsScenarioLoading] = useState<boolean>(false)
     const [scenario, setScenario] = useState<ScenarioBase<
-        DatasetBase<any>
+        any,
+        any,
+        any
     > | null>(null)
+
+    const [isBulk, setIsBulk] = useState<boolean>(false)
+
+    const [scenarioTask, setScenarioTask] = useState<string | null>(null)
     const [scenarioTasks, setScenarioTasks] = useState<number>(1)
     const [maxScenarioTasks, setMaxScenarioTasks] = useState<number>(1)
 
@@ -51,7 +56,11 @@ export default function LaunchScenario(): JSX.Element {
             return
         }
 
-        await scenario.launch(scenarioTasks)
+        if (isBulk) {
+            await scenario.bulk(scenarioTasks)
+        } else {
+            await scenario.launch(scenarioTask || scenario.entities[0].id)
+        }
 
         setIsLoading(false)
     }
@@ -63,11 +72,16 @@ export default function LaunchScenario(): JSX.Element {
         setScenario(foundScenario || null)
 
         if (foundScenario) {
-            foundScenario.getTasksCount().then((tasks) => {
+            ;(async () => {
+                scenario?.clear()
+                await foundScenario.initialize()
+                const tasks = foundScenario.entities.length
+
                 setMaxScenarioTasks(tasks)
                 setScenarioTasks(tasks)
+
                 setIsScenarioLoading(false)
-            })
+            })()
         } else {
             setIsScenarioLoading(false)
         }
@@ -127,58 +141,141 @@ export default function LaunchScenario(): JSX.Element {
                             )}
                             {scenario && !isScenarioLoading && (
                                 <Flex direction="column" gap={3}>
-                                    <Grid
-                                        templateColumns="repeat(2, 1fr)"
-                                        gap={3}
-                                        alignItems="center"
-                                        w="100%"
-                                    >
-                                        <GridItem>
-                                            <FormControl isReadOnly>
-                                                <FormLabel>Dataset</FormLabel>
-                                                <Link
-                                                    href={scenario.dataset.url}
-                                                    isExternal
-                                                    border="1px solid"
-                                                    borderColor={useColorModeValue(
-                                                        'gray.200',
-                                                        'gray.700'
-                                                    )}
-                                                    px={4}
-                                                    py={2}
-                                                    borderRadius="md"
-                                                    display="block"
-                                                >
-                                                    {scenario.dataset.name}
-                                                </Link>
-                                            </FormControl>
-                                        </GridItem>
-                                        <GridItem>
-                                            <FormControl>
+                                    <Flex direction="column" gap={4} w="100%">
+                                        <FormControl isReadOnly minW="50%">
+                                            <FormLabel>Dataset</FormLabel>
+                                            <Link
+                                                href={scenario.dataset.url}
+                                                isExternal
+                                                border="1px solid"
+                                                borderColor={useColorModeValue(
+                                                    'gray.200',
+                                                    'gray.700'
+                                                )}
+                                                px={4}
+                                                py={2}
+                                                borderRadius="md"
+                                                display="block"
+                                            >
+                                                {scenario.dataset.name}
+                                            </Link>
+                                        </FormControl>
+                                        <Flex gap={2}>
+                                            <FormControl
+                                                isRequired
+                                                w="20%"
+                                                minW="8rem"
+                                            >
                                                 <FormLabel>
-                                                    Tasks Count
-                                                </FormLabel>{' '}
-                                                <NumberInput
-                                                    defaultValue={
-                                                        maxScenarioTasks
-                                                    }
-                                                    min={1}
-                                                    max={maxScenarioTasks}
-                                                    onChange={(value) =>
-                                                        setScenarioTasks(
-                                                            parseInt(value)
+                                                    Launch Type
+                                                </FormLabel>
+                                                <Select
+                                                    placeholder="Select launch type"
+                                                    defaultValue={'single'}
+                                                    onChange={(e) => {
+                                                        if (
+                                                            e.target.value !==
+                                                                'single' &&
+                                                            e.target.value !==
+                                                                'bulk'
+                                                        ) {
+                                                            e.target.value =
+                                                                'single'
+                                                        }
+
+                                                        setIsBulk(
+                                                            e.target.value ===
+                                                                'bulk'
                                                         )
-                                                    }
+                                                    }}
                                                 >
-                                                    <NumberInputField />
-                                                    <NumberInputStepper>
-                                                        <NumberIncrementStepper />
-                                                        <NumberDecrementStepper />
-                                                    </NumberInputStepper>
-                                                </NumberInput>
+                                                    <option value="single">
+                                                        Single
+                                                    </option>
+                                                    <option value="bulk">
+                                                        Bulk
+                                                    </option>
+                                                </Select>
                                             </FormControl>
-                                        </GridItem>
-                                    </Grid>
+                                            <FormControl isRequired>
+                                                <FormLabel>
+                                                    {isBulk
+                                                        ? 'Tasks Count'
+                                                        : 'Task ID'}
+                                                </FormLabel>{' '}
+                                                {isBulk ? (
+                                                    <NumberInput
+                                                        defaultValue={
+                                                            maxScenarioTasks
+                                                        }
+                                                        min={1}
+                                                        max={maxScenarioTasks}
+                                                        onChange={(value) =>
+                                                            setScenarioTasks(
+                                                                parseInt(value)
+                                                            )
+                                                        }
+                                                    >
+                                                        <NumberInputField />
+                                                        <NumberInputStepper>
+                                                            <NumberIncrementStepper />
+                                                            <NumberDecrementStepper />
+                                                        </NumberInputStepper>
+                                                    </NumberInput>
+                                                ) : (
+                                                    <Select
+                                                        placeholder="Select task"
+                                                        onChange={(e) =>
+                                                            setScenarioTask(
+                                                                e.target.value
+                                                            )
+                                                        }
+                                                        value={
+                                                            scenarioTask ??
+                                                            scenario.entities[0]
+                                                                .id
+                                                        }
+                                                    >
+                                                        {scenario.entities.map(
+                                                            (entity) => {
+                                                                let prompt =
+                                                                    entity.toTask()
+                                                                        .prompt
+                                                                if (
+                                                                    prompt.length >
+                                                                    80
+                                                                ) {
+                                                                    prompt =
+                                                                        prompt.slice(
+                                                                            0,
+                                                                            80
+                                                                        ) +
+                                                                        '...'
+                                                                }
+
+                                                                return (
+                                                                    <option
+                                                                        key={
+                                                                            entity.id
+                                                                        }
+                                                                        value={
+                                                                            entity.id
+                                                                        }
+                                                                    >
+                                                                        {
+                                                                            entity.id
+                                                                        }{' '}
+                                                                        -{' '}
+                                                                        {prompt}
+                                                                    </option>
+                                                                )
+                                                            }
+                                                        )}
+                                                    </Select>
+                                                )}
+                                            </FormControl>
+                                        </Flex>
+                                    </Flex>
                                 </Flex>
                             )}
                         </Flex>
@@ -186,7 +283,12 @@ export default function LaunchScenario(): JSX.Element {
                     <Button
                         leftIcon={<MdRocketLaunch />}
                         colorScheme="blue"
-                        isDisabled={!scenario || isLoading}
+                        isDisabled={
+                            !scenario ||
+                            isLoading ||
+                            (isBulk && !scenarioTasks) ||
+                            (!isBulk && !scenarioTask)
+                        }
                         isLoading={isLoading}
                         onClick={onLaunch}
                     >

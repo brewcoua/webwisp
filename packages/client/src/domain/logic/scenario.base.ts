@@ -1,8 +1,9 @@
 import { useClient } from '@api/client'
-import { CreateTaskProps } from './task.types'
+import { CreateTaskProps } from '../task.types'
 import { DatasetBase } from './dataset.base'
+import { DataEntity } from './data.entity'
 
-export interface ScenarioBaseProps<Dataset extends DatasetBase<any>> {
+export interface ScenarioBaseProps<T, Dataset extends DatasetBase<T>> {
     id: string
     name: string
     dataset: Dataset
@@ -12,27 +13,51 @@ export interface ScenarioBaseProps<Dataset extends DatasetBase<any>> {
     }
 }
 
-export abstract class ScenarioBase<Dataset extends DatasetBase<any>> {
+export abstract class ScenarioBase<
+    Data,
+    Entity extends DataEntity<Data>,
+    Dataset extends DatasetBase<Data>,
+> {
     public readonly id: string
     public readonly name: string
-    public readonly properties: ScenarioBaseProps<Dataset>['properties']
+    public readonly properties: ScenarioBaseProps<Data, Dataset>['properties']
     public readonly dataset: Dataset
+    public abstract entities: Entity[]
 
-    constructor(props: ScenarioBaseProps<Dataset>) {
+    constructor(props: ScenarioBaseProps<Data, Dataset>) {
         this.id = props.id
         this.name = props.name
         this.properties = props.properties
         this.dataset = props.dataset
     }
 
-    public async launch(count?: number): Promise<void> {
-        console.log(`Launching scenario ${this.name}`)
+    public async launch(id: string): Promise<void> {
+        console.log(`Launching scenario ${this.name} with id ${id}`)
+
+        const client = useClient()
+        const task = this.entities.find((entity) => entity.id === id)?.toTask()
+
+        if (!task) {
+            throw new Error(`Task with id ${id} not found`)
+        }
+
+        await client.tasks.createTask(task)
+
+        console.log(`Scenario ${this.name} launched`)
+    }
+
+    public async bulk(count?: number): Promise<void> {
+        console.log(`Launching scenario ${this.name} as bulk`)
 
         // We'll send tasks in bulk of 30 tasks
         const bulkSize = 30
         const client = useClient()
 
-        let tasks = await this.load()
+        if (!this.entities.length) {
+            await this.initialize()
+        }
+
+        let tasks = this.toTasks()
         if (count) {
             tasks = tasks.slice(0, count)
         }
@@ -56,10 +81,10 @@ export abstract class ScenarioBase<Dataset extends DatasetBase<any>> {
         console.log(`Scenario ${this.name} launched`)
     }
 
-    public async getTasksCount(): Promise<number> {
-        const tasks = await this.load()
-        return tasks.length
+    public clear(): void {
+        this.entities = []
     }
 
-    abstract load(): Promise<CreateTaskProps[]>
+    abstract initialize(): Promise<void>
+    abstract toTasks(): CreateTaskProps[]
 }
