@@ -12,7 +12,7 @@ import { EventEmitter2 } from '@nestjs/event-emitter'
 
 import { TASK_REPOSITORY, TRACES_REPOSITORY } from '../../tasks.tokens'
 import { TaskRepositoryPort } from './task.repository.port'
-import { TaskStatus } from '../../domain/task.types'
+import { CreateTaskProps, TaskStatus } from '../../domain/task.types'
 import { TracesRepositoryPort } from './traces.repository.port'
 
 @Injectable()
@@ -58,16 +58,23 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
 
         const props = task.getProps()
 
-        const result = true /*this.tasksQueue.sendToQueue(
+        console.log('eval', props.evaluation)
+
+        const result = this.tasksQueue.sendToQueue(
             MessageQueues.Tasks,
             Buffer.from(
                 JSON.stringify({
                     id: task.id,
                     target: props.target,
                     prompt: props.prompt,
-                })
+
+                    login_script: props.login_script,
+                    correlation: props.correlation,
+                    difficulty: props.difficulty,
+                    evaluation: props.evaluation && props.evaluation.config,
+                } as CreateTaskProps)
             )
-        )*/
+        )
 
         if (result) {
             Logger.log(`Task published: ${task.id}`, 'TaskQueuesRepository')
@@ -157,9 +164,8 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
                 }
 
                 this.eventEmitter.emit('task', event)
-                this.eventsQueue?.ack(message)
             },
-            { noAck: false }
+            { noAck: true }
         )
     }
 }

@@ -5,7 +5,7 @@ import ParsedResult, {
     ParsedArgument,
     ParsedArguments,
 } from './domain/ParsedResult'
-import config from '@services/exec/execution.config'
+import config from '@services/execution/execution.config'
 import {
     AbstractAction,
     AbstractArgument,

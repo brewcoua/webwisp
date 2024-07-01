@@ -1,4 +1,4 @@
-import { CycleReport } from '@services/exec/domain/task.types'
+import { CycleReport } from '@services/execution/domain/task.types'
 
 const prompts: Prompts = {
     system: {

@@ -15,6 +15,7 @@ export interface TaskProps {
 
     cycles: CycleReport[]
 
+    login_script?: LoginScripts
     correlation?: string
     difficulty?: TaskDifficultyProps
     evaluation?: {
@@ -27,6 +28,7 @@ export interface CreateTaskProps {
     target: string
     prompt: string
 
+    login_script?: LoginScripts
     correlation?: string
     difficulty?: TaskDifficultyProps
     evaluation?: TaskEvaluationProps
@@ -43,4 +45,8 @@ export interface CycleReport {
     action: Action
     reasoning?: string
     duration: number
+}
+
+export enum LoginScripts {
+    CLASSIFIEDS = 'classifieds',
 }

@@ -5,7 +5,8 @@ import { nanoid } from 'nanoid'
 import BrowserService from '@services/browser'
 import MindService from '@services/mind'
 import RabbitMQService from '@services/rabbitmq'
-import ExecutionService from '@services/exec'
+import ExecutionService from '@services/execution'
+import EvaluationService from '@services/evaluation'
 
 export default class WorkerService {
     private readonly logger: Logger = makeLogger().child({
@@ -15,6 +16,7 @@ export default class WorkerService {
     public readonly id = nanoid()
 
     private execution!: ExecutionService
+    public evaluation!: EvaluationService
     public rabbitmq!: RabbitMQService
     public browser!: BrowserService
     public mind!: MindService
@@ -32,6 +34,7 @@ export default class WorkerService {
             this.mind.initialize(),
         ])
 
+        this.evaluation = new EvaluationService(this.logger)
         this.execution = new ExecutionService(this, this.logger)
 
         this.logger.info('WorkerService initialized')

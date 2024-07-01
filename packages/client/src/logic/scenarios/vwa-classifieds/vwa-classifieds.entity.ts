@@ -1,5 +1,5 @@
 import { DataEntity } from '@domain/logic/data.entity'
-import { CreateTaskProps } from '@domain/task.types'
+import { CreateTaskProps, LoginScripts } from '@domain/task.types'
 import { VisualWebArenaData } from '@logic/datasets/vwa.dataset'
 
 const BASE_URL = 'http://ec2-3-13-232-171.us-east-2.compute.amazonaws.com:9980'
@@ -32,6 +32,9 @@ export class VWAClassifiedsEntity extends DataEntity<VisualWebArenaData> {
         return {
             target: this.replaceUrl(this.props.start_url),
             prompt: this.props.intent,
+            login_script: this.props.require_login
+                ? LoginScripts.CLASSIFIEDS
+                : undefined,
             difficulty: {
                 reasoning_difficulty: this.props.reasoning_difficulty,
                 visual_difficulty: this.props.visual_difficulty,

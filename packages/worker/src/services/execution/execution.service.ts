@@ -15,6 +15,7 @@ import CycleResult, { CycleStatus } from './domain/cycle.types'
 import { ActionStatus, ActionType } from '@domain/action.types'
 import { WorkerEventType } from './domain/worker.events'
 import { WorkerStatus } from './domain/worker.types'
+import { getLoginScript } from '@services/evaluation/scripts'
 
 export default class ExecutionService {
     private readonly logger: Logger
@@ -42,6 +43,7 @@ export default class ExecutionService {
             id: task.id,
             status: result.status,
         })
+
         this.logger.verbose('Result', result)
 
         const status = this.worker.rabbitmq.emitTaskEvent({
@@ -88,6 +90,55 @@ export default class ExecutionService {
             task: task.id,
         })
 
+        const page = await this.worker.browser.detach(task.target)
+        if (!page) {
+            return {
+                status: TaskStatus.FAILED,
+                message: 'Failed to attach to page',
+                cycles: [],
+            }
+        }
+
+        if (task.login_script) {
+            this.logger.verbose('Running login script', { id: task.id })
+            const script = getLoginScript(task.login_script)
+            await script.run(page.unwrap())
+
+            // Go back to the target
+            await page.goto(task.target)
+            await page.waitToLoad()
+        }
+
+        const result = await this.loop(page, task)
+
+        if (task.evaluation) {
+            this.logger.verbose('Evaluating task', { id: task.id })
+            const results = await this.worker.evaluation.evaluate(
+                page,
+                task.evaluation
+            )
+
+            return {
+                status: result.status,
+                message: result.message,
+                value: result.value,
+                cycles: result.cycles,
+                evaluation: {
+                    results,
+                    config: task.evaluation,
+                },
+            }
+        }
+
+        return {
+            status: result.status,
+            message: result.message,
+            value: result.value,
+            cycles: result.cycles,
+        }
+    }
+
+    private async loop(page: PageWrapper, task: CreateTaskProps) {
         const cycles: CycleReport[] = []
         const cycleCounters = {
             total: 0,
@@ -96,14 +147,6 @@ export default class ExecutionService {
                 action: 0, // Action fails
                 format: 0, // Format is wrong
             },
-        }
-        const page = await this.worker.browser.detach(task.target)
-        if (!page) {
-            return {
-                status: TaskStatus.FAILED,
-                message: 'Failed to attach to page',
-                cycles,
-            }
         }
 
         while (

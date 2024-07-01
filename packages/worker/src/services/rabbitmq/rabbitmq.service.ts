@@ -1,11 +1,14 @@
 import { MessageQueues } from '@configs/app.const'
 import { useEnv } from '@configs/env'
-import { TaskEvent, TaskEventType } from '@services/exec/domain/task.events'
-import { CreateTaskProps } from '@services/exec/domain/task.types'
+import {
+    TaskEvent,
+    TaskEventType,
+} from '@services/execution/domain/task.events'
+import { CreateTaskProps } from '@services/execution/domain/task.types'
 import {
     PartialWorkerEvent,
     WorkerEventType,
-} from '@services/exec/domain/worker.events'
+} from '@services/execution/domain/worker.events'
 import amqp from 'amqplib'
 
 import { Logger } from 'winston'

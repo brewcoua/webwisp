@@ -1,9 +1,11 @@
+import { LoginScripts } from '@modules/tasks/domain/task.types'
 import {
     TaskDifficultyDto,
     TaskEvaluationConfigDto,
 } from '@modules/tasks/dtos/task.eval.dto'
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger'
 import {
+    IsEnum,
     IsOptional,
     IsString,
     IsUrl,
@@ -37,6 +39,17 @@ export class CreateTaskRequestDto {
     @MinLength(6)
     @MaxLength(1024)
     readonly prompt!: string
+
+    @ApiProperty({
+        example: LoginScripts.CLASSIFIEDS,
+        description: 'The login script to use for the task',
+        enum: LoginScripts,
+        enumName: 'LoginScripts',
+    })
+    @IsOptional()
+    @IsString()
+    @IsEnum(LoginScripts)
+    readonly login_script?: LoginScripts
 
     @ApiProperty({
         example: '60e1c1e2c1d6b2f8b9b3b2f8',

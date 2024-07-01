@@ -71,7 +71,7 @@ export interface CycleDisplayProps {
 export function CycleDisplay({ cycle }: CycleDisplayProps): JSX.Element {
     const command = useMemo(() => {
         const base = cycle.action.type
-        const args = Object.values(cycle.action.arguments).map((arg) => {
+        const args = Object.values(cycle.action.arguments || {}).map((arg) => {
             if (typeof arg === 'string') return `"${arg}"`
             return arg
         })

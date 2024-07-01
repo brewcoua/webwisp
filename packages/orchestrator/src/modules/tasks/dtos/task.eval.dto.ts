@@ -11,9 +11,8 @@ import {
     TaskEvaluationUrlNote,
 } from '../domain/task.eval'
 import {
-    IsBoolean,
     IsEnum,
-    IsObject,
+    IsNumber,
     IsOptional,
     IsString,
     MaxLength,
@@ -76,13 +75,13 @@ export class TaskEvaluationResultDto implements TaskEvaluationResult {
         example: false,
         description: 'The result of the evaluation',
     })
-    @IsBoolean()
-    @Type(() => Boolean)
-    readonly result: boolean
+    @IsNumber()
+    @Type(() => Number)
+    readonly score: number
 
     constructor(props: TaskEvaluationResult) {
         this.type = props.type
-        this.result = props.result
+        this.score = props.score
     }
 }
 

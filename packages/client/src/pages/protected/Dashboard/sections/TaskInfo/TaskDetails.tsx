@@ -153,11 +153,7 @@ export default function TaskDetails({ task }: TaskDetailsProps): JSX.Element {
                                             <DetailsField
                                                 key={index}
                                                 label={result.type}
-                                                value={
-                                                    result.result
-                                                        ? 'passed'
-                                                        : 'failed'
-                                                }
+                                                value={result.score.toString()}
                                             />
                                         )
                                     )}

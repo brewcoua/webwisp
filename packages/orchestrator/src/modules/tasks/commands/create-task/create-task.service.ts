@@ -19,6 +19,10 @@ export class CreateTaskService implements ICommandHandler<CreateTaskCommand> {
         const task = TaskEntity.create({
             target: command.target,
             prompt: command.prompt,
+
+            login_script: command.login_script,
+            difficulty: command.difficulty,
+            evaluation: command.evaluation,
         })
 
         const result = this.taskQueuesRepository.sendTask(task)

@@ -13,7 +13,7 @@ export class VisualWebArenaDataset extends DatasetBase<VisualWebArenaData> {
 export interface VisualWebArenaData {
     sites: string[]
     task_id: number
-    required_login: boolean
+    require_login: boolean
     storage_state: string
     start_url: string
     geolocation: null

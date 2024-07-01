@@ -74,6 +74,37 @@ export default class PageWrapper {
         return page ? page.id : null
     }
 
+    public async getQueryText(query: string): Promise<string | null> {
+        try {
+            // Query selector with innerText
+            const element = await this.page.$(query)
+            return element ? element.innerText() : null
+        } catch (err) {
+            return null
+        }
+    }
+
+    public async getContent(): Promise<string | null> {
+        try {
+            const content = await this.page.content()
+            return content
+        } catch (err) {
+            return null
+        }
+    }
+
+    public async evaluate(script: string): Promise<any> {
+        try {
+            return this.page.evaluate(script)
+        } catch (err) {
+            return null
+        }
+    }
+
+    public unwrap(): Page {
+        return this.page
+    }
+
     /**
      * Take a screenshot of the current page
      *

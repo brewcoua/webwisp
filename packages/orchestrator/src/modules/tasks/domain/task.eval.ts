@@ -58,5 +58,5 @@ export interface TaskEvaluationPageImageQuery {
 
 export interface TaskEvaluationResult {
     type: TaskEvaluationType
-    result: boolean
+    score: number
 }
