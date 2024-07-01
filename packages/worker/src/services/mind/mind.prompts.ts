@@ -20,7 +20,7 @@ const prompts: Prompts = {
             'Describe the current state of the website, including the screenshot, url, title, and previous actions.' +
             'Based on what you see, you may doubt the previous actions, and decide to go back to a previous state.\n\n' +
             '## Action ##\n' +
-            'Describe the action you want to perform, including why you want to perform it, and what you expect to happen.\n\n' +
+            'Describe the action you want to perform, including why you want to perform it, and what you expect to happen. Only ever issue one action at a time.\n\n' +
             '~~~\n' +
             '$ <single-sentence action description for what you want to do>\n' +
             '<action> [arg1] [arg2] ...\n' +
@@ -30,7 +30,9 @@ const prompts: Prompts = {
             'When trying to interact with an element, you will need to provide the label (colored number, associated with the bounding box over the element) most closely associated with it, as it is the only way to identify it. ' +
             'However, you must make sure that the label is the correct one, as the system will not check if the label is correct or not.\n' +
             'A successful action in the previous actions only means that it was performed, not that it did as expected. You must always check the result of the action to see if it was successful. ' +
-            'In fact, the current state of the page matters way more than the previous actions, as it is the only way to know what is happening.',
+            'In fact, the current state of the page matters way more than the previous actions, as it is the only way to know what is happening.\n' +
+            'When searching through a list of elements, make sure to look for filters, sortings, search bars, or any other way to narrow down the search, as it will make your task easier.\n' +
+            "Especially, never scroll more than 3 times in a row. If you can't find what you are looking for, try to use the search bar or any other filtering mechanism available.",
         addons: {
             examples: {
                 message:

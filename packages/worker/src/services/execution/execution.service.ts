@@ -288,6 +288,11 @@ export default class ExecutionService {
             }
         }
 
+        this.logger.debug('Generated completion', {
+            id: task.id,
+            completion,
+        })
+
         const parsed = this.worker.mind.parser.parse(completion)
 
         if (!parsed || !parsed.success) {

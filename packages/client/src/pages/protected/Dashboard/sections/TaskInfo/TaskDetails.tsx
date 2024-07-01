@@ -1,7 +1,7 @@
 import {
+    Box,
     Code,
     Flex,
-    Heading,
     Icon,
     IconProps,
     Link,
@@ -13,14 +13,82 @@ import {
 import { TaskProps } from '@domain/task.types'
 
 import { IconType } from 'react-icons/lib'
-import { PiIdentificationBadge } from 'react-icons/pi'
-import { FaLink } from 'react-icons/fa'
 
 export interface TaskDetailsProps {
     task: TaskProps
 }
 
 export default function TaskDetails({ task }: TaskDetailsProps): JSX.Element {
+    const details = (
+        <>
+            <b>id:</b> {task.id}
+            {task.correlation && (
+                <>
+                    <br />
+                    <b>correlation:</b> {task.correlation}
+                </>
+            )}
+            <br />
+            <b>status:</b> {task.status}
+            <br />
+            <b>target: </b>
+            <Link href={task.target} isExternal>
+                {task.target}
+            </Link>
+            <br />
+            <b>prompt:</b> {task.prompt}
+            {task.message && (
+                <>
+                    <br />
+                    <br />
+                    <b>message:</b> {task.message}
+                </>
+            )}
+            {task.value && (
+                <>
+                    <br />
+                    <b>value:</b> {task.value}
+                </>
+            )}
+            {task.difficulty && (
+                <>
+                    <br />
+                    <br />
+                    <b>difficulty:</b> {task.difficulty.visual_difficulty} /{' '}
+                    {task.difficulty.reasoning_difficulty} /{' '}
+                    {task.difficulty.overall_difficulty}
+                    <br />
+                </>
+            )}
+            {task.evaluation && (
+                <>
+                    <br />
+                    <b>evaluation:</b>
+                    <Flex ml={3} direction="column">
+                        <Box>
+                            <b>results: </b>
+                            {task.evaluation.results
+                                .reduce((acc, res) => acc + res.score, 0)
+                                .toString() + ' '}
+                            / {task.evaluation.results.length}
+                        </Box>
+                        <b>config:</b>
+                        <Flex ml={3} direction="column">
+                            {task.evaluation.config.eval_types.map((type) => (
+                                <Box>
+                                    <b>{type}: </b>
+                                    {task.evaluation?.results.find(
+                                        (res) => res.type === type
+                                    )?.score || 'N/A'}
+                                </Box>
+                            ))}
+                        </Flex>
+                    </Flex>
+                </>
+            )}
+        </>
+    )
+
     return (
         <Stack
             spacing={4}
@@ -29,143 +97,15 @@ export default function TaskDetails({ task }: TaskDetailsProps): JSX.Element {
             h="100%"
             w="100%"
         >
-            <Flex
-                direction="column"
-                align="flex-start"
-                justify="flex-start"
-                gap={2}
+            <Code
+                h="100%"
                 w="100%"
+                display="block"
+                whiteSpace="pre"
+                wordBreak="break-word"
             >
-                <Heading size="md">Task Details</Heading>
-                <Flex
-                    direction="column"
-                    align="flex-start"
-                    justify="flex-start"
-                    gap={2.5}
-                    bg={useColorModeValue('gray.100', 'gray.800')}
-                    p={2}
-                    borderRadius="md"
-                    w="100%"
-                >
-                    <Stack
-                        direction="row"
-                        align="center"
-                        justify="flex-start"
-                        spacing={3}
-                        divider={<StackDivider />}
-                    >
-                        <DetailsField
-                            icon={PiIdentificationBadge}
-                            iconColor={useColorModeValue(
-                                'grey.200',
-                                'grey.800'
-                            )}
-                            label="ID"
-                            value={task.id}
-                        />
-                        <DetailsField
-                            icon={FaLink}
-                            iconColor={useColorModeValue(
-                                'blue.500',
-                                'blue.300'
-                            )}
-                            label="Correlation"
-                            value={task.correlation || 'none'}
-                        />
-                    </Stack>
-                    <DetailsField label="Status" value={task.status} />
-                    <DetailsField label="Target" value={task.target} isLink />
-                    <DetailsField label="Prompt" value={task.prompt} isArea />
-                </Flex>
-            </Flex>
-
-            {(task.evaluation || task.difficulty) && (
-                <Flex
-                    direction="column"
-                    align="flex-start"
-                    justify="flex-start"
-                    gap={2}
-                    w="100%"
-                >
-                    <Heading size="md">Task Evaluation</Heading>
-                    <Stack
-                        direction="column"
-                        align="flex-start"
-                        justify="flex-start"
-                        gap={2.5}
-                        bg={useColorModeValue('gray.100', 'gray.800')}
-                        p={2}
-                        borderRadius="md"
-                        w="100%"
-                        divider={<StackDivider />}
-                    >
-                        {task.difficulty && (
-                            <Flex
-                                direction="column"
-                                align="flex-start"
-                                justify="flex-start"
-                                gap={1}
-                            >
-                                <Heading size="sm">Difficulty</Heading>
-                                <Flex
-                                    direction="column"
-                                    align="flex-start"
-                                    justify="flex-start"
-                                    gap={2}
-                                >
-                                    <DetailsField
-                                        label="Reasoning"
-                                        value={
-                                            task.difficulty.reasoning_difficulty
-                                        }
-                                    />
-                                    <DetailsField
-                                        label="Visual"
-                                        value={
-                                            task.difficulty.visual_difficulty
-                                        }
-                                    />
-                                    <DetailsField
-                                        label="Overall"
-                                        value={
-                                            task.difficulty.overall_difficulty
-                                        }
-                                    />
-                                </Flex>
-                            </Flex>
-                        )}
-                        {task.evaluation && (
-                            <Flex
-                                direction="column"
-                                align="flex-start"
-                                justify="flex-start"
-                                gap={1}
-                            >
-                                <Heading size="sm">Evaluation</Heading>
-                                <Flex
-                                    direction="column"
-                                    align="flex-start"
-                                    justify="flex-start"
-                                    gap={2}
-                                >
-                                    {task.evaluation.results.map(
-                                        (result, index) => (
-                                            <DetailsField
-                                                key={index}
-                                                label={result.type}
-                                                value={result.score.toString()}
-                                            />
-                                        )
-                                    )}
-                                    {task.evaluation.results.length === 0 && (
-                                        <Text>No evaluation results</Text>
-                                    )}
-                                </Flex>
-                            </Flex>
-                        )}
-                    </Stack>
-                </Flex>
-            )}
+                {details}
+            </Code>
         </Stack>
     )
 }
