@@ -42,6 +42,35 @@ const config: RunnerConfig = {
                 },
             ],
         },
+        hover: {
+            description:
+                'Hover over an element on the page. Used for displaying hover menus.',
+            example: 'hover 3',
+            arguments: [
+                {
+                    name: 'label',
+                    type: AbstractArgumentType.NUMBER,
+                    required: true,
+                },
+            ],
+        },
+        select: {
+            description:
+                'Select an option from a dropdown element on the page.',
+            example: 'select 3 "Option 1"',
+            arguments: [
+                {
+                    name: 'label',
+                    type: AbstractArgumentType.NUMBER,
+                    required: true,
+                },
+                {
+                    name: 'option',
+                    type: AbstractArgumentType.STRING,
+                    required: true,
+                },
+            ],
+        },
         press_enter: {
             description:
                 'Press the enter key on the keyboard. This does not type anything and may be used to submit forms.',

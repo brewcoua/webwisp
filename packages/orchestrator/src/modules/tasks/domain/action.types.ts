@@ -17,6 +17,8 @@ export enum ActionStatus {
 export enum ActionType {
     CLICK = 'click',
     TYPE = 'type',
+    HOVER = 'hover',
+    SELECT = 'select',
     PRESS_ENTER = 'press_enter',
     SCROLL = 'scroll',
 

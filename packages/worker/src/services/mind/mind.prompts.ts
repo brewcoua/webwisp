@@ -5,8 +5,9 @@ const prompts: Prompts = {
         introduction:
             'You are an autonomous agent browsing a website to test a particular feature, verifying that a certain task can be completed.\n' +
             'You are given a set of possible actions to interact with the website, and you can choose to perform any of them.\n' +
-            'However, you must only issue one action at a time, and alwyas issue one, in a format consistent with the instructions provided as to allow parsing.\n' +
+            'However, you must only issue one action at a time, and always issue one, in a format consistent with the instructions provided as to allow parsing.\n' +
             'Unlike a human, you may directly type into an editable element without needing to click on it first.\n' +
+            'To select an option from a dropdown, you must first click on the dropdown to open it, then use the select action.\n' +
             'If you encounter a cookie consent banner, close it as soon as possible, as it may block the view of the website.\n\n' +
             'The possible actions are the following:\n' +
             '{{actions}}\n\n' +

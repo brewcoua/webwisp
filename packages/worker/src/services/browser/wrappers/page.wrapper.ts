@@ -5,7 +5,7 @@ import { Logger } from 'winston'
 import config, { REMOTE_PORT } from '../browser.config'
 import { Action, ActionStatus, ActionType } from '@domain/action.types'
 
-const SoMUrl = 'https://unpkg.com/@brewcoua/web-som@1.2.2/SoM.min.js'
+const SoMUrl = 'https://unpkg.com/@brewcoua/web-som@1.2.3/SoM.min.js'
 
 export default class PageWrapper {
     private readonly logger: Logger
@@ -216,7 +216,9 @@ export default class PageWrapper {
                 })
             } else if (
                 action.type === ActionType.CLICK ||
-                action.type === ActionType.TYPE
+                action.type === ActionType.TYPE ||
+                action.type === ActionType.HOVER ||
+                action.type === ActionType.SELECT
             ) {
                 const element = await this.page.$(
                     `[data-som="${action.arguments.label}"]`
@@ -231,6 +233,14 @@ export default class PageWrapper {
                         break
                     case ActionType.TYPE:
                         await element.fill(action.arguments.text as string)
+                        break
+                    case ActionType.HOVER:
+                        await element.hover()
+                        break
+                    case ActionType.SELECT:
+                        await element.selectOption(
+                            action.arguments.option as string
+                        )
                         break
                 }
             }

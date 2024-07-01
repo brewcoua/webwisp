@@ -14,7 +14,7 @@ import {
 import { useMemo } from 'preact/hooks'
 
 import { HiOutlineCursorClick } from 'react-icons/hi'
-import { FaKeyboard } from 'react-icons/fa'
+import { FaKeyboard, FaMousePointer } from 'react-icons/fa'
 import { PiKeyReturnBold, PiMouseScroll } from 'react-icons/pi'
 import {
     IoArrowBackCircle,
@@ -24,6 +24,7 @@ import {
     IoCloseCircle,
 } from 'react-icons/io5'
 import { MdOutlinePending } from 'react-icons/md'
+import { GrSelect } from 'react-icons/gr'
 
 import { ActionStatus, ActionType } from '@domain/action.types'
 import { CycleReport } from '@domain/task.types'
@@ -123,6 +124,8 @@ export interface ActionIconProps extends IconProps {
 const actionIcons = {
     [ActionType.CLICK]: HiOutlineCursorClick,
     [ActionType.TYPE]: FaKeyboard,
+    [ActionType.HOVER]: FaMousePointer,
+    [ActionType.SELECT]: GrSelect,
     [ActionType.PRESS_ENTER]: PiKeyReturnBold,
     [ActionType.SCROLL]: PiMouseScroll,
     [ActionType.BACK]: IoArrowBackCircle,
