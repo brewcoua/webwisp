@@ -29,6 +29,9 @@ services:
             - path: ./.env.orchestrator
               required: true
 
+        secrets:
+            - gcloud-key
+
     worker:
         image: ghcr.io/brewcoua/webwisp-worker:master
 
@@ -84,3 +87,7 @@ networks:
 volumes:
     task_data:
         driver: local
+
+secrets:
+    gcloud-key:
+        file: ./.secrets/gcloud-key.json
