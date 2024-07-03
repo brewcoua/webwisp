@@ -12,9 +12,17 @@ import { Action, ActionSchema, IAction } from './action.model'
 export class CycleReport {
     @Prop({
         required: true,
-        type: ActionSchema,
+        type: [ActionSchema],
     })
-    action: Action
+    actions: Action[]
+
+    @Prop({
+        required: true,
+        type: String,
+        minLength: 6,
+        maxLength: 1024,
+    })
+    description: string
 
     @Prop({
         required: false,
@@ -32,7 +40,8 @@ export class CycleReport {
     duration: number
 
     constructor(report: ICycleReport) {
-        this.action = report.action
+        this.actions = report.actions
+        this.description = report.description
         this.reasoning = report.reasoning
         this.duration = report.duration
     }
@@ -43,7 +52,8 @@ export type CycleReportDocument = HydratedDocument<CycleReport>
 export const CycleReportSchema = SchemaFactory.createForClass(CycleReport)
 
 export interface ICycleReport extends ObjectLiteral {
-    action: IAction
+    actions: IAction[]
+    description: string
     reasoning?: string
     duration: number
 }

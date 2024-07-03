@@ -6,10 +6,10 @@ import { ActionType } from '@domain/action.types'
 
 const config: RunnerConfig = {
     cycles: {
-        total: 10,
+        total: 12,
         failed: {
-            total: 5,
-            action: 3,
+            total: 6,
+            action: 5,
             format: 3,
         },
     },

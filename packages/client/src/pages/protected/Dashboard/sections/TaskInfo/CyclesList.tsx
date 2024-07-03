@@ -8,7 +8,15 @@ import {
     Flex,
     Icon,
     IconProps,
+    Table,
+    TableCaption,
+    TableContainer,
+    Tbody,
+    Td,
     Text,
+    Th,
+    Thead,
+    Tr,
     useColorModeValue,
 } from '@chakra-ui/react'
 import { useMemo } from 'preact/hooks'
@@ -70,16 +78,18 @@ export interface CycleDisplayProps {
     cycle: CycleReport
 }
 export function CycleDisplay({ cycle }: CycleDisplayProps): JSX.Element {
-    const command = useMemo(() => {
-        const base = cycle.action.type
-        const args = Object.values(cycle.action.arguments || {}).map((arg) => {
-            if (typeof arg === 'string') return `"${arg}"`
-            return arg
-        })
+    const actionsCommands = useMemo(() => {
+        return cycle.actions.map((action) => {
+            const base = action.type
+            const args = Object.values(action.arguments || {}).map((arg) => {
+                if (typeof arg === 'string') return `"${arg}"`
+                return arg
+            })
 
-        if (args) return `$ ${base} ${args.join(' ')}`
-        return `$ ${base}`
-    }, [cycle.action])
+            if (args) return `${base} ${args.join(' ')}`
+            return base
+        })
+    }, [cycle.actions])
 
     return (
         <AccordionItem border="none">
@@ -92,11 +102,7 @@ export function CycleDisplay({ cycle }: CycleDisplayProps): JSX.Element {
                     borderRadius="md"
                 >
                     <Flex align="center" justify="flex-start" gap={2}>
-                        <StatusIcon status={cycle.action.status} />
-                        <Flex align="center" gap={1}>
-                            <ActionIcon type={cycle.action.type} />
-                            <Text>{cycle.action.description}</Text>
-                        </Flex>
+                        <Text>{cycle.description}</Text>
                     </Flex>
                     <Flex align="center" gap={1}>
                         <Text
@@ -110,8 +116,45 @@ export function CycleDisplay({ cycle }: CycleDisplayProps): JSX.Element {
                 </AccordionButton>
             </h2>
             <AccordionPanel pb={4}>
-                <Text>{cycle.reasoning}</Text>
-                <Code>{command}</Code>
+                <Text>{cycle.reasoning || 'No reasoning given.'}</Text>
+                <TableContainer
+                    mt={2}
+                    border="1px solid"
+                    borderColor="gray.300"
+                    borderRadius="md"
+                >
+                    <Table variant="striped" colorScheme="gray">
+                        <Thead>
+                            <Tr>
+                                <Th>Type</Th>
+                                <Th>Command</Th>
+                                <Th>Status</Th>
+                            </Tr>
+                        </Thead>
+                        <Tbody>
+                            {cycle.actions.map((action, index) => (
+                                <Tr key={index}>
+                                    <Td>
+                                        <ActionIcon type={action.type} />
+                                    </Td>
+                                    <Td>
+                                        <Code
+                                            bg={useColorModeValue(
+                                                'gray.200',
+                                                'gray.700'
+                                            )}
+                                        >
+                                            {actionsCommands[index]}
+                                        </Code>
+                                    </Td>
+                                    <Td>
+                                        <StatusIcon status={action.status} />
+                                    </Td>
+                                </Tr>
+                            ))}
+                        </Tbody>
+                    </Table>
+                </TableContainer>
             </AccordionPanel>
         </AccordionItem>
     )

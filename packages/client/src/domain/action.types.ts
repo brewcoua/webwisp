@@ -1,6 +1,5 @@
 export type Action = {
     type: ActionType
-    description: string
     arguments: ActionArguments
     status: ActionStatus
 }

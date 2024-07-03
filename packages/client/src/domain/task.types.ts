@@ -19,7 +19,7 @@ export interface TaskProps {
 
     cycles: CycleReport[]
 
-    correlation?: string
+    group?: string
     difficulty?: TaskDifficultyProps
     evaluation?: {
         results: TaskEvaluationResult[]
@@ -32,7 +32,7 @@ export interface CreateTaskProps {
     prompt: string
 
     login_script?: LoginScripts
-    correlation?: string
+    group?: string
     difficulty?: TaskDifficultyProps
     evaluation?: TaskEvaluationProps
 }
@@ -45,7 +45,8 @@ export enum TaskStatus {
 }
 
 export interface CycleReport {
-    action: Action
+    description: string
+    actions: Action[]
     reasoning?: string
     duration: number
 }

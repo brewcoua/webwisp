@@ -6,7 +6,8 @@ import {
 
 export type ParsedResult = {
     success: true
-    action: Action
+    actions: Action[]
+    description: string
     reasoning?: string
 }
 export default ParsedResult
@@ -14,6 +15,12 @@ export default ParsedResult
 export type ParseError = {
     success: false
     error: string
+}
+
+export type ParsedActions = {
+    success: true
+    description: string
+    actions: Action[]
 }
 
 export type ParsedAction = {

@@ -53,7 +53,7 @@ export class CreateTaskRequestDto {
 
     @ApiProperty({
         example: '60e1c1e2c1d6b2f8b9b3b2f8',
-        description: 'The correlation ID for the task',
+        description: 'The ID of the group the task belongs to',
         minLength: 24,
         maxLength: 24,
     })
@@ -63,7 +63,7 @@ export class CreateTaskRequestDto {
     @MinLength(24)
     @MaxLength(24)
     @Matches(/^[0-9a-f]{24}$/)
-    readonly correlation?: string
+    readonly group?: string
 
     @ApiProperty({
         type: () => TaskEvaluationConfigDto,

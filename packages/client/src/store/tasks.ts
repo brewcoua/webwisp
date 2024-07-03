@@ -131,6 +131,7 @@ onMount($tasks, () => {
                 addTask({
                     ...taskEvent.task,
                     id: taskEvent.id,
+                    status: TaskStatus.RUNNING,
                 })
                 break
             case TaskEventType.CYCLE_COMPLETED:

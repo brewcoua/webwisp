@@ -22,10 +22,10 @@ export default function TaskDetails({ task }: TaskDetailsProps): JSX.Element {
     const details = (
         <>
             <b>id:</b> {task.id}
-            {task.correlation && (
+            {task.group && (
                 <>
                     <br />
-                    <b>correlation:</b> {task.correlation}
+                    <b>group:</b> {task.group}
                 </>
             )}
             <br />

@@ -42,7 +42,8 @@ export enum TaskStatus {
 }
 
 export interface CycleReport {
-    action: Action
+    actions: Action[]
+    description: string
     reasoning?: string
     duration: number
 }

@@ -62,16 +62,20 @@ export abstract class ScenarioBase<
             tasks = tasks.slice(0, count)
         }
 
-        const correlation = await client.tasks.getCorrelation()
-        if (correlation) {
-            tasks = tasks.map((task) => ({ ...task, correlation }))
+        const group = await client.tasks.createGroup({
+            name: `${this.name} (${tasks.length}) [${new Date().toISOString()}]`,
+        })
+        if (!group) {
+            throw new Error('Failed to create group')
         }
+
+        tasks = tasks.map((task) => ({ ...task, group: group.id }))
 
         for (let i = 0; i < tasks.length; i += bulkSize) {
             const bulk = tasks.slice(i, i + bulkSize)
 
             console.log(
-                `Sending bulk of ${bulk.length} tasks with correlation ${correlation}`
+                `Sending bulk of ${bulk.length} tasks with group ${group.id}`
             )
             console.log(bulk)
 

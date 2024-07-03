@@ -58,8 +58,6 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
 
         const props = task.getProps()
 
-        console.log('eval', props.evaluation)
-
         const result = this.tasksQueue.sendToQueue(
             MessageQueues.Tasks,
             Buffer.from(
@@ -69,7 +67,7 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
                     prompt: props.prompt,
 
                     login_script: props.login_script,
-                    correlation: props.correlation,
+                    group: props.group,
                     difficulty: props.difficulty,
                     evaluation: props.evaluation && props.evaluation.config,
                 } as CreateTaskProps)

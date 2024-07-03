@@ -161,8 +161,12 @@ export default class ExecutionService {
             switch (cycleResult.status) {
                 case CycleStatus.SUCCESS: {
                     cycles.push(cycleResult.report)
-                    const action = cycleResult.report.action
-                    if (action.type === ActionType.DONE) {
+                    const actions = cycleResult.report.actions
+                    const action = actions.find(
+                        (action) => action.type === ActionType.DONE
+                    )
+
+                    if (action) {
                         return {
                             status:
                                 action.arguments.status === 'success'
@@ -194,7 +198,12 @@ export default class ExecutionService {
                         id: task.id,
                         cycle: cycleCounters.total,
                         failed: cycleCounters.failed,
-                        action: cycleResult.report.action,
+                        actions: cycleResult.report.actions,
+                    })
+                    this.worker.rabbitmq.emitTaskEvent({
+                        type: TaskEventType.CYCLE_COMPLETED,
+                        id: task.id,
+                        report: cycleResult.report,
                     })
 
                     break
@@ -305,19 +314,26 @@ export default class ExecutionService {
             }
         }
 
-        const action = parsed.action
-        const status = await page.perform(action)
+        const actions = parsed.actions
+        const performedActions = []
+        for (const action of actions) {
+            const status = await page.perform(action)
+            performedActions.push({
+                ...action,
+                status,
+            })
+        }
 
         return {
             status:
-                status === ActionStatus.COMPLETED
-                    ? CycleStatus.SUCCESS
-                    : CycleStatus.ACTION_FAILED,
+                performedActions.some(
+                    (action) => action.status === ActionStatus.FAILED
+                ) || !performedActions.length
+                    ? CycleStatus.ACTION_FAILED
+                    : CycleStatus.SUCCESS,
             report: {
-                action: {
-                    ...action,
-                    status,
-                },
+                description: parsed.description,
+                actions: performedActions,
                 reasoning: parsed.reasoning,
                 duration: Date.now() - startedAt,
             },

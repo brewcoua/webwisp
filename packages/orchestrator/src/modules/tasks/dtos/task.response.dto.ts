@@ -50,7 +50,7 @@ export default class TaskResponseDto extends ResponseBase implements TaskProps {
         description: 'The correlation of the task',
     })
     @ApiPropertyOptional()
-    readonly correlation?: string
+    readonly group?: string
 
     @ApiProperty({
         type: () => TaskDifficultyDto,
@@ -74,7 +74,7 @@ export default class TaskResponseDto extends ResponseBase implements TaskProps {
         this.message = props.message
         this.value = props.value
         this.cycles = props.cycles
-        this.correlation = props.correlation
+        this.group = props.group
         this.difficulty =
             props.difficulty && new TaskDifficultyDto(props.difficulty)
         this.evaluation =

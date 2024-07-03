@@ -1,6 +1,7 @@
 import { Provider } from '@nestjs/common'
 
 import {
+    TASK_GROUP_REPOSITORY,
     TASK_QUEUES_REPOSITORY,
     TASK_REPOSITORY,
     TRACES_REPOSITORY,
@@ -8,6 +9,7 @@ import {
 import TaskRepository from './task.repository'
 import TaskQueuesRepository from './queues.repository'
 import { TracesRepository } from './traces.repository'
+import TaskGroupRepository from './group.repository'
 
 export const Repositories: Provider[] = [
     {
@@ -21,5 +23,9 @@ export const Repositories: Provider[] = [
     {
         provide: TRACES_REPOSITORY,
         useClass: TracesRepository,
+    },
+    {
+        provide: TASK_GROUP_REPOSITORY,
+        useClass: TaskGroupRepository,
     },
 ]

@@ -10,6 +10,7 @@ import prompts, {
 import Message from './domain/Message'
 import { Action, ActionType } from '@domain/action.types'
 import { AbstractAction } from '@domain/action.abstract-types'
+import { CycleReport } from '@services/execution/domain/task.types'
 
 export default class MindTransformer {
     public makePrompt(placeholders: MindPromptPlaceholders): Message[] {
@@ -60,7 +61,7 @@ export default class MindTransformer {
                             url: placeholders.url,
                             task: placeholders.task,
                             previous_actions: placeholders.previous_cycles
-                                .map((cycle) => this.mapAction(cycle.action))
+                                .map((cycle) => this.mapCycle(cycle))
                                 .join('\n'),
                         }),
                     },
@@ -85,15 +86,19 @@ export default class MindTransformer {
         }, prompt)
     }
 
-    private mapAction(action: Action) {
-        return `- ${action.type} ${Object.keys(action.arguments)
-            .map((arg) => {
-                const value = action.arguments[arg]
-                return typeof value === 'string' ? `"${value}"` : value
+    private mapCycle(cycle: CycleReport) {
+        return `- ${cycle.description}\n\t${cycle.actions
+            .map((action) => {
+                const args = Object.values(action.arguments || {}).map(
+                    (arg) => {
+                        if (typeof arg === 'string') return `"${arg}"`
+                        return arg
+                    }
+                )
+
+                return `${action.type}${args ? ` ${args.join(' ')}` : ''}`
             })
-            .join(' ')} : ${action.description} ${
-            action.status ? `(${action.status})` : ''
-        }`
+            .join('\n\t')}`
     }
 
     private mapAbstractAction(

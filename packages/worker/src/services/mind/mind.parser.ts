@@ -2,6 +2,7 @@ import { ActionArguments, ActionStatus, ActionType } from '@domain/action.types'
 import ParsedResult, {
     ParseError,
     ParsedAction,
+    ParsedActions,
     ParsedArgument,
     ParsedArguments,
 } from './domain/ParsedResult'
@@ -41,18 +42,19 @@ export default class MindParser {
 
         return {
             success: true,
-            action: action.action,
+            description: action.description,
+            actions: action.actions,
             reasoning,
         }
     }
 
-    private parseAction(action: string): ParsedAction | ParseError {
+    private parseAction(action: string): ParsedActions | ParseError {
         const lines = action.split('\n')
 
-        if (lines.length !== 2) {
+        if (lines.length < 2) {
             return {
                 success: false,
-                error: `Line count mismatch (expected 2, got ${lines.length})`,
+                error: `Line count mismatch (expected more than 2, got ${lines.length})`,
             }
         }
 
@@ -68,40 +70,54 @@ export default class MindParser {
             }
         }
 
-        const actionLine = lines[1].trim()
-        if (!actionLine) {
+        const actionLines = lines.slice(1).map((line) => line.trim())
+        if (!actionLines.length) {
             return {
                 success: false,
                 error: 'No action line found',
             }
         }
 
-        const actionType = actionLine.split(' ')[0] as ActionType
-        const actionInfo = config.actions[actionType]
-        if (!actionInfo) {
-            return {
-                success: false,
-                error: `Unknown action type: ${actionType}`,
-            }
-        }
+        const actions: (ParsedAction | ParseError)[] = actionLines.map(
+            (line) => {
+                const actionType = line.split(' ')[0] as ActionType
+                const actionInfo = config.actions[actionType]
+                if (!actionInfo) {
+                    return {
+                        success: false,
+                        error: `Unknown action type: ${actionType}`,
+                    }
+                }
 
-        const args = actionLine.substring(actionType.length).trim()
-        const parsedArgs = this.parseArgs(args, actionInfo)
-        if (!parsedArgs.success) {
-            return {
-                success: false,
-                error: 'Failed to parse arguments:\n' + parsedArgs.error,
+                const args = line.substring(actionType.length).trim()
+                const parsedArgs = this.parseArgs(args, actionInfo)
+                if (!parsedArgs.success) {
+                    return {
+                        success: false,
+                        error:
+                            'Failed to parse arguments:\n' + parsedArgs.error,
+                    }
+                }
+
+                return {
+                    success: true,
+                    action: {
+                        status: ActionStatus.PENDING,
+                        type: actionType,
+                        arguments: parsedArgs.arguments,
+                    },
+                }
             }
+        )
+
+        if (actions.some((action) => !action.success)) {
+            return actions.find((action) => !action.success) as ParseError
         }
 
         return {
             success: true,
-            action: {
-                status: ActionStatus.PENDING,
-                type: actionType,
-                description: description.substring(2),
-                arguments: parsedArgs.arguments,
-            },
+            description: description.substring(2),
+            actions: actions.map((action) => (action as ParsedAction).action),
         }
     }
 

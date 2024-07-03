@@ -21,6 +21,7 @@ export class CreateTaskService implements ICommandHandler<CreateTaskCommand> {
             prompt: command.prompt,
 
             login_script: command.login_script,
+            group: command.group,
             difficulty: command.difficulty,
             evaluation: command.evaluation,
         })

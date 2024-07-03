@@ -9,8 +9,10 @@ import { MongooseModule } from '@nestjs/mongoose'
 import { ServeStaticModule } from '@nestjs/serve-static'
 
 import TasksMapper from './tasks.mapper'
+import TaskGroupMapper from './domain/group.mapper'
 
 import { Task, TaskSchema } from './database/models/task.model'
+import { TaskGroup, TaskGroupSchema } from './database/models/group.model'
 
 import { TasksController } from './tasks.controller'
 import { TASK_QUEUES_REPOSITORY, TRACES_REPOSITORY } from './tasks.tokens'
@@ -22,7 +24,7 @@ import { Repositories } from './database/repositories'
 import { QueryHandlers, QueryHttpControllers } from './queries'
 import { CommandHandlers, CommandHttpControllers } from './commands'
 
-const Mappers: Provider[] = [TasksMapper]
+const Mappers: Provider[] = [TasksMapper, TaskGroupMapper]
 
 @Module({
     imports: [
@@ -30,6 +32,10 @@ const Mappers: Provider[] = [TasksMapper]
             {
                 name: Task.name,
                 schema: TaskSchema,
+            },
+            {
+                name: TaskGroup.name,
+                schema: TaskGroupSchema,
             },
         ]),
         ServeStaticModule.forRoot({

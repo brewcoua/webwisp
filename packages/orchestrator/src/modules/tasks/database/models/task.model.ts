@@ -67,9 +67,9 @@ export class Task {
 
     @Prop({
         required: false,
-        type: String,
+        type: Types.ObjectId,
     })
-    correlation?: string
+    group?: Types.ObjectId
 
     @Prop({
         required: false,
@@ -90,7 +90,7 @@ export class Task {
         this.message = task.message
         this.value = task.value
         this.cycles = task.cycles
-        this.correlation = task.correlation
+        this.group = task.group
         this.difficulty = task.difficulty
         this.evaluation = task.evaluation
     }
@@ -113,7 +113,7 @@ export interface ITask extends ObjectLiteral {
     value?: string
     cycles: CycleReport[]
 
-    correlation?: string
+    group?: Types.ObjectId
     difficulty?: TaskDifficultyProps
     evaluation?: TaskProps['evaluation']
 }

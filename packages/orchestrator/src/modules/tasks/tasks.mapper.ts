@@ -27,7 +27,8 @@ export default class TasksMapper
             value: copy.value,
             cycles: copy.cycles,
 
-            correlation: copy.correlation,
+            group:
+                (copy.group && MongoUtils.toObjectId(copy.group)) || undefined,
             difficulty: copy.difficulty,
             evaluation: copy.evaluation,
         }
@@ -47,7 +48,7 @@ export default class TasksMapper
                 value: record.value,
                 cycles: record.cycles,
 
-                correlation: record.correlation,
+                group: record.group && MongoUtils.fromObjectId(record.group),
                 difficulty: record.difficulty,
                 evaluation: record.evaluation,
             },
@@ -69,7 +70,7 @@ export default class TasksMapper
             value: props.value,
             cycles: props.cycles,
 
-            correlation: props.correlation,
+            group: props.group,
             difficulty: props.difficulty,
             evaluation: props.evaluation,
         })

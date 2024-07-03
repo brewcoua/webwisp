@@ -20,14 +20,6 @@ export class Action {
     @Prop({
         required: true,
         type: String,
-        minlength: 3,
-        maxlength: 2048,
-    })
-    description: string
-
-    @Prop({
-        required: true,
-        type: String,
         enum: ActionStatus,
     })
     status: ActionStatus
@@ -40,7 +32,6 @@ export class Action {
 
     constructor(action: IAction) {
         this.type = action.type
-        this.description = action.description
         this.arguments = action.arguments
         this.status = action.status
     }
@@ -52,7 +43,6 @@ export const ActionSchema = SchemaFactory.createForClass(Action)
 
 export interface IAction extends ObjectLiteral {
     type: ActionType
-    description: string
     arguments: Record<string, string | number | boolean>
     status: ActionStatus
 }

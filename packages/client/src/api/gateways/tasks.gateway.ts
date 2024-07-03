@@ -5,6 +5,7 @@ import { CreateTaskProps, TaskProps } from '@domain/task.types'
 
 import { useAccessToken } from './auth.gateway'
 import { TaskEvent } from '@domain/task.events'
+import { CreateTaskGroupProps, TaskGroupProps } from '@domain/group.types'
 
 export default class TasksGateway {
     async createTask(task: CreateTaskProps): Promise<{ id: string }> {
@@ -61,13 +62,21 @@ export default class TasksGateway {
         return tasks.data
     }
 
-    async getCorrelation(): Promise<string | null> {
-        const response = await fetchAuthed(`${BASE_URL}/api/tasks/correlation`)
+    async createGroup(
+        props: CreateTaskGroupProps
+    ): Promise<TaskGroupProps | null> {
+        const response = await fetchAuthed(`${BASE_URL}/api/tasks/group`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(props),
+        })
         if (!response?.ok) {
             return null
         }
 
-        return response.text()
+        return response.json()
     }
 
     async getQueuedTasks(): Promise<TaskProps[] | null> {
