@@ -3,6 +3,7 @@ import { TaskProps, TaskStatus } from '@domain/task.types'
 import { signal } from '@preact/signals'
 import { createSlice } from '@reduxjs/toolkit'
 import { AppDispatch } from '@store'
+import { useAppSelector } from '@store/hooks'
 import axios from 'axios'
 
 export type TasksState = TaskProps[]
@@ -78,12 +79,17 @@ export const {
 } = tasksSlice.actions
 
 export const selectTasks = (state: { tasks: TasksState }) => state.tasks
+export const useTask = (id: string) => {
+    const tasks = useAppSelector(selectTasks)
+    return tasks.find((task) => task.id === id)
+}
+export const useTasks = () => {
+    return useAppSelector(selectTasks)
+}
 
 export default tasksSlice.reducer
 
 // Thunks
-
-export const tasksEventSource = signal<EventSource | null>(null)
 
 export const fetchTasks = () => async (dispatch: AppDispatch) => {
     try {
@@ -92,13 +98,25 @@ export const fetchTasks = () => async (dispatch: AppDispatch) => {
                 limit: 100,
             },
         })
-        dispatch(tasksSlice.actions.addTask(response.data))
+        dispatch(addTask(response.data))
         return true
     } catch (err) {
         return false
     }
 }
 
+export const deleteTask = (id: string) => async (dispatch: AppDispatch) => {
+    try {
+        await axios.delete(`/api/tasks/${id}`)
+        dispatch(removeTask(id))
+
+        return true
+    } catch (err) {
+        return false
+    }
+}
+
+export const tasksEventSource = signal<EventSource | null>(null)
 export const subscribeToTasks = () => async (dispatch: AppDispatch) => {
     try {
         const token = localStorage.getItem('access-token')

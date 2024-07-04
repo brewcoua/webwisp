@@ -1,6 +1,7 @@
 import { UserProps } from '@domain/user.types'
 import { createSlice } from '@reduxjs/toolkit'
 import { AppDispatch } from '@store'
+import { useAppSelector } from '@store/hooks'
 import axios from 'axios'
 
 export interface UserState extends UserProps {
@@ -40,6 +41,7 @@ export const userSlice = createSlice({
 export const { setUser, clearUser } = userSlice.actions
 
 export const selectUser = (state: { user: UserState }) => state.user
+export const useUser = () => useAppSelector(selectUser)
 
 export default userSlice.reducer
 

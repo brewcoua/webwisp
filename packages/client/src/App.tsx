@@ -1,7 +1,7 @@
 import { Flex } from '@chakra-ui/react'
 import { Switch, Route } from 'wouter-preact'
 import { Login, SignUp, NotFound } from './pages'
-import { UnauthedShell } from '@hoc'
+import { AuthedShell, UnauthedShell } from '@hoc'
 
 export default function App() {
     return (
@@ -10,7 +10,7 @@ export default function App() {
                 <Route path="/login">{UnauthedShell(<Login />)}</Route>
                 <Route path="/signup">{UnauthedShell(<SignUp />)}</Route>
 
-                <Route path="/"></Route>
+                <Route path="/">{AuthedShell(<Dashboard />)}</Route>
 
                 <Route>{UnauthedShell(<NotFound />)}</Route>
 
