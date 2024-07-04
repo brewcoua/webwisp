@@ -8,7 +8,9 @@
         "strict": true,
         "declaration": false,
         "noEmit": true,
+
         "jsx": "react-jsx",
+        "jsxImportSource": "preact",
 
         "skipLibCheck": true,
         "skipDefaultLibCheck": true,
@@ -22,19 +24,23 @@
 
         "lib": ["ES2022", "DOM"],
 
-        "rootDir": ".",
         "baseUrl": ".",
+        "rootDir": "src",
+        "outDir": "dist",
 
         "paths": {
             "@domain/*": ["src/domain/*"],
             "@api/*": ["src/api/*"],
-            "@store/*": ["src/store/*"],
             "@logic/*": ["src/logic/*"],
+
+            "@hoc": ["src/hoc"],
+            "@hoc/*": ["src/hoc/*"],
+            "@features/*": ["src/features/*"],
+            "@store": ["src/store"],
+            "@store/*": ["src/store/*"],
             
             "react": ["./node_modules/preact/compat/"],
-            "react/jsx-runtime": ["./node_modules/preact/jsx-runtime"],
             "react-dom": ["./node_modules/preact/compat/"],
-            "react-dom/*": ["./node_modules/preact/compat/*"]
         }
     },
     "include": ["src/**/*"],

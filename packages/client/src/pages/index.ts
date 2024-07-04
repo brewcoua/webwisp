@@ -1,2 +1,3 @@
-export { default as ProtectedPages } from './protected'
-export { default as PublicPages } from './public'
+export { default as Login } from './login'
+export { default as SignUp } from './signup'
+export { default as NotFound } from './not_found'
