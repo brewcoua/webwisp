@@ -1,16 +1,23 @@
-import { useState } from 'preact/hooks'
-import { Flex, Text, useToast } from '@chakra-ui/react'
+import { useEffect, useState } from 'preact/hooks'
+import { Flex, Spinner, Text, useToast } from '@chakra-ui/react'
 
 import { TaskProps } from '@domain/task.types'
 import BentoBox from '@features/ui/BentoBox'
 import { useAppDispatch } from '@store/hooks'
 
 import TaskItem from './TaskItem'
-import { deleteTask, useTasks } from '../tasks.slice'
+import {
+    deleteTask,
+    fetchTasks,
+    subscribeToTasks,
+    useTasks,
+} from '../tasks.slice'
 import { selectTask } from '../selected.slice'
 
 export default function TasksList() {
     const [isDeleting, setIsDeleting] = useState<string | null>(null)
+    const [isLoading, setIsLoading] = useState(false)
+
     const toast = useToast()
 
     const tasks = useTasks()
@@ -45,6 +52,16 @@ export default function TasksList() {
         setIsDeleting(null)
     }
 
+    useEffect(() => {
+        const load = async () => {
+            if (await dispatch(fetchTasks())) {
+                await dispatch(subscribeToTasks())
+            }
+        }
+        setIsLoading(true)
+        load().finally(() => setIsLoading(false))
+    }, [])
+
     return (
         <BentoBox
             h="100%"
@@ -53,7 +70,7 @@ export default function TasksList() {
             position="relative"
             overflow="hidden"
         >
-            {tasks.length > 0 && (
+            {!isLoading && tasks.values.length > 0 && (
                 <Flex
                     position="absolute"
                     top={0}
@@ -65,7 +82,7 @@ export default function TasksList() {
                     direction="column"
                     gap={2}
                 >
-                    {tasks.map((task) => (
+                    {tasks.values.map((task) => (
                         <TaskItem
                             key={task.id}
                             task={task}
@@ -77,9 +94,14 @@ export default function TasksList() {
                     ))}
                 </Flex>
             )}
-            {tasks.length === 0 && (
+            {!isLoading && tasks.values.length === 0 && (
                 <Flex h="100%" w="100%" align="center" justify="center">
                     <Text fontSize="lg">No tasks found</Text>
+                </Flex>
+            )}
+            {isLoading && (
+                <Flex h="100%" w="100%" align="center" justify="center">
+                    <Spinner size="lg" />
                 </Flex>
             )}
         </BentoBox>

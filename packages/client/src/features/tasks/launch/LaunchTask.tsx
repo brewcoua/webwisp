@@ -14,14 +14,17 @@ import {
 import { useState } from 'preact/hooks'
 import { MdRocketLaunch } from 'react-icons/md'
 
-import BentoBox from '../BentoBox'
-import { useClient } from '@api/client'
+import BentoBox from '@features/ui/BentoBox'
 import { UserScopes } from '@domain/user.types'
+import { useAppDispatch } from '@store/hooks'
 
-export default function LaunchTask(): JSX.Element {
+import { createTask } from '../tasks.slice'
+
+export default function LaunchTask() {
     const [target, setTarget] = useState<string>('')
     const [prompt, setPrompt] = useState<string>('')
     const [isLaunching, setIsLaunching] = useState(false)
+    const dispatch = useAppDispatch()
 
     const isTargetValid = ((): boolean => {
         try {
@@ -35,11 +38,10 @@ export default function LaunchTask(): JSX.Element {
         prompt.length > 0 && prompt.trim().split(' ').length >= 3
 
     const onLaunch = async (): Promise<void> => {
-        const client = useClient()
         setIsLaunching(true)
 
         try {
-            await client.tasks.createTask({ target, prompt })
+            await dispatch(createTask({ target, prompt }))
             setTarget('')
             setPrompt('')
         } catch (e) {
@@ -92,7 +94,7 @@ export default function LaunchTask(): JSX.Element {
                             <Input
                                 type="url"
                                 placeholder="https://example.com"
-                                onChange={(e) => setTarget(e.target.value)}
+                                onChange={(e: any) => setTarget(e.target.value)}
                                 value={target}
                             />
                         </FormControl>
@@ -100,7 +102,7 @@ export default function LaunchTask(): JSX.Element {
                             <FormLabel>Prompt</FormLabel>
                             <Textarea
                                 placeholder="Check that the page loads."
-                                onChange={(e) => setPrompt(e.target.value)}
+                                onChange={(e: any) => setPrompt(e.target.value)}
                                 value={prompt}
                                 size="sm"
                                 rows={3}

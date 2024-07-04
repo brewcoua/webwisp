@@ -49,7 +49,7 @@ export default selectTaskSlice.reducer
 
 export const queryTaskTrace = (id: string) => async (dispatch: AppDispatch) => {
     try {
-        const response = await axios.get(`/api/tasks/trace/${id}`)
+        const response = await axios.get(`/tasks/trace/${id}`)
         dispatch(setTraceUrl(response.data.url))
         return true
     } catch (err) {

@@ -4,6 +4,7 @@ import { signal } from '@preact/signals'
 import { createSlice } from '@reduxjs/toolkit'
 import { AppDispatch } from '@store'
 import { useAppSelector } from '@store/hooks'
+import { formatUrl } from '@store/query'
 import axios from 'axios'
 
 export type WorkersState = WorkerProps[]
@@ -26,6 +27,7 @@ export const workersSlice = createSlice({
                     new Date(a.updatedAt).getTime()
                 )
             })
+            return state
         },
         addWorkers: (state, action) => {
             // First, filter out any duplicate from the state
@@ -42,6 +44,8 @@ export const workersSlice = createSlice({
                     new Date(a.updatedAt).getTime()
                 )
             })
+
+            return state
         },
         removeWorker: (state, action) => {
             return state.filter((worker) => worker.id !== action.payload)
@@ -97,7 +101,7 @@ export default workersSlice.reducer
 
 export const fetchWorkers = () => async (dispatch: AppDispatch) => {
     try {
-        const response = await axios.get('/api/workers')
+        const response = await axios.get('/workers')
         dispatch(addWorkers(response.data))
         return true
     } catch (err) {
@@ -118,7 +122,9 @@ export const subscribeToWorkers = () => async (dispatch: AppDispatch) => {
         }
 
         const eventSource = new EventSource(
-            `/api/workers/subscribe?access_token=${encodeURIComponent(token)}`
+            formatUrl(
+                `/workers/subscribe?access_token=${encodeURIComponent(token)}`
+            )
         )
 
         eventSource.onmessage = (message) => {

@@ -1,24 +1,11 @@
-import {
-    Box,
-    Code,
-    Flex,
-    Icon,
-    IconProps,
-    Link,
-    Stack,
-    StackDivider,
-    Text,
-    useColorModeValue,
-} from '@chakra-ui/react'
+import { Box, Code, Flex, Link, Stack, StackDivider } from '@chakra-ui/react'
 import { TaskProps } from '@domain/task.types'
-
-import { IconType } from 'react-icons/lib'
 
 export interface TaskDetailsProps {
     task: TaskProps
 }
 
-export default function TaskDetails({ task }: TaskDetailsProps): JSX.Element {
+export default function TaskDetails({ task }: TaskDetailsProps) {
     const details = (
         <>
             <b>id:</b> {task.id}
@@ -106,77 +93,6 @@ export default function TaskDetails({ task }: TaskDetailsProps): JSX.Element {
             >
                 {details}
             </Code>
-        </Stack>
-    )
-}
-
-export interface DetailsFieldProps {
-    icon?: IconType
-    iconColor?: IconProps['color']
-    label: string
-    value: string
-    isLink?: boolean
-    isArea?: boolean
-}
-
-export function DetailsField({
-    icon,
-    iconColor,
-    label,
-    value,
-    isLink,
-    isArea,
-}: DetailsFieldProps): JSX.Element {
-    const TextComponent = isLink ? (
-        <Link
-            href={value}
-            isExternal
-            bg={useColorModeValue('gray.300', 'gray.600')}
-            px={2}
-            py={1}
-            borderRadius="md"
-        >
-            {value}
-        </Link>
-    ) : (
-        <Text
-            bg={useColorModeValue('gray.300', 'gray.600')}
-            px={2}
-            py={1}
-            borderRadius="md"
-        >
-            {value}
-        </Text>
-    )
-
-    if (isArea) {
-        return (
-            <Stack direction="column" spacing={1}>
-                <Flex align="center" justify="flex-start" gap={1.5}>
-                    {icon && <Icon as={icon} color={iconColor} />}
-                    <Text>{label} :</Text>
-                </Flex>
-                <Text
-                    bg={useColorModeValue('gray.300', 'gray.600')}
-                    px={2}
-                    py={1}
-                    borderRadius="md"
-                    minH="5rem"
-                    minW="20rem"
-                >
-                    {value}
-                </Text>
-            </Stack>
-        )
-    }
-
-    return (
-        <Stack direction="row" spacing={2}>
-            <Flex align="center" justify="flex-start" gap={1.5}>
-                {icon && <Icon as={icon} color={iconColor} />}
-                <Text>{label} :</Text>
-            </Flex>
-            {TextComponent}
         </Stack>
     )
 }

@@ -1,5 +1,3 @@
-import { useStore } from '@nanostores/preact'
-import { $tasks } from '@store/tasks'
 import {
     Flex,
     Spinner,
@@ -12,51 +10,40 @@ import {
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'preact/hooks'
 
-import BentoBox from '../../BentoBox'
-import Preview from './Preview'
+import BentoBox from '@features/ui/BentoBox'
+import { useAppDispatch } from '@store/hooks'
 
-import CyclesList from './CyclesList'
-import { TaskProps } from '@domain/task.types'
-import { useClient } from '@api/client'
 import TaskDetails from './TaskDetails'
-import { $selected_task } from '@store/selected_task'
+import CyclesList from './CyclesList'
+import Preview from './Preview'
+import { queryTaskTrace, useSelectedTask } from '../selected.slice'
 
-export default function TaskInfo(): JSX.Element {
+export default function TaskInfo() {
     const [isLoading, setIsLoading] = useState(false)
 
-    const [task, setTask] = useState<TaskProps | null>(null)
-    const [trace, setTrace] = useState<string | null>(null)
-
-    const tasks = useStore($tasks)
-    const selectedTask = useStore($selected_task)
+    const selectedTask = useSelectedTask()
+    const dispatch = useAppDispatch()
 
     useEffect(() => {
-        if (!selectedTask) {
-            setTask(null)
-        }
-
-        const foundTask = tasks.find((task) => task.id === selectedTask)
-        if (foundTask) {
-            setTask(foundTask)
+        if (selectedTask.id && !selectedTask.trace_url) {
             setIsLoading(true)
-            useClient()
-                .tasks.getTrace(foundTask.id)
-                .then((trace) => {
-                    setTrace(trace)
-                    setIsLoading(false)
-                })
+            dispatch(queryTaskTrace(selectedTask.id)).then(() =>
+                setIsLoading(false)
+            )
         }
     }, [selectedTask])
 
     return (
         <BentoBox direction="column" gap={5} h="100%" w="80%" p={3}>
-            {(!task || isLoading) && (
+            {(!selectedTask.id || isLoading) && (
                 <Flex justify="center" align="center" h="100%" w="100%">
-                    {!task && <Text>Select a task to view its details</Text>}
+                    {!selectedTask.id && (
+                        <Text>Select a task to view its details</Text>
+                    )}
                     {isLoading && <Spinner size="lg" />}
                 </Flex>
             )}
-            {task && !isLoading && (
+            {selectedTask.id && !isLoading && (
                 <Tabs
                     h="100%"
                     defaultIndex={0}
@@ -72,13 +59,13 @@ export default function TaskInfo(): JSX.Element {
                     </TabList>
                     <TabPanels h="100%">
                         <TabPanel h="100%">
-                            <TaskDetails task={task} />
+                            <TaskDetails task={selectedTask} />
                         </TabPanel>
                         <TabPanel h="100%">
-                            <CyclesList cycles={task.cycles} />
+                            <CyclesList cycles={selectedTask.cycles} />
                         </TabPanel>
                         <TabPanel h="100%">
-                            <Preview trace={trace} />
+                            <Preview trace={selectedTask.trace_url} />
                         </TabPanel>
                     </TabPanels>
                 </Tabs>

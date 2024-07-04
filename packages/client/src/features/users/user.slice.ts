@@ -49,7 +49,7 @@ export default userSlice.reducer
 
 export const fetchUser = () => async (dispatch: AppDispatch) => {
     try {
-        const response = await axios.get('/api/auth/me')
+        const response = await axios.get('/auth/me')
         dispatch(userSlice.actions.setUser(response.data))
         return true
     } catch (err) {
@@ -60,11 +60,13 @@ export const fetchUser = () => async (dispatch: AppDispatch) => {
 export const login =
     (username: string, password: string) => async (dispatch: AppDispatch) => {
         try {
-            const response = await axios.post('/api/auth/login', {
+            const response = await axios.post('/auth/login', {
                 username,
                 password,
             })
             localStorage.setItem('access-token', response.data.access_token)
+            axios.defaults.headers.common['Authorization'] =
+                `Bearer ${response.data.access_token}`
 
             return await dispatch(fetchUser())
         } catch (err) {
@@ -75,7 +77,7 @@ export const login =
 export const signUp =
     (username: string, password: string) => async (dispatch: AppDispatch) => {
         try {
-            await axios.post('/api/auth/signup', {
+            await axios.post('/auth/signup', {
                 username,
                 password,
             })

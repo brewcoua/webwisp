@@ -1,11 +1,12 @@
 import { Flex, Spinner, Text, useColorModeValue } from '@chakra-ui/react'
+import { formatUrl } from '@store/query'
 import { useEffect, useRef, useState } from 'preact/hooks'
 
 export interface PreviewProps {
-    trace: string | null
+    trace?: string
 }
 
-export default function Preview({ trace }: PreviewProps): JSX.Element {
+export default function Preview({ trace }: PreviewProps) {
     if (!trace) {
         return (
             <Flex
@@ -29,7 +30,9 @@ export default function Preview({ trace }: PreviewProps): JSX.Element {
         }
 
         setIsLoading(true)
-        frameRef.current.src = trace
+        frameRef.current.src = formatUrl(
+            `/tasks/viewer/-/?trace=${formatUrl(trace.substring(4))}`
+        )
 
         const onLoad = async () => {
             const iframeDocument =

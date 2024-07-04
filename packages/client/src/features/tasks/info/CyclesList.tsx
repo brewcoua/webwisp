@@ -9,7 +9,6 @@ import {
     Icon,
     IconProps,
     Table,
-    TableCaption,
     TableContainer,
     Tbody,
     Td,
@@ -41,7 +40,7 @@ export interface CyclesListProps {
     cycles: CycleReport[]
 }
 
-export default function CyclesList({ cycles }: CyclesListProps): JSX.Element {
+export default function CyclesList({ cycles }: CyclesListProps) {
     return (
         <Flex position="relative" h="100%" w="100%" overflow="hidden">
             <Flex
@@ -77,7 +76,7 @@ export default function CyclesList({ cycles }: CyclesListProps): JSX.Element {
 export interface CycleDisplayProps {
     cycle: CycleReport
 }
-export function CycleDisplay({ cycle }: CycleDisplayProps): JSX.Element {
+export function CycleDisplay({ cycle }: CycleDisplayProps) {
     const actionsCommands = useMemo(() => {
         return cycle.actions.map((action) => {
             const base = action.type
@@ -175,7 +174,7 @@ const actionIcons = {
     [ActionType.FORWARD]: IoArrowForwardCircle,
     [ActionType.DONE]: IoCheckmarkDoneCircle,
 }
-export function ActionIcon({ type, ...props }: ActionIconProps): JSX.Element {
+export function ActionIcon({ type, ...props }: ActionIconProps) {
     const IconKind = actionIcons[type]
     return <Icon as={IconKind} {...props} />
 }
@@ -196,7 +195,7 @@ const statusIcons = {
     [ActionStatus.PENDING]: MdOutlinePending,
 }
 
-export function StatusIcon({ status, ...props }: StatusIconProps): JSX.Element {
+export function StatusIcon({ status, ...props }: StatusIconProps) {
     return (
         <Icon
             color={statusColors[status]}

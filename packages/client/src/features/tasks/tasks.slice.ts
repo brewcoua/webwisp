@@ -1,14 +1,19 @@
 import { TaskEvent, TaskEventType } from '@domain/task.events'
-import { TaskProps, TaskStatus } from '@domain/task.types'
+import { CreateTaskProps, TaskProps, TaskStatus } from '@domain/task.types'
 import { signal } from '@preact/signals'
 import { createSlice } from '@reduxjs/toolkit'
 import { AppDispatch } from '@store'
 import { useAppSelector } from '@store/hooks'
+import { formatUrl } from '@store/query'
 import axios from 'axios'
 
-export type TasksState = TaskProps[]
+export interface TasksState {
+    values: TaskProps[]
+}
 
-const initialState: TasksState = []
+const initialState: TasksState = {
+    values: [],
+}
 
 export const tasksSlice = createSlice({
     name: 'tasks',
@@ -16,52 +21,61 @@ export const tasksSlice = createSlice({
     reducers: {
         addTask: (state, action) => {
             // First, filter out any duplicate from the state
-            state = state.filter((task) => task.id !== action.payload.id)
+            state.values = state.values.filter(
+                (task) => task.id !== action.payload.id
+            )
             // Then add the new task
-            state.push(action.payload)
+            state.values.push(action.payload)
             // Then sort the tasks by their updatedAt date
-            state.sort((a, b) => {
+            state.values.sort((a, b) => {
                 return (
                     new Date(b.updatedAt).getTime() -
                     new Date(a.updatedAt).getTime()
                 )
             })
+            return state
         },
         addTasks: (state, action) => {
             // First, filter out any duplicate from the state
-            state = state.filter(
+            state.values = state.values.filter(
                 (task) =>
                     !action.payload.some((t: TaskProps) => t.id === task.id)
             )
             // Then add the new tasks
-            state.push(...action.payload)
+            state.values.push(...action.payload)
             // Then sort the tasks by their updatedAt date
-            state.sort((a, b) => {
+            state.values.sort((a, b) => {
                 return (
                     new Date(b.updatedAt).getTime() -
                     new Date(a.updatedAt).getTime()
                 )
             })
+            return state
         },
         removeTask: (state, action) => {
-            return state.filter((task) => task.id !== action.payload)
+            state.values.filter((task) => task.id !== action.payload)
+            return state
         },
         addTaskCycle: (state, action) => {
-            const task = state.find((task) => task.id === action.payload.id)
+            const task = state.values.find(
+                (task) => task.id === action.payload.id
+            )
             if (task) {
                 task.cycles.push(action.payload.cycle)
             }
             return state
         },
         setTaskStatus: (state, action) => {
-            const task = state.find((task) => task.id === action.payload.id)
+            const task = state.values.find(
+                (task) => task.id === action.payload.id
+            )
             if (task) {
                 task.status = action.payload.status
             }
             return state
         },
         clearTaskCycles: (state, action) => {
-            const task = state.find((task) => task.id === action.payload)
+            const task = state.values.find((task) => task.id === action.payload)
             if (task) {
                 task.cycles = []
             }
@@ -72,6 +86,7 @@ export const tasksSlice = createSlice({
 
 export const {
     addTask,
+    addTasks,
     removeTask,
     addTaskCycle,
     setTaskStatus,
@@ -81,7 +96,7 @@ export const {
 export const selectTasks = (state: { tasks: TasksState }) => state.tasks
 export const useTask = (id: string) => {
     const tasks = useAppSelector(selectTasks)
-    return tasks.find((task) => task.id === id)
+    return tasks.values.find((task) => task.id === id)
 }
 export const useTasks = () => {
     return useAppSelector(selectTasks)
@@ -93,12 +108,12 @@ export default tasksSlice.reducer
 
 export const fetchTasks = () => async (dispatch: AppDispatch) => {
     try {
-        const response = await axios.get('/api/tasks', {
+        const response = await axios.get('/tasks', {
             params: {
                 limit: 100,
             },
         })
-        dispatch(addTask(response.data))
+        dispatch(addTasks(response.data.data))
         return true
     } catch (err) {
         return false
@@ -107,12 +122,39 @@ export const fetchTasks = () => async (dispatch: AppDispatch) => {
 
 export const deleteTask = (id: string) => async (dispatch: AppDispatch) => {
     try {
-        await axios.delete(`/api/tasks/${id}`)
+        await axios.delete(`/tasks/${id}`)
         dispatch(removeTask(id))
 
         return true
     } catch (err) {
         return false
+    }
+}
+
+export const createTask = (task: CreateTaskProps) => async () => {
+    try {
+        await axios.post('/tasks/create', task)
+        return true
+    } catch (err) {
+        return false
+    }
+}
+
+export const createTaskBulk = (tasks: CreateTaskProps[]) => async () => {
+    try {
+        await axios.post('/tasks/bulk', tasks)
+        return true
+    } catch (err) {
+        return false
+    }
+}
+
+export const createTaskGroup = (props: { name: string }) => async () => {
+    try {
+        const response = await axios.post('/tasks/group', props)
+        return response.data
+    } catch (err) {
+        return null
     }
 }
 
@@ -129,7 +171,9 @@ export const subscribeToTasks = () => async (dispatch: AppDispatch) => {
         }
 
         const eventSource = new EventSource(
-            `/api/tasks/subscribe?access_token=${encodeURIComponent(token)}`
+            formatUrl(
+                `/tasks/subscribe?access_token=${encodeURIComponent(token)}`
+            )
         )
 
         eventSource.onmessage = (message) => {

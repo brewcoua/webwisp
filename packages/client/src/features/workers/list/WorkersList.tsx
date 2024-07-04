@@ -1,29 +1,33 @@
-import { useStore } from '@nanostores/preact'
-import { Accordion, SlideFade, Text } from '@chakra-ui/react'
+import { Accordion, Flex, SlideFade, Spinner, Text } from '@chakra-ui/react'
 
-import { $workers } from '@store/workers'
-import { useClient } from '@api/client'
 import { useEffect, useState } from 'preact/hooks'
 
-import BentoBox from '../../BentoBox'
+import BentoBox from '@features/ui/BentoBox'
+import { useAppDispatch } from '@store/hooks'
+
 import { WorkerItem } from './WorkerItem'
+import { fetchWorkers, subscribeToWorkers, useWorkers } from '../workers.slice'
 
-import styles from './WorkersList.module.scss'
+export default function WorkersList() {
+    const workers = useWorkers()
+    const dispatch = useAppDispatch()
 
-export default function WorkersList(): JSX.Element {
+    const [isLoading, setIsLoading] = useState(false)
+
     useEffect(() => {
-        useClient()
-            .workers.getWorkers()
-            .then((workers) => {
-                $workers.set(workers)
-            })
-    }, [])
+        const load = async () => {
+            if (await dispatch(fetchWorkers())) {
+                await dispatch(subscribeToWorkers())
+            }
+        }
 
-    const workers = useStore($workers)
+        setIsLoading(true)
+        load().finally(() => setIsLoading(false))
+    }, [])
 
     return (
         <BentoBox h="100%" w="50%" position="relative" overflow="hidden">
-            {workers.length > 0 && (
+            {!isLoading && workers.length > 0 && (
                 <Accordion
                     position="absolute"
                     top="0"
@@ -31,7 +35,6 @@ export default function WorkersList(): JSX.Element {
                     bottom="0"
                     right="0"
                     overflowY="auto"
-                    className={styles.workersList}
                     allowToggle
                     p={2}
                 >
@@ -40,7 +43,7 @@ export default function WorkersList(): JSX.Element {
                     ))}
                 </Accordion>
             )}
-            {workers.length === 0 && (
+            {!isLoading && workers.length === 0 && (
                 <SlideFade
                     in
                     offsetY="20px"
@@ -55,6 +58,11 @@ export default function WorkersList(): JSX.Element {
                         No workers available
                     </Text>
                 </SlideFade>
+            )}
+            {isLoading && (
+                <Flex justify="center" align="center" h="100%" w="100%">
+                    <Spinner size="lg" />
+                </Flex>
             )}
         </BentoBox>
     )

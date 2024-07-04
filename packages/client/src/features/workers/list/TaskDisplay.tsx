@@ -6,32 +6,20 @@ import {
     Flex,
     Icon,
     Link,
-    Spinner,
     useColorModeValue,
 } from '@chakra-ui/react'
-import { TaskProps } from '@domain/task.types'
-import { getTask } from '@store/tasks'
-import { useEffect, useState } from 'preact/hooks'
+import { IconType } from 'react-icons'
 import { FaExternalLinkAlt } from 'react-icons/fa'
 
+import { useTask } from '@features/tasks/tasks.slice'
+
 export interface TaskDisplayProps extends AccordionPanelProps {
-    task: string
+    task_id: string
 }
-export default function TaskDisplay({
-    task,
-    ...rest
-}: TaskDisplayProps): JSX.Element {
-    const [isLoading, setIsLoading] = useState(true)
-    const [props, setProps] = useState<TaskProps | null>(null)
+export default function TaskDisplay({ task_id, ...rest }: TaskDisplayProps) {
+    const task = useTask(task_id)
 
-    useEffect(() => {
-        getTask(task).then((task) => {
-            setProps(task)
-            setIsLoading(false)
-        })
-    }, [])
-
-    if (isLoading) {
+    if (!task) {
         return (
             <AccordionPanel
                 h="5rem"
@@ -39,29 +27,26 @@ export default function TaskDisplay({
                 display="flex"
                 justifyContent="center"
                 alignItems="center"
+                {...rest}
             >
-                <Spinner size="lg" />
+                Task not found
             </AccordionPanel>
         )
     }
 
-    if (!props) {
-        return <AccordionPanel {...rest}>Task not found</AccordionPanel>
-    }
-
     return (
-        <AccordionPanel {...rest}>
+        <AccordionPanel display="flex" flexDirection="column" gap={2} {...rest}>
             <TextDisplay icon={FaExternalLinkAlt} isLink>
-                {props.target}
+                {task.target}
             </TextDisplay>
-            <TextDisplay minH="5rem">{props.prompt}</TextDisplay>
+            <TextDisplay minH="5rem">{task.prompt}</TextDisplay>
         </AccordionPanel>
     )
 }
 
 export interface TextDisplayProps extends BoxProps {
     children: string
-    icon?: React.ElementType
+    icon?: IconType
     isLink?: boolean
 }
 export function TextDisplay({
@@ -69,7 +54,7 @@ export function TextDisplay({
     icon,
     isLink,
     ...props
-}: TextDisplayProps): JSX.Element {
+}: TextDisplayProps) {
     return (
         <Flex gap={2} alignItems="center">
             {icon && <Icon as={icon} fontSize="lg" />}

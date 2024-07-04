@@ -1,7 +1,7 @@
 import axios from 'axios'
 import { ReactNode } from 'preact/compat'
 
-const withAuthorization = (node: ReactNode) => {
+const withAuthorization = (node: ReactNode): ReactNode => {
     // Set default headers for axios
     const token = localStorage.getItem('access-token')
     if (token) {

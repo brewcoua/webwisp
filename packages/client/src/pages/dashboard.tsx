@@ -1,12 +1,12 @@
 import { Flex } from '@chakra-ui/react'
 
-import LaunchTask from './sections/LaunchTask'
-import LaunchScenario from './sections/LaunchScenario'
-import WorkersList from './sections/WorkersList'
-import TasksList from './sections/TasksList'
-import TaskInfo from './sections/TaskInfo'
+import TaskInfo from '@features/tasks/info'
+import { LaunchScenario, LaunchTask } from '@features/tasks/launch'
+import TasksList from '@features/tasks/list'
 
-export default function Dashboard(): JSX.Element {
+import WorkersList from '@features/workers/list'
+
+export default function Dashboard() {
     return (
         <Flex
             h="200%"

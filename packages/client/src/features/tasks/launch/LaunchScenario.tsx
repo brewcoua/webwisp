@@ -10,10 +10,7 @@ import {
     Text,
     Spinner,
     Link,
-    Input,
     useColorModeValue,
-    Grid,
-    GridItem,
     NumberInput,
     NumberInputField,
     NumberInputStepper,
@@ -23,7 +20,7 @@ import {
 import { useEffect, useState } from 'preact/hooks'
 import { MdRocketLaunch } from 'react-icons/md'
 
-import BentoBox from '../BentoBox'
+import BentoBox from '@features/ui/BentoBox'
 import { UserScopes } from '@domain/user.types'
 import { VWAClassifiedsScenario } from '@logic/scenarios'
 import { ScenarioBase } from '@domain/logic/scenario.base'
@@ -32,7 +29,7 @@ export const scenarios: ScenarioBase<any, any, any>[] = [
     new VWAClassifiedsScenario(),
 ]
 
-export default function LaunchScenario(): JSX.Element {
+export default function LaunchScenario() {
     const [selectedScenario, setSelectedScenario] = useState<string>('')
     const [isLoading, setIsLoading] = useState<boolean>(false)
 
@@ -110,7 +107,7 @@ export default function LaunchScenario(): JSX.Element {
                             <FormLabel>Scenario</FormLabel>
                             <Select
                                 placeholder="Select scenario"
-                                onChange={(e) =>
+                                onChange={(e: any) =>
                                     setSelectedScenario(e.target.value)
                                 }
                                 value={selectedScenario}
@@ -172,7 +169,7 @@ export default function LaunchScenario(): JSX.Element {
                                                 <Select
                                                     placeholder="Select launch type"
                                                     defaultValue={'single'}
-                                                    onChange={(e) => {
+                                                    onChange={(e: any) => {
                                                         if (
                                                             e.target.value !==
                                                                 'single' &&
@@ -225,7 +222,7 @@ export default function LaunchScenario(): JSX.Element {
                                                 ) : (
                                                     <Select
                                                         placeholder="Select task"
-                                                        onChange={(e) =>
+                                                        onChange={(e: any) =>
                                                             setScenarioTask(
                                                                 e.target.value
                                                             )

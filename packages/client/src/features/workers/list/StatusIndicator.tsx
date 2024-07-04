@@ -14,7 +14,7 @@ export interface StatusIndicatorProps extends BoxProps {
 export default function StatusIndicator({
     status,
     ...props
-}: StatusIndicatorProps): JSX.Element {
+}: StatusIndicatorProps) {
     const baseProps: BoxProps = {
         h: '0.75rem',
         w: '0.75rem',
