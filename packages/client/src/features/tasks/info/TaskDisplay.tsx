@@ -10,7 +10,6 @@ import {
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'preact/hooks'
 
-import BentoBox from '@features/ui/BentoBox'
 import { useAppDispatch } from '@store/hooks'
 
 import TaskDetails from './TaskDetails'
@@ -18,14 +17,14 @@ import CyclesList from './CyclesList'
 import Preview from './Preview'
 import { queryTaskTrace, useSelectedTask } from '../selected.slice'
 
-export default function TaskInfo() {
+export default function TaskDisplay() {
     const [isLoading, setIsLoading] = useState(false)
 
     const selectedTask = useSelectedTask()
     const dispatch = useAppDispatch()
 
     useEffect(() => {
-        if (selectedTask.id && !selectedTask.trace_url) {
+        if (selectedTask && !selectedTask.trace_url) {
             setIsLoading(true)
             dispatch(queryTaskTrace(selectedTask.id)).then(() =>
                 setIsLoading(false)
@@ -34,16 +33,16 @@ export default function TaskInfo() {
     }, [selectedTask])
 
     return (
-        <BentoBox direction="column" gap={5} h="100%" w="80%" p={3}>
-            {(!selectedTask.id || isLoading) && (
+        <>
+            {(!selectedTask || isLoading) && (
                 <Flex justify="center" align="center" h="100%" w="100%">
-                    {!selectedTask.id && (
+                    {!selectedTask && (
                         <Text>Select a task to view its details</Text>
                     )}
                     {isLoading && <Spinner size="lg" />}
                 </Flex>
             )}
-            {selectedTask.id && !isLoading && (
+            {selectedTask && !isLoading && (
                 <Tabs
                     h="100%"
                     defaultIndex={0}
@@ -70,6 +69,6 @@ export default function TaskInfo() {
                     </TabPanels>
                 </Tabs>
             )}
-        </BentoBox>
+        </>
     )
 }

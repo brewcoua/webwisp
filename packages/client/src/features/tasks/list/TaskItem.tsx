@@ -44,15 +44,15 @@ export default function TaskItem({
         <SlideFade in offsetY="20px" style={{ width: '100%' }}>
             <Button
                 bg={useColorModeValue('gray.200', 'gray.600')}
-                opacity={selectedTask.id === task.id ? 1 : 0.7}
+                opacity={selectedTask?.id === task.id ? 1 : 0.7}
                 _hover={{
-                    opacity: selectedTask.id === task.id ? 1 : 0.9,
+                    opacity: selectedTask?.id === task.id ? 1 : 0.9,
                 }}
                 _active={{
                     bg: useColorModeValue('gray.200', 'gray.600'),
-                    scale: 0.8,
+                    transform: 'scale(0.99)',
                 }}
-                transition="scale 0.1s"
+                transition="transform 0.05s"
                 display="flex"
                 align="center"
                 justify="space-between"

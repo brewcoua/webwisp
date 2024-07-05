@@ -58,6 +58,8 @@ export default class TaskQueuesRepository implements TaskQueuesRepositoryPort {
 
         const props = task.getProps()
 
+        console.log(props.difficulty, props.group)
+
         const result = this.tasksQueue.sendToQueue(
             MessageQueues.Tasks,
             Buffer.from(

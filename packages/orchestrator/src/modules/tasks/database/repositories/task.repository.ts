@@ -9,6 +9,8 @@ import TaskEntity from '../../domain/task.entity'
 import { ITask, Task } from '../models/task.model'
 import { TaskRepositoryPort } from './task.repository.port'
 import TasksMapper from '../../tasks.mapper'
+import { MatchQueryParams, PaginatedQueryParams } from '@domain/ddd'
+import { MongoUtils } from '@domain/utils'
 
 @Injectable()
 export default class TaskRepository
@@ -21,5 +23,30 @@ export default class TaskRepository
         eventEmitter: EventEmitter2
     ) {
         super(mapper, eventEmitter)
+    }
+
+    public async findAllPaginatedByGroup(
+        params: PaginatedQueryParams,
+        group?: string,
+        matches?: MatchQueryParams[]
+    ) {
+        return this.findPaginated(params, [
+            // If group is undefined, match all tasks that don't have a group
+            {
+                $match: {
+                    group: group
+                        ? MongoUtils.toObjectId(group)
+                        : { $exists: false },
+                },
+            },
+            ...(matches || []).map((match) => ({
+                $match: {
+                    [match.key]: {
+                        $regex: match.query,
+                        $options: 'i',
+                    },
+                },
+            })),
+        ])
     }
 }

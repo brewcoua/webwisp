@@ -21,76 +21,6 @@ export interface TaskDetailsProps {
 }
 
 export default function TaskDetails({ task }: TaskDetailsProps) {
-    const details = (
-        <>
-            <b>id:</b> {task.id}
-            {task.group && (
-                <>
-                    <br />
-                    <b>group:</b> {task.group}
-                </>
-            )}
-            <br />
-            <b>status:</b> {task.status}
-            <br />
-            <b>target: </b>
-            <Link href={task.target} isExternal>
-                {task.target}
-            </Link>
-            <br />
-            <b>prompt:</b> {task.prompt}
-            {task.message && (
-                <>
-                    <br />
-                    <br />
-                    <b>message:</b> {task.message}
-                </>
-            )}
-            {task.value && (
-                <>
-                    <br />
-                    <b>value:</b> {task.value}
-                </>
-            )}
-            {task.difficulty && (
-                <>
-                    <br />
-                    <br />
-                    <b>difficulty:</b> {task.difficulty.visual_difficulty} /{' '}
-                    {task.difficulty.reasoning_difficulty} /{' '}
-                    {task.difficulty.overall_difficulty}
-                    <br />
-                </>
-            )}
-            {task.evaluation && (
-                <>
-                    <br />
-                    <b>evaluation:</b>
-                    <Flex ml={3} direction="column">
-                        <Box>
-                            <b>results: </b>
-                            {task.evaluation.results
-                                .reduce((acc, res) => acc + res.score, 0)
-                                .toString() + ' '}
-                            / {task.evaluation.results.length}
-                        </Box>
-                        <b>config:</b>
-                        <Flex ml={3} direction="column">
-                            {task.evaluation.config.eval_types.map((type) => (
-                                <Box>
-                                    <b>{type}: </b>
-                                    {task.evaluation?.results.find(
-                                        (res) => res.type === type
-                                    )?.score || 'N/A'}
-                                </Box>
-                            ))}
-                        </Flex>
-                    </Flex>
-                </>
-            )}
-        </>
-    )
-
     return (
         <Stack
             spacing={4}
@@ -185,6 +115,17 @@ export function OverallDetails({ task }: TaskDetailsProps) {
                         )}
                     </Flex>
                 )}
+
+                <HStack divider={<StackDivider />} spacing={2}>
+                    <Flex gap={1}>
+                        <Text fontWeight="bold">Created:</Text>
+                        <Text>{new Date(task.createdAt).toLocaleString()}</Text>
+                    </Flex>
+                    <Flex gap={1}>
+                        <Text fontWeight="bold">Updated:</Text>
+                        <Text>{new Date(task.updatedAt).toLocaleString()}</Text>
+                    </Flex>
+                </HStack>
             </CardBody>
         </Card>
     )

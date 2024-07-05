@@ -1,56 +1,82 @@
-import { TaskProps, TaskStatus } from '@domain/task.types'
+import { TaskGroupProps } from '@domain/group.types'
+import { TaskProps } from '@domain/task.types'
 import { createSlice } from '@reduxjs/toolkit'
 import { AppDispatch } from '@store'
 import { useAppSelector } from '@store/hooks'
 import axios from 'axios'
 
-export interface SelectedTaskState extends TaskProps {
-    trace_url?: string
+export interface SelectedState {
+    task?: TaskProps & { trace_url?: string }
+    group?: TaskGroupProps
+    display?: 'task' | 'group'
 }
 
-const initialState: SelectedTaskState = {
-    id: '',
-    createdAt: '',
-    updatedAt: '',
+const initialState: SelectedState = {}
 
-    target: '',
-    prompt: '',
-
-    status: TaskStatus.PENDING,
-    cycles: [],
-}
-
-export const selectTaskSlice = createSlice({
-    name: 'selected_task',
+export const selectedSlice = createSlice({
+    name: 'selected',
     initialState,
     reducers: {
         selectTask: (state, action) => {
-            return action.payload
+            state.task = action.payload
+            return state
+        },
+        selectGroup: (state, action) => {
+            state.group = action.payload
+            return state
         },
         clearTask: (state) => {
-            return initialState
+            state.task = undefined
+            return state
         },
-        setTraceUrl: (state, action) => {
-            state.trace_url = action.payload
+        clearGroup: (state) => {
+            state.group = undefined
+            return state
+        },
+        setSelectedTraceUrl: (state, action) => {
+            if (state.task) {
+                state.task.trace_url = action.payload
+            }
+            return state
+        },
+        setDisplay: (state, action) => {
+            state.display = action.payload
+            return state
         },
     },
 })
 
-export const { selectTask, clearTask, setTraceUrl } = selectTaskSlice.actions
+export const {
+    selectTask,
+    selectGroup,
+    clearTask,
+    clearGroup,
+    setSelectedTraceUrl,
+    setDisplay,
+} = selectedSlice.actions
 
-export const selectSelectedTask = (state: {
-    selected_task: SelectedTaskState
-}) => state.selected_task
+export const selectSelected = (state: { selected: SelectedState }) =>
+    state.selected
+export const selectSelectedTask = (state: { selected: SelectedState }) =>
+    state.selected.task
+export const selectSelectedGroup = (state: { selected: SelectedState }) =>
+    state.selected.group
+export const selectSelectedDisplay = (state: { selected: SelectedState }) =>
+    state.selected.display
+
+export const useSelected = () => useAppSelector(selectSelected)
 export const useSelectedTask = () => useAppSelector(selectSelectedTask)
+export const useSelectedGroup = () => useAppSelector(selectSelectedGroup)
+export const useSelectedDisplay = () => useAppSelector(selectSelectedDisplay)
 
-export default selectTaskSlice.reducer
+export default selectedSlice.reducer
 
 // Thunks
 
 export const queryTaskTrace = (id: string) => async (dispatch: AppDispatch) => {
     try {
         const response = await axios.get(`/tasks/trace/${id}`)
-        dispatch(setTraceUrl(response.data.url))
+        dispatch(setSelectedTraceUrl(response.data.url))
         return true
     } catch (err) {
         return false

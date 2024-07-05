@@ -54,6 +54,8 @@ export default class ExecutionService {
                 target: task.target,
                 prompt: task.prompt,
                 id: task.id,
+                group: task.group,
+                difficulty: task.difficulty,
             },
         })
 
@@ -83,6 +85,8 @@ export default class ExecutionService {
                 prompt: task.prompt,
                 status: TaskStatus.RUNNING,
                 cycles: [],
+                group: task.group,
+                difficulty: task.difficulty,
             },
         })
 

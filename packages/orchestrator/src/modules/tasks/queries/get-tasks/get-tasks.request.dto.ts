@@ -3,6 +3,7 @@ import {
     IsEnum,
     IsOptional,
     IsString,
+    Matches,
     MaxLength,
     MinLength,
 } from 'class-validator'
@@ -50,6 +51,20 @@ export class GetTasksRequestDto extends PaginatedQueryRequestDto<SortableTaskFie
     @MaxLength(512)
     @IsString()
     readonly prompt?: string
+
+    @ApiProperty({
+        example: '6687ba14da1b8221de863618',
+        description: 'Filter tasks by group',
+        required: false,
+        minLength: 24,
+        maxLength: 24,
+    })
+    @IsOptional()
+    @MinLength(24)
+    @MaxLength(24)
+    @IsString()
+    @Matches(/^[a-f0-9]{24}$/)
+    readonly group?: string
 
     @ApiProperty({
         example: SortableTaskFields.updatedAt,
