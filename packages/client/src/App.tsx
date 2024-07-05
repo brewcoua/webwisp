@@ -1,21 +1,33 @@
 import { Flex } from '@chakra-ui/react'
-import { Switch, Route } from 'wouter'
-import { ProtectedPages, PublicPages } from './pages'
-import NotFound from './pages/NotFound'
+import { Switch, Route } from 'wouter-preact'
+
+import { Login, SignUp, NotFound, Dashboard } from './pages'
+import { AuthedShell, UnauthedShell } from '@hoc'
 
 export default function App() {
     return (
         <Flex h="100vh" w="100%">
             <Switch>
-                <Route path="/signup" component={PublicPages} />
-                <Route path="/login" component={PublicPages} />
+                <Route path="/">
+                    <AuthedShell>
+                        <Dashboard />
+                    </AuthedShell>
+                </Route>
 
+                <Route path="/login">
+                    <UnauthedShell>
+                        <Login />
+                    </UnauthedShell>
+                </Route>
+                <Route path="/signup">
+                    <UnauthedShell>
+                        <SignUp />
+                    </UnauthedShell>
+                </Route>
                 <Route>
-                    <Switch>
-                        <Route path="/" component={ProtectedPages} />
-                        <Route path="/dashboard" component={ProtectedPages} />
-                        <Route component={NotFound} />
-                    </Switch>
+                    <UnauthedShell>
+                        <NotFound />
+                    </UnauthedShell>
                 </Route>
             </Switch>
         </Flex>

@@ -1,7 +1,12 @@
-import { useClient } from '@api/client'
 import { CreateTaskProps } from '../task.types'
 import { DatasetBase } from './dataset.base'
 import { DataEntity } from './data.entity'
+import { useAppDispatch } from '@store/hooks'
+import {
+    createTask,
+    createTaskBulk,
+    createTaskGroup,
+} from '@features/tasks/tasks.slice'
 
 export interface ScenarioBaseProps<T, Dataset extends DatasetBase<T>> {
     id: string
@@ -29,60 +34,6 @@ export abstract class ScenarioBase<
         this.name = props.name
         this.properties = props.properties
         this.dataset = props.dataset
-    }
-
-    public async launch(id: string): Promise<void> {
-        console.log(`Launching scenario ${this.name} with id ${id}`)
-
-        const client = useClient()
-        const task = this.entities.find((entity) => entity.id === id)?.toTask()
-
-        if (!task) {
-            throw new Error(`Task with id ${id} not found`)
-        }
-
-        await client.tasks.createTask(task)
-
-        console.log(`Scenario ${this.name} launched`)
-    }
-
-    public async bulk(count?: number): Promise<void> {
-        console.log(`Launching scenario ${this.name} as bulk`)
-
-        // We'll send tasks in bulk of 30 tasks
-        const bulkSize = 30
-        const client = useClient()
-
-        if (!this.entities.length) {
-            await this.initialize()
-        }
-
-        let tasks = this.toTasks()
-        if (count) {
-            tasks = tasks.slice(0, count)
-        }
-
-        const group = await client.tasks.createGroup({
-            name: `${this.name} (${tasks.length}) [${new Date().toISOString()}]`,
-        })
-        if (!group) {
-            throw new Error('Failed to create group')
-        }
-
-        tasks = tasks.map((task) => ({ ...task, group: group.id }))
-
-        for (let i = 0; i < tasks.length; i += bulkSize) {
-            const bulk = tasks.slice(i, i + bulkSize)
-
-            console.log(
-                `Sending bulk of ${bulk.length} tasks with group ${group.id}`
-            )
-            console.log(bulk)
-
-            await client.tasks.bulkTasks(bulk)
-        }
-
-        console.log(`Scenario ${this.name} launched`)
     }
 
     public clear(): void {
