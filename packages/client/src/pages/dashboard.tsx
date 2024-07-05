@@ -1,6 +1,6 @@
 import { Flex } from '@chakra-ui/react'
 
-import TaskInfo from '@features/tasks/info'
+import InfoDisplay from '@features/tasks/info'
 import { LaunchScenario, LaunchTask } from '@features/tasks/launch'
 import TasksList from '@features/tasks/list'
 
@@ -45,7 +45,7 @@ export default function Dashboard() {
                 justifyContent="center"
             >
                 <TasksList />
-                <TaskInfo />
+                <InfoDisplay />
             </Flex>
         </Flex>
     )

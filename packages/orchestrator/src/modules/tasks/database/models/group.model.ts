@@ -31,8 +31,10 @@ export interface ITaskGroup extends ObjectLiteral {
     name: string
 }
 
-export const SortableTaskGroupFiles = {
+export const SortableTaskGroupFields = {
     name: 'name',
 } satisfies {
     [key in keyof ITaskGroup]?: string
 }
+export type SortableTaskGroupField =
+    (typeof SortableTaskGroupFields)[keyof typeof SortableTaskGroupFields]

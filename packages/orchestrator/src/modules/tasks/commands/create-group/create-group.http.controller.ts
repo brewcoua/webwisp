@@ -36,7 +36,7 @@ export class CreateTaskGroupHttpController {
     @ApiBearerAuth()
     @Scopes(UserScopes.EDIT)
     @HttpCode(HttpStatus.CREATED)
-    @Post('group')
+    @Post('groups')
     async createGroup(@Body() props: CreateTaskGroupRequestDto) {
         const command = new CreateTaskGroupCommand(props)
         const result: Result<TaskGroupEntity, Error> =

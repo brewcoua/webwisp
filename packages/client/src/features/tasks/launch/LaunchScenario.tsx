@@ -26,7 +26,8 @@ import { UserScopes } from '@domain/user.types'
 import { VWAClassifiedsScenario } from '@logic/scenarios'
 import { ScenarioBase } from '@domain/logic/scenario.base'
 import { useAppDispatch } from '@store/hooks'
-import { createTask, createTaskBulk, createTaskGroup } from '../tasks.slice'
+import { createTask, createTaskBulk } from '../tasks.slice'
+import { createGroup } from '../groups.slice'
 
 export const scenarios: ScenarioBase<any, any, any>[] = [
     new VWAClassifiedsScenario(),
@@ -66,7 +67,7 @@ export default function LaunchScenario() {
             tasks = tasks.slice(0, scenarioTasks)
 
             const group = await dispatch(
-                createTaskGroup({
+                createGroup({
                     name: `${scenario.name} (${scenarioTasks} tasks)`,
                 })
             )

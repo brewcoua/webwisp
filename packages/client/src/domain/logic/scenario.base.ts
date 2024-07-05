@@ -1,12 +1,6 @@
 import { CreateTaskProps } from '../task.types'
 import { DatasetBase } from './dataset.base'
 import { DataEntity } from './data.entity'
-import { useAppDispatch } from '@store/hooks'
-import {
-    createTask,
-    createTaskBulk,
-    createTaskGroup,
-} from '@features/tasks/tasks.slice'
 
 export interface ScenarioBaseProps<T, Dataset extends DatasetBase<T>> {
     id: string

@@ -1,1 +1,1 @@
-export { default } from './TaskInfo'
+export { default } from './InfoDisplay'

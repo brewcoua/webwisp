@@ -64,7 +64,11 @@ export default function CyclesList({ cycles }: CyclesListProps) {
                         flexDir="column"
                     >
                         {cycles.map((cycle, index) => (
-                            <CycleDisplay key={index} cycle={cycle} />
+                            <CycleDisplay
+                                key={index}
+                                index={index}
+                                cycle={cycle}
+                            />
                         ))}
                     </Accordion>
                 )}
@@ -74,9 +78,10 @@ export default function CyclesList({ cycles }: CyclesListProps) {
 }
 
 export interface CycleDisplayProps {
+    index: number
     cycle: CycleReport
 }
-export function CycleDisplay({ cycle }: CycleDisplayProps) {
+export function CycleDisplay({ index, cycle }: CycleDisplayProps) {
     const actionsCommands = useMemo(() => {
         return cycle.actions.map((action) => {
             const base = action.type
@@ -96,12 +101,12 @@ export function CycleDisplay({ cycle }: CycleDisplayProps) {
                 <AccordionButton
                     alignItems="center"
                     justifyContent="space-between"
-                    bg={useColorModeValue('gray.300', 'gray.600')}
-                    _hover={{ bg: useColorModeValue('gray.400', 'gray.500') }}
+                    bg={useColorModeValue('gray.200', 'gray.600')}
+                    _hover={{ bg: useColorModeValue('gray.300', 'gray.500') }}
                     borderRadius="md"
                 >
                     <Flex align="center" justify="flex-start" gap={2}>
-                        <Text>{cycle.description}</Text>
+                        <Text>{`${index + 1}. ${cycle.description}`}</Text>
                     </Flex>
                     <Flex align="center" gap={1}>
                         <Text
