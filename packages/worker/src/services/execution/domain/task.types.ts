@@ -6,6 +6,7 @@ import {
 } from './task.eval'
 
 export interface TaskProps {
+    id: string
     target: string
     prompt: string
     status: TaskStatus

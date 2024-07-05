@@ -16,6 +16,7 @@ import {
     NumberInputStepper,
     NumberIncrementStepper,
     NumberDecrementStepper,
+    useToast,
 } from '@chakra-ui/react'
 import { useEffect, useState } from 'preact/hooks'
 import { MdRocketLaunch } from 'react-icons/md'
@@ -24,10 +25,14 @@ import BentoBox from '@features/ui/BentoBox'
 import { UserScopes } from '@domain/user.types'
 import { VWAClassifiedsScenario } from '@logic/scenarios'
 import { ScenarioBase } from '@domain/logic/scenario.base'
+import { useAppDispatch } from '@store/hooks'
+import { createTask, createTaskBulk, createTaskGroup } from '../tasks.slice'
 
 export const scenarios: ScenarioBase<any, any, any>[] = [
     new VWAClassifiedsScenario(),
 ]
+
+export const BULK_SIZE = 30
 
 export default function LaunchScenario() {
     const [selectedScenario, setSelectedScenario] = useState<string>('')
@@ -46,6 +51,9 @@ export default function LaunchScenario() {
     const [scenarioTasks, setScenarioTasks] = useState<number>(1)
     const [maxScenarioTasks, setMaxScenarioTasks] = useState<number>(1)
 
+    const dispatch = useAppDispatch()
+    const toast = useToast()
+
     const onLaunch = async () => {
         setIsLoading(true)
         if (!scenario) {
@@ -54,9 +62,77 @@ export default function LaunchScenario() {
         }
 
         if (isBulk) {
-            await scenario.bulk(scenarioTasks)
+            let tasks = scenario.toTasks()
+            tasks = tasks.slice(0, scenarioTasks)
+
+            const group = await dispatch(
+                createTaskGroup({
+                    name: `${scenario.name} (${scenarioTasks} tasks)`,
+                })
+            )
+            if (!group) {
+                setIsLoading(false)
+                toast({
+                    title: 'Error',
+                    description: 'Failed to create task group',
+                    status: 'error',
+                    duration: 5000,
+                    isClosable: true,
+                })
+                return
+            }
+
+            tasks = tasks.map((task) => ({ ...task, group: group.id }))
+
+            for (let i = 0; i < tasks.length; i += BULK_SIZE) {
+                const bulk = tasks.slice(i, i + BULK_SIZE)
+
+                const result = await dispatch(createTaskBulk(bulk))
+                if (!result) {
+                    setIsLoading(false)
+                    toast({
+                        title: 'Error',
+                        description: 'Failed to create task bulk',
+                        status: 'error',
+                        duration: 5000,
+                        isClosable: true,
+                    })
+                    return
+                }
+
+                console.log(
+                    `Sent bulk of ${bulk.length} tasks with group ${group.id}`
+                )
+            }
         } else {
-            await scenario.launch(scenarioTask || scenario.entities[0].id)
+            const taskId = scenarioTask || scenario.entities[0].id
+            const task = scenario.entities.find((t) => t.id === taskId)
+
+            if (!task) {
+                setIsLoading(false)
+                toast({
+                    title: 'Error',
+                    description: 'Task not found',
+                    status: 'error',
+                    duration: 5000,
+                    isClosable: true,
+                })
+                return
+            }
+
+            const result = await dispatch(createTask(task.toTask()))
+
+            if (!result) {
+                setIsLoading(false)
+                toast({
+                    title: 'Error',
+                    description: 'Failed to create task',
+                    status: 'error',
+                    duration: 5000,
+                    isClosable: true,
+                })
+                return
+            }
         }
 
         setIsLoading(false)

@@ -53,6 +53,7 @@ export default class ExecutionService {
                 ...result,
                 target: task.target,
                 prompt: task.prompt,
+                id: task.id,
             },
         })
 
@@ -70,13 +71,14 @@ export default class ExecutionService {
 
     async execute(
         task: CreateTaskProps
-    ): Promise<Omit<TaskProps, 'target' | 'prompt'>> {
+    ): Promise<Omit<TaskProps, 'id' | 'target' | 'prompt'>> {
         this.logger.verbose('Executing task', { id: task.id })
 
         this.worker.rabbitmq.emitTaskEvent({
             type: TaskEventType.STARTED,
             id: task.id,
             task: {
+                id: task.id,
                 target: task.target,
                 prompt: task.prompt,
                 status: TaskStatus.RUNNING,
