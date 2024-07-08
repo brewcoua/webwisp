@@ -71,11 +71,13 @@ const config: RunnerConfig = {
                 },
             ],
         },
+        /*
         press_enter: {
             description:
                 'Press the enter key on the keyboard. This does not type anything and may be used to submit forms.',
             example: 'press_enter',
         },
+        */
         scroll: {
             description:
                 'Scroll the page up or down, for 2/3 of the viewport height.',

@@ -30,6 +30,7 @@ const prompts: Prompts = {
             'To make your decision, you will be given everytime a screenshot of the current state of the website, the url and title of the page, and the full list of your previous actions, written by yourself in previous steps.\n' +
             'When trying to interact with an element, you will need to provide the label (colored number, associated with the bounding box over the element) most closely associated with it, as it is the only way to identify it. ' +
             'However, you must make sure that the label is the correct one, as the system will not check if the label is correct or not.\n' +
+            'Elements that can be typed into are striped, while clickable elements are filled with a solid color.\n\n' +
             'A successful action in the previous actions only means that it was performed, not that it did as expected. You must always check the result of the action to see if it was successful. ' +
             'In fact, the current state of the page matters way more than the previous actions, as it is the only way to know what is happening.\n' +
             'In priority, you should always try to filter results before even trying to scroll or interact with the page.\n' +

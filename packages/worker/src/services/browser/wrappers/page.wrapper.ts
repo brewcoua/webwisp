@@ -5,7 +5,7 @@ import { Logger } from 'winston'
 import config, { REMOTE_PORT } from '../browser.config'
 import { Action, ActionStatus, ActionType } from '@domain/action.types'
 
-const SoMUrl = 'https://unpkg.com/@brewcoua/web-som@1.2.3/SoM.min.js'
+const SoMUrl = 'https://unpkg.com/@brewcoua/web-som@1.2.4/SoM.min.js'
 
 export default class PageWrapper {
     private readonly logger: Logger
@@ -204,9 +204,9 @@ export default class PageWrapper {
                         action.arguments.direction === 'down' ? '' : '-'
                     }((window.innerHeight / 3) * 2) })`
                 )
-            } else if (action.type === ActionType.PRESS_ENTER) {
+            } /*else if (action.type === ActionType.PRESS_ENTER) {
                 await this.page.keyboard.press('Enter')
-            } else if (action.type === ActionType.BACK) {
+            }*/ else if (action.type === ActionType.BACK) {
                 await this.page.goBack({
                     waitUntil: 'domcontentloaded',
                 })

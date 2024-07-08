@@ -17,6 +17,13 @@ const config: BrowserConfig = {
     },
     context: {
         bypassCSP: true,
+        recordVideo: {
+            dir: '/data/videos',
+            size: {
+                width: 1280,
+                height: 720,
+            },
+        },
     },
     screenshot: {
         path: './dist/img/{{timestamp}}.png',

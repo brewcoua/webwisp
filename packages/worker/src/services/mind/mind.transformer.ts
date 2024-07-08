@@ -96,7 +96,9 @@ export default class MindTransformer {
                     }
                 )
 
-                return `${action.type}${args ? ` ${args.join(' ')}` : ''}`
+                return `${action.type}${args ? ` ${args.join(' ')}` : ''} [${
+                    action.status
+                }]`
             })
             .join('\n\t')}`
     }

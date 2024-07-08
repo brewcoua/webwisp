@@ -18,7 +18,7 @@ export enum ActionType {
     TYPE = 'type',
     HOVER = 'hover',
     SELECT = 'select',
-    PRESS_ENTER = 'press_enter',
+    //PRESS_ENTER = 'press_enter',
     SCROLL = 'scroll',
 
     BACK = 'back',
